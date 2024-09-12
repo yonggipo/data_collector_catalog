@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
+import 'package:data_collector_catalog/notification_util.dart';
 import 'package:flutter/material.dart';
 
 import 'light_sensor_util.dart';
@@ -48,6 +49,7 @@ class _MyAppState extends State {
     sensors = [
       // MicrophoneUtil.shared,
       LightSensorUtil.shared,
+      NotificationUtil.shared,
     ];
   }
 
@@ -55,9 +57,11 @@ class _MyAppState extends State {
     dev.log('start monitoring.. sensors: ${sensors.length}');
     for (var sensor in sensors) {
       sensor.start();
-      Timer.periodic(sensor.samplingInterval.duration, (Timer timer) {
-        sensor.start();
-      });
+      if (sensor.samplingInterval != SamplingInterval.event) {
+        Timer.periodic(sensor.samplingInterval.duration, (Timer timer) {
+          sensor.start();
+        });
+      }
     }
   }
 }

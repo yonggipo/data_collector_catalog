@@ -1,8 +1,8 @@
 enum SamplingInterval {
   event,
-  fiveMinutes,
-  fifteenMinutes,
-  fourHours,
+  min5,
+  min15,
+  h4,
 }
 
 extension SamplingIntervalExt on SamplingInterval {
@@ -10,11 +10,11 @@ extension SamplingIntervalExt on SamplingInterval {
     switch (this) {
       case SamplingInterval.event:
         return const Duration(seconds: 1);
-      case SamplingInterval.fiveMinutes:
+      case SamplingInterval.min5:
         return const Duration(minutes: 5);
-      case SamplingInterval.fifteenMinutes:
+      case SamplingInterval.min15:
         return const Duration(minutes: 15);
-      case SamplingInterval.fourHours:
+      case SamplingInterval.h4:
         return const Duration(hours: 4);
     }
   }

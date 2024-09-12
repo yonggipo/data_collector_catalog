@@ -12,7 +12,7 @@ final class MicrophoneUtil {
   factory MicrophoneUtil() => shared;
 
   FlutterAudioCapture plugin = FlutterAudioCapture();
-  final samplingInterval = SamplingInterval.fifteenMinutes;
+  final samplingInterval = SamplingInterval.min15;
 
   void listener(dynamic obj) {
     var buffer = Float64List.fromList(obj.cast<double>());

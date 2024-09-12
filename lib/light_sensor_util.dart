@@ -12,7 +12,7 @@ final class LightSensorUtil implements SensorUtil {
   factory LightSensorUtil() => shared;
 
   @override
-  final samplingInterval = SamplingInterval.fifteenMinutes;
+  final samplingInterval = SamplingInterval.min15;
   StreamSubscription? _subscription;
 
   @override
