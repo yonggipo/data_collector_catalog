@@ -1,5 +1,7 @@
+import 'package:data_collector_catalog/light_sensor_util.dart';
 import 'package:data_collector_catalog/microphone_util.dart';
 import 'package:flutter/material.dart';
+import 'package:light_sensor/light_sensor.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +21,8 @@ class _MyAppState extends State {
   void initState() {
     super.initState();
 
-    MicrophoneUtil().startListener();
+    // MicrophoneUtil().startListener();
+    LightSensorUtil.shared.start();
   }
 
   @override

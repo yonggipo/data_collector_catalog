@@ -1,7 +1,7 @@
 abstract class SensorUtil {
   Future<bool> requestPermission();
-  void process();
+  void start();
   void cancel();
   void onError(Object error);
-  void listener(dynamic obj);
+  void onData(dynamic object);
 }
