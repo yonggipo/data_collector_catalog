@@ -62,6 +62,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_audio_capture:
+    dependency: "direct main"
+    description:
+      name: flutter_audio_capture
+      sha256: "07c43d66f164e44790c1f5e8fa3066a2a65e270d8e3137e44033ef8330d82830"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.7"
   flutter_lints:
     dependency: "direct dev"
     description:
