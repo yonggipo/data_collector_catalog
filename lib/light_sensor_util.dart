@@ -40,6 +40,7 @@ final class LightSensorUtil implements SensorUtil {
 
   @override
   Future<bool> requestPermission() {
-    return Future.value(true);
+    // TODO: implement requestPermission
+    throw UnimplementedError();
   }
 }
