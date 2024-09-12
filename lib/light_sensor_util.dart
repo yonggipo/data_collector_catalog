@@ -1,8 +1,9 @@
 import 'dart:async';
-
-import 'package:light_sensor/light_sensor.dart';
 import 'dart:developer' as dev;
 
+import 'package:light_sensor/light_sensor.dart';
+
+import 'sampling_interval.dart';
 import 'sensor_util.dart';
 
 final class LightSensorUtil implements SensorUtil {
@@ -10,6 +11,8 @@ final class LightSensorUtil implements SensorUtil {
   LightSensorUtil._();
   factory LightSensorUtil() => shared;
 
+  @override
+  final samplingInterval = SamplingInterval.fifteenMinutes;
   StreamSubscription? _subscription;
 
   @override
@@ -20,7 +23,8 @@ final class LightSensorUtil implements SensorUtil {
 
   @override
   void onData(object) {
-    dev.log('LUX: $object');
+    dev.log('<light sensor> lux: $object');
+    cancel();
   }
 
   @override
@@ -30,7 +34,6 @@ final class LightSensorUtil implements SensorUtil {
 
   @override
   void start() async {
-    // LightSensor
     final hasSensor = await LightSensor.hasSensor();
     if (hasSensor) _subscription = LightSensor.luxStream().listen(onData);
   }

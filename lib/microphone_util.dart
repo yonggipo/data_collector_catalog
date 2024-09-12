@@ -4,12 +4,15 @@ import 'dart:typed_data';
 import 'package:flutter_audio_capture/flutter_audio_capture.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'sampling_interval.dart';
+
 final class MicrophoneUtil {
   static final MicrophoneUtil shared = MicrophoneUtil._();
   MicrophoneUtil._();
   factory MicrophoneUtil() => shared;
 
   FlutterAudioCapture plugin = FlutterAudioCapture();
+  final samplingInterval = SamplingInterval.fifteenMinutes;
 
   void listener(dynamic obj) {
     var buffer = Float64List.fromList(obj.cast<double>());

@@ -1,7 +1,11 @@
-import 'package:data_collector_catalog/light_sensor_util.dart';
-import 'package:data_collector_catalog/microphone_util.dart';
+import 'dart:async';
+import 'dart:developer' as dev;
+
 import 'package:flutter/material.dart';
-import 'package:light_sensor/light_sensor.dart';
+
+import 'light_sensor_util.dart';
+import 'sampling_interval.dart';
+import 'sensor_util.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,12 +21,14 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State {
+  List<SensorUtil> sensors = [];
+
   @override
   void initState() {
     super.initState();
 
-    // MicrophoneUtil().startListener();
-    LightSensorUtil.shared.start();
+    setupSensor();
+    startMonitoring();
   }
 
   @override
@@ -34,5 +40,24 @@ class _MyAppState extends State {
         ),
       ),
     );
+  }
+
+  // MARK: - private
+
+  void setupSensor() {
+    sensors = [
+      // MicrophoneUtil.shared,
+      LightSensorUtil.shared,
+    ];
+  }
+
+  void startMonitoring() {
+    dev.log('start monitoring.. sensors: ${sensors.length}');
+    for (var sensor in sensors) {
+      sensor.start();
+      Timer.periodic(sensor.samplingInterval.duration, (Timer timer) {
+        sensor.start();
+      });
+    }
   }
 }
