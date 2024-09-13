@@ -1,39 +1,53 @@
 import 'dart:developer' as dev;
 import 'dart:typed_data';
 
+import 'package:data_collector_catalog/sensor_util.dart';
 import 'package:flutter_audio_capture/flutter_audio_capture.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'sampling_interval.dart';
 
-final class MicrophoneUtil {
+final class MicrophoneUtil extends SensorUtil {
   static final MicrophoneUtil shared = MicrophoneUtil._();
   MicrophoneUtil._();
   factory MicrophoneUtil() => shared;
 
   FlutterAudioCapture plugin = FlutterAudioCapture();
-  final samplingInterval = SamplingInterval.min15;
 
-  void listener(dynamic obj) {
-    var buffer = Float64List.fromList(obj.cast<double>());
-    // dev.log('buffer: $buffer');
-    processAudioBuffer(buffer, 16000);
-  }
+  @override
+  final samplingInterval = SamplingInterval.min15;
 
   // Callback function if flutter_audio_capture failure to register
   // audio capture stream subscription.
+  @override
   void onError(Object e) {
     dev.log('error: $e');
   }
 
-  void startListener() async {
+  @override
+  void cancel() async {
+    // Stop to capture audio stream buffer
+    await plugin.stop();
+  }
+
+  @override
+  void onData(object) {
+    var buffer = Float64List.fromList(object.cast<double>());
+    // dev.log('buffer: $buffer');
+    processAudioBuffer(buffer, 16000);
+  }
+
+  @override
+  void start() async {
     // Start to capture audio stream buffer
     // sampleRate: sample rate you want
     // bufferSize: buffer size you want (iOS only)
     await plugin.init();
-    await requestMicrophonePermission();
-    await plugin.start(listener, onError, sampleRate: 16000, bufferSize: 3000);
+    await requestPermission();
+    await plugin.start(onData, onError, sampleRate: 16000, bufferSize: 3000);
   }
+
+  // MARK: - private
 
   // 예시의 간단한 에너지 계산 함수
   double calculateEnergy(Float64List buffer) {
@@ -57,19 +71,31 @@ final class MicrophoneUtil {
     double energy = calculateEnergy(buffer);
     double pitch = calculatePitch(buffer, sampleRate);
 
-    print('Energy: $energy dB');
-    print('Pitch: $pitch Hz');
+    dev.log('Energy: $energy dB');
+    dev.log('Pitch: $pitch Hz');
   }
 
-  void cancel() async {
-    // Stop to capture audio stream buffer
-    await plugin.stop();
-  }
-
-  Future<void> requestMicrophonePermission() async {
+  @override
+  Future<bool> requestPermission() async {
     var status = await Permission.microphone.status;
     if (!status.isGranted) {
-      await Permission.microphone.request();
+      return Permission.microphone.request().then((status) {
+        dev.log(status.toString());
+        return verifyStatus(status);
+      });
+    } else {
+      return verifyStatus(status);
+    }
+  }
+
+  bool verifyStatus(PermissionStatus status) {
+    switch (status) {
+      case PermissionStatus.denied ||
+            PermissionStatus.restricted ||
+            PermissionStatus.permanentlyDenied:
+        return false;
+      default:
+        return true;
     }
   }
 }

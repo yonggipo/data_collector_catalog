@@ -5,6 +5,7 @@ import 'package:data_collector_catalog/notification_util.dart';
 import 'package:flutter/material.dart';
 
 import 'light_sensor_util.dart';
+import 'microphone_util.dart';
 import 'sampling_interval.dart';
 import 'sensor_util.dart';
 
@@ -47,7 +48,7 @@ class _MyAppState extends State {
 
   void setupSensor() {
     sensors = [
-      // MicrophoneUtil.shared,
+      MicrophoneUtil.shared,
       LightSensorUtil.shared,
       NotificationUtil.shared,
     ];

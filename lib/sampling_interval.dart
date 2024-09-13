@@ -5,7 +5,7 @@ enum SamplingInterval {
   h4,
 }
 
-extension SamplingIntervalExt on SamplingInterval {
+extension SamplingIntervalGetters on SamplingInterval {
   Duration get duration {
     switch (this) {
       case SamplingInterval.event:

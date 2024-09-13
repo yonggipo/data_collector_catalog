@@ -23,7 +23,16 @@ final class NotificationUtil implements SensorUtil {
 
   @override
   void onData(object) {
-    dev.log('<notification util> notification: $object');
+    dev.log('<notification util> notification: $object', time: DateTime.now());
+    print(object);
+    // [log] <notification util> notification: ServiceNotificationEvent(
+    //         id: 1249065348
+    //         can reply: false
+    //         packageName: com.android.vending
+    //         title: 카카오톡 KakaoTalk을(를) 설치할 수 없음
+    //         content: 다시 시도해도 문제가 계속되면 일반적인 문제해결 방법을 참조하세요.
+    //         hasRemoved: false
+    //         haveExtraPicture: false
   }
 
   @override
