@@ -3,8 +3,8 @@ import 'dart:developer' as dev;
 
 import 'package:light_sensor/light_sensor.dart';
 
-import 'sensor_util.dart';
-import 'sampling_interval.dart';
+import '../sensor_util.dart';
+import '../sampling_interval.dart';
 
 final class LightSensorUtil implements SensorUtil {
   static final LightSensorUtil shared = LightSensorUtil._();

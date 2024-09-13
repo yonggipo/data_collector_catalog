@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 
 import 'sensors/light_sensor_util.dart';
 import 'sensors/microphone_util.dart';
-import 'sensors/sampling_interval.dart';
-import 'sensors/sensor_util.dart';
+import 'sampling_interval.dart';
+import 'sensor_util.dart';
 
 void main() {
   runApp(const MyApp());

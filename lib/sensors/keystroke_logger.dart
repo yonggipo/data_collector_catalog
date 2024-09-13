@@ -1,5 +1,5 @@
-import 'package:data_collector_catalog/sensors/sampling_interval.dart';
-import 'package:data_collector_catalog/sensors/sensor_util.dart';
+import 'package:data_collector_catalog/sampling_interval.dart';
+import 'package:data_collector_catalog/sensor_util.dart';
 
 final class KeystrokeLogger extends SensorUtil {
   @override

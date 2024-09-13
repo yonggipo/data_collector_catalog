@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:developer' as dev;
 import 'package:notification_listener_service/notification_listener_service.dart';
 
-import 'sampling_interval.dart';
-import 'sensor_util.dart';
+import '../sampling_interval.dart';
+import '../sensor_util.dart';
 import 'package:logger/logger.dart';
 
 final class NotificationUtil implements SensorUtil {

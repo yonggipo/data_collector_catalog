@@ -1,11 +1,11 @@
 import 'dart:developer' as dev;
 import 'dart:typed_data';
 
-import 'package:data_collector_catalog/sensors/sensor_util.dart';
+import 'package:data_collector_catalog/sensor_util.dart';
 import 'package:flutter_audio_capture/flutter_audio_capture.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import 'sampling_interval.dart';
+import '../sampling_interval.dart';
 
 final class MicrophoneUtil extends SensorUtil {
   static final MicrophoneUtil shared = MicrophoneUtil._();
