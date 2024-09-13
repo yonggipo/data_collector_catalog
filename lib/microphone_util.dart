@@ -45,6 +45,8 @@ final class MicrophoneUtil extends SensorUtil {
     await plugin.init();
     await requestPermission();
     await plugin.start(onData, onError, sampleRate: 16000, bufferSize: 3000);
+    await Future.delayed(const Duration(seconds: 1));
+    cancel();
   }
 
   // MARK: - private
