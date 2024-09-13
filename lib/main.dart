@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
-import 'package:data_collector_catalog/notification_util.dart';
+import 'package:data_collector_catalog/sensors/notification_util.dart';
 import 'package:flutter/material.dart';
 
-import 'light_sensor_util.dart';
-import 'microphone_util.dart';
-import 'sampling_interval.dart';
-import 'sensor_util.dart';
+import 'sensors/light_sensor_util.dart';
+import 'sensors/microphone_util.dart';
+import 'sensors/sampling_interval.dart';
+import 'sensors/sensor_util.dart';
 
 void main() {
   runApp(const MyApp());

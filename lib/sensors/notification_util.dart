@@ -4,6 +4,7 @@ import 'package:notification_listener_service/notification_listener_service.dart
 
 import 'sampling_interval.dart';
 import 'sensor_util.dart';
+import 'package:logger/logger.dart';
 
 final class NotificationUtil implements SensorUtil {
   static final NotificationUtil shared = NotificationUtil._();
@@ -21,11 +22,16 @@ final class NotificationUtil implements SensorUtil {
     _subscription = null;
   }
 
+  final logger = Logger(printer: PrettyPrinter());
+
   @override
   void onData(object) {
-    dev.log('<notification util> notification: $object');
+    dev.log('<notification util> notification: ${object.toString()}');
     dev.log('<notification util> notification: $object', time: DateTime.now());
     print(object);
+
+    logger.d(object.runtimeType);
+
     // [log] <notification util> notification: ServiceNotificationEvent(
     //         id: 1249065348
     //         can reply: false
@@ -34,6 +40,15 @@ final class NotificationUtil implements SensorUtil {
     //         content: 다시 시도해도 문제가 계속되면 일반적인 문제해결 방법을 참조하세요.
     //         hasRemoved: false
     //         haveExtraPicture: false
+
+    // I/flutter ( 9867): ServiceNotificationEvent(
+    // I/flutter ( 9867):       id: -1917236267
+    // I/flutter ( 9867):       can reply: true
+    // I/flutter ( 9867):       packageName: com.Slack
+    // I/flutter ( 9867):       title: 장하늬
+    // I/flutter ( 9867):       content: ㅋㅋㅋㅋ
+    // I/flutter ( 9867):       hasRemoved: false
+    // I/flutter ( 9867):       haveExtraPicture: false
   }
 
   @override
