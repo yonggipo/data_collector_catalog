@@ -23,6 +23,7 @@ final class NotificationUtil implements SensorUtil {
 
   @override
   void onData(object) {
+    dev.log('<notification util> notification: $object');
     dev.log('<notification util> notification: $object', time: DateTime.now());
     print(object);
     // [log] <notification util> notification: ServiceNotificationEvent(
@@ -48,12 +49,18 @@ final class NotificationUtil implements SensorUtil {
 
   @override
   void start() async {
+    dev.log('noti detection start');
     bool status = await NotificationListenerService.isPermissionGranted();
+    dev.log('noti detection status: $status');
+
     if (!status) {
       if (await requestPermission()) {
         /// stream the incoming notification events
         NotificationListenerService.notificationsStream.listen(onData);
       }
+    } else {
+      /// stream the incoming notification events
+      NotificationListenerService.notificationsStream.listen(onData);
     }
   }
 }
