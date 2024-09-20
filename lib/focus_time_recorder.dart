@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:developer' as dev;
 
+import 'package:flutter/services.dart';
+
 final class FocusTimeRecorder extends StatefulWidget {
   const FocusTimeRecorder({super.key});
 
@@ -64,19 +66,43 @@ class _FocusTimeRecorderState extends State<FocusTimeRecorder> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          TextField(
+          KeyboardListener(
+            onKeyEvent: (value) {
+              // 중간에 입력이 멈춘 시간??
+              if (value is KeyDownEvent) {
+                dev.log('Event: ${value.toString()}');
+                dev.log('Logical key label: ${value.logicalKey.keyLabel}');
+                dev.log('Event character: ${value.character}');
+              }
+
+              // for detect backspace
+              //  return event.logicalKey == LogicalKeyboardKey.keyQ
+              if (value.logicalKey == LogicalKeyboardKey.backspace) {
+                dev.log('Did backspace tapped!!');
+              }
+            },
             focusNode: _focusNode,
-            controller: _controller,
-            onChanged: _onTextChanged, // Track changes in the input text
-            decoration: const InputDecoration(
-              hintText: 'Focus on this TextField and start typing...',
+            child: TextField(
+              controller: _controller,
+              onChanged: _onTextChanged, // Track changes in the input text
+              decoration: const InputDecoration(
+                hintText: 'Focus on this textField and start typing...',
+              ),
             ),
           ),
+
+          // text: '안녕하세요'
+          // keyBoardEvent: [
+          //     {
+          //
+          //     }
+
           const SizedBox(height: 20),
           if (_focusDuration != null)
             Column(
               children: [
                 Text('Focus lasted for: ${_focusDuration!.inSeconds} seconds'),
+                Text('Input during focus: $_inputText'),
                 Text('Input during focus: $_inputText'),
               ],
             ),
