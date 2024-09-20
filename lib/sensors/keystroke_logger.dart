@@ -1,15 +1,29 @@
-import 'package:data_collector_catalog/sampling_interval.dart';
-import 'package:data_collector_catalog/sensor_util.dart';
+import 'dart:async';
+import 'dart:developer' as dev;
 
+import 'package:data_collector_catalog/sensors/key_event_listener.dart';
+
+import '../sampling_interval.dart';
+import '../sensor_util.dart';
+
+/// AOS - https://developer.android.com/reference/android/view/KeyEvent
+/// iOS -
 final class KeystrokeLogger extends SensorUtil {
+  StreamSubscription? _subscription;
+
+  @override
+  final samplingInterval = SamplingInterval.event;
+
   @override
   void cancel() {
-    // TODO: implement cancel
+    _subscription?.cancel();
+    _subscription = null;
   }
 
   @override
   void onData(object) {
-    // TODO: implement onData
+    dev.log('key stroke event: $object');
+    cancel();
   }
 
   @override
@@ -24,11 +38,7 @@ final class KeystrokeLogger extends SensorUtil {
   }
 
   @override
-  // TODO: implement samplingInterval
-  SamplingInterval get samplingInterval => throw UnimplementedError();
-
-  @override
   void start() {
-    // TODO: implement start
+    _subscription = KeyEventListener.keyEvnetStream.listen(onData);
   }
 }
