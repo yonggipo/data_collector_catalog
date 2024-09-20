@@ -25,7 +25,7 @@ class MainActivity: FlutterActivity() {
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        val keyEvent = event?.keyCharacterMap?.getNumber(keyCode)
+        val keyEvent = keyCode // event?.keyCharacterMap?.getNumber(keyCode)
         keyEventSink?.success(keyEvent)
         return super.onKeyDown(keyCode, event)
     }

@@ -1,13 +1,15 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
-import 'package:data_collector_catalog/sensors/notification_util.dart';
 import 'package:flutter/material.dart';
 
-import 'sensors/light_sensor_util.dart';
-import 'sensors/microphone_util.dart';
+import 'focus_time_recorder.dart';
 import 'sampling_interval.dart';
 import 'sensor_util.dart';
+import 'sensors/keystroke_logger.dart';
+import 'sensors/light_sensor_util.dart';
+import 'sensors/microphone_util.dart';
+import 'sensors/notification_util.dart';
 
 void main() {
   runApp(const MyApp());
@@ -40,6 +42,7 @@ class _MyAppState extends State {
         appBar: AppBar(
           title: const Text('Data Collector Catalog'),
         ),
+        body: const FocusTimeRecorder(),
       ),
     );
   }
@@ -51,6 +54,7 @@ class _MyAppState extends State {
       MicrophoneUtil.shared,
       LightSensorUtil.shared,
       NotificationUtil.shared,
+      KeystrokeLogger.shared,
     ];
   }
 

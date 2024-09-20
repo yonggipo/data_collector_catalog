@@ -9,6 +9,9 @@ import '../sensor_util.dart';
 /// AOS - https://developer.android.com/reference/android/view/KeyEvent
 /// iOS -
 final class KeystrokeLogger extends SensorUtil {
+  static final KeystrokeLogger shared = KeystrokeLogger._();
+  KeystrokeLogger._();
+  factory KeystrokeLogger() => shared;
   StreamSubscription? _subscription;
 
   @override
@@ -23,7 +26,6 @@ final class KeystrokeLogger extends SensorUtil {
   @override
   void onData(object) {
     dev.log('key stroke event: $object');
-    cancel();
   }
 
   @override
