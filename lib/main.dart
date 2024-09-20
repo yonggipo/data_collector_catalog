@@ -3,7 +3,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 
-import 'focus_time_recorder.dart';
+import 'keystroke/focus_time_recorder.dart';
 import 'sampling_interval.dart';
 import 'sensor_util.dart';
 import 'sensors/keystroke_logger.dart';

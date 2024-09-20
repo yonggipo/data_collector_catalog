@@ -1,3 +1,4 @@
+import 'package:data_collector_catalog/keystroke/keystroke_data.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as dev;
 
@@ -14,16 +15,16 @@ class _FocusTimeRecorderState extends State<FocusTimeRecorder> {
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _controller = TextEditingController();
 
+  final List<KeystrokeLog> _logs = [];
+  List<KeyboardEvent> _events = [];
   DateTime? _focusStartTime;
   Duration? _focusDuration;
-  String _inputText =
-      ''; // Stores the user input while the TextField is focused
+  String _inputText = '';
 
   @override
   void initState() {
     super.initState();
 
-    // Add a listener to the FocusNode to detect focus changes
     _focusNode.addListener(() {
       if (_focusNode.hasFocus) {
         _onFocusGained();
@@ -35,27 +36,35 @@ class _FocusTimeRecorderState extends State<FocusTimeRecorder> {
 
   void _onFocusGained() {
     setState(() {
-      _focusStartTime = DateTime.now(); // Record the time when focus is gained
-      _inputText = ''; // Reset the input text when the TextField is focused
+      _focusStartTime = DateTime.now();
+      _inputText = '';
     });
-    print("TextField focused at: $_focusStartTime");
+    dev.log("TextField focused at: $_focusStartTime");
   }
 
   void _onFocusLost() {
     if (_focusStartTime != null) {
       setState(() {
-        _focusDuration = DateTime.now()
-            .difference(_focusStartTime!); // Calculate focus duration
-        _focusStartTime = null; // Reset focus start time
+        _focusDuration = DateTime.now().difference(_focusStartTime!);
+        _logs.add(
+          KeystrokeLog(
+            text: _inputText,
+            focusDuration: _focusDuration,
+            keyboardEvents: _events,
+          ),
+        );
+        _focusStartTime = null;
+        _events = [];
       });
-      print("Focus duration: ${_focusDuration?.inSeconds} seconds");
-      print("Input text during focus: $_inputText");
+      dev.log("Focus duration: ${_focusDuration?.inSeconds} seconds");
+      dev.log("Input text during focus: $_inputText");
+      dev.log("Collected logs: ${_logs.toString()}");
     }
   }
 
   void _onTextChanged(String text) {
     setState(() {
-      _inputText = text; // Update the input text as the user types
+      _inputText = text;
     });
   }
 
@@ -67,42 +76,31 @@ class _FocusTimeRecorderState extends State<FocusTimeRecorder> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           KeyboardListener(
-            onKeyEvent: (value) {
-              // 중간에 입력이 멈춘 시간??
-              if (value is KeyDownEvent) {
-                dev.log('Event: ${value.toString()}');
-                dev.log('Logical key label: ${value.logicalKey.keyLabel}');
-                dev.log('Event character: ${value.character}');
-              }
-
-              // for detect backspace
-              //  return event.logicalKey == LogicalKeyboardKey.keyQ
-              if (value.logicalKey == LogicalKeyboardKey.backspace) {
-                dev.log('Did backspace tapped!!');
+            onKeyEvent: (event) {
+              if (event is KeyDownEvent) {
+                _events.add(
+                  KeyboardEvent(
+                    keyLabel: event.logicalKey.keyLabel,
+                    character: event.character,
+                    timeStamp: DateTime.now(),
+                  ),
+                );
               }
             },
             focusNode: _focusNode,
             child: TextField(
               controller: _controller,
-              onChanged: _onTextChanged, // Track changes in the input text
+              onChanged: _onTextChanged,
               decoration: const InputDecoration(
                 hintText: 'Focus on this textField and start typing...',
               ),
             ),
           ),
-
-          // text: '안녕하세요'
-          // keyBoardEvent: [
-          //     {
-          //
-          //     }
-
           const SizedBox(height: 20),
           if (_focusDuration != null)
             Column(
               children: [
                 Text('Focus lasted for: ${_focusDuration!.inSeconds} seconds'),
-                Text('Input during focus: $_inputText'),
                 Text('Input during focus: $_inputText'),
               ],
             ),
