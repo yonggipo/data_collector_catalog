@@ -2,6 +2,7 @@
     <!-- Mircophone Permission -->
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:label="data_collector_catalog"
@@ -10,8 +11,13 @@
 
         <service
             android:name=".LightSensorService"
-            android:exported="false"
-            android:foregroundServiceType="shortService" />
+            android:exported="true"
+            android:foregroundServiceType="shortService"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
 
          <!-- Notification Permission -->
         <service 

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../sensor_util.dart';
 import '../sampling_interval.dart';
@@ -50,15 +51,35 @@ final class LightSensorUtil implements SensorUtil {
     final hasSensor = await LightSensor.hasSensor();
     dev.log(hasSensor.toString());
     if (hasSensor) {
-      _subscription = LightSensor.luxStream().listen(onData);
+      if (await requestPermission()) {
+        _subscription = LightSensor.luxStream().listen(onData);
+      }
     } else {
       dev.log('Can not found Light Sensor');
     }
   }
 
   @override
-  Future<bool> requestPermission() {
-    // TODO: implement requestPermission
-    throw UnimplementedError();
+  Future<bool> requestPermission() async {
+    var status = await Permission.notification.status;
+    if (!status.isGranted) {
+      return Permission.notification.request().then((status) {
+        dev.log(status.toString());
+        return verifyStatus(status);
+      });
+    } else {
+      return verifyStatus(status);
+    }
+  }
+
+  bool verifyStatus(PermissionStatus status) {
+    switch (status) {
+      case PermissionStatus.denied ||
+            PermissionStatus.restricted ||
+            PermissionStatus.permanentlyDenied:
+        return false;
+      default:
+        return true;
+    }
   }
 }
