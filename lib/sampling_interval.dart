@@ -1,4 +1,5 @@
 enum SamplingInterval {
+  test,
   event,
   min5,
   min15,
@@ -8,6 +9,8 @@ enum SamplingInterval {
 extension SamplingIntervalGetters on SamplingInterval {
   Duration get duration {
     switch (this) {
+      case SamplingInterval.test:
+        return const Duration(seconds: 10);
       case SamplingInterval.event:
         return const Duration(seconds: 1);
       case SamplingInterval.min5:
