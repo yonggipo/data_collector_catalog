@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:data_collector_catalog/sensors/key_event_listener.dart';
+import 'package:flutter/foundation.dart';
 
 import '../sampling_interval.dart';
 import '../sensor_util.dart';
@@ -25,6 +26,7 @@ final class KeystrokeLogger extends SensorUtil {
 
   @override
   void onData(object) {
+    if (kReleaseMode) print('[✓] key stroke event $object');
     dev.log('key stroke event: $object');
   }
 

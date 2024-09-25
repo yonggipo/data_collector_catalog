@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -38,6 +39,7 @@ final class LightSensorUtil implements SensorUtil {
   @override
   void onData(object) {
     dev.log('<light sensor> lux: $object');
+    if (kReleaseMode) print('[✓] lux: $object');
     cancel();
   }
 
@@ -55,6 +57,7 @@ final class LightSensorUtil implements SensorUtil {
         _subscription = LightSensor.luxStream().listen(onData);
       }
     } else {
+      if (kReleaseMode) print('[✓] Can not found Light Sensor');
       dev.log('Can not found Light Sensor');
     }
   }
