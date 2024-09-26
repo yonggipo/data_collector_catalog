@@ -45,4 +45,9 @@ final class KeystrokeLogger extends SensorUtil {
   void start() {
     _subscription = KeyEventListener.keyEvnetStream.listen(onData);
   }
+
+  @override
+  void upload(String filePath, file) {
+    // TODO: implement upload
+  }
 }

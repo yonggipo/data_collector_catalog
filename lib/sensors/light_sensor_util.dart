@@ -85,4 +85,9 @@ final class LightSensorUtil implements SensorUtil {
         return true;
     }
   }
+
+  @override
+  void upload(String filePath, file) {
+    // TODO: implement upload
+  }
 }

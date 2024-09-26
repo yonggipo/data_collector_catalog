@@ -1,17 +1,28 @@
 import 'dart:async';
 import 'dart:developer' as dev;
-import 'package:notification_listener_service/notification_listener_service.dart';
+
+import 'package:data_collector_catalog/model/file_manager.dart';
+import 'package:data_collector_catalog/model/lux_event.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 
 import '../sampling_interval.dart';
 import '../sensor_util.dart';
-import 'package:logger/logger.dart';
 
 final class NotificationUtil implements SensorUtil {
   static final NotificationUtil shared = NotificationUtil._();
   NotificationUtil._();
   factory NotificationUtil() => shared;
 
+  // MARK: - Properties
+  // Dio dio = Dio();
+  List<NotificationEvent> envents = [];
   StreamSubscription? _subscription;
+  ServiceInstance? service;
+  // Map<String, Map<String, dynamic>> map = {};
+  // final Map<String, Map<String, dynamic>> eventJson = {};
 
   @override
   SamplingInterval samplingInterval = SamplingInterval.event;
@@ -22,60 +33,79 @@ final class NotificationUtil implements SensorUtil {
     _subscription = null;
   }
 
-  final logger = Logger(printer: PrettyPrinter());
-
   @override
-  void onData(object) {
-    dev.log('<notification util> notification: ${object.toString()}');
-    dev.log('<notification util> notification: $object', time: DateTime.now());
-    print(object);
+  void onData(object) async {
+    dev.log('[✓ Noti]: events: ${object.toString()}');
 
-    logger.d(object.runtimeType);
+    // push to firebase
+    final timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
+    final event = LuxEvent(lux: object, timeStamp: timeStamp);
+    await Firebase.initializeApp();
+    final ref = FirebaseDatabase.instance.ref();
+    await ref.child("lux").push().set(event.toJson()).catchError((e) {
+      dev.log('[✗] error2: $e');
+    });
 
-    // [log] <notification util> notification: ServiceNotificationEvent(
-    //         id: 1249065348
-    //         can reply: false
-    //         packageName: com.android.vending
-    //         title: 카카오톡 KakaoTalk을(를) 설치할 수 없음
-    //         content: 다시 시도해도 문제가 계속되면 일반적인 문제해결 방법을 참조하세요.
-    //         hasRemoved: false
-    //         haveExtraPicture: false
+    // send to ui
+    service?.invoke(
+      'update',
+    );
 
-    // I/flutter ( 9867): ServiceNotificationEvent(
-    // I/flutter ( 9867):       id: -1917236267
-    // I/flutter ( 9867):       can reply: true
-    // I/flutter ( 9867):       packageName: com.Slack
-    // I/flutter ( 9867):       title: 장하늬
-    // I/flutter ( 9867):       content: ㅋㅋㅋㅋ
-    // I/flutter ( 9867):       hasRemoved: false
-    // I/flutter ( 9867):       haveExtraPicture: false
+    // save to json file
+    FileManager().toJsonFile(event.toJson());
+    // luxJson.clear();
+    // luxValues.clear();
+    // map.clear();
   }
 
   @override
   void onError(Object error) {
-    // TODO: implement onError
+    dev.log('[✗ Noti] error: $error');
   }
 
   /// request notification permission
   @override
   Future<bool> requestPermission() async {
-    return NotificationListenerService.requestPermission();
+    await NotificationsListener.openPermissionSettings();
+    return NotificationsListener.hasPermission.then((hasP) {
+      return hasP ?? false;
+    });
   }
 
   @override
   void start() async {
-    dev.log('noti detection start');
-    bool status = await NotificationListenerService.isPermissionGranted();
-    dev.log('noti detection status: $status');
+    dev.log('start listening noti event');
+    // Listener init
+    NotificationsListener.initialize();
+    NotificationsListener.receivePort?.listen(onData, onError: onError);
 
-    if (!status) {
-      if (await requestPermission()) {
-        /// stream the incoming notification events
-        NotificationListenerService.notificationsStream.listen(onData);
-      }
-    } else {
-      /// stream the incoming notification events
-      NotificationListenerService.notificationsStream.listen(onData);
+    var hasPermission = await NotificationsListener.hasPermission ?? false;
+    if (!hasPermission) {
+      NotificationsListener.openPermissionSettings();
+      return;
     }
+
+    var isRunning = await NotificationsListener.isRunning ?? false;
+    if (!isRunning) {
+      await NotificationsListener.startService();
+    }
+  }
+
+  @override
+  Future<void> upload(String filePath, dynamic file) async {
+    // var formData = FormData.fromMap({
+    //   'Lux': await MultipartFile.fromFile(filePath,
+    //       filename: 'Lux.json', contentType: MediaType('application', 'json')),
+    //   'pin': pin, // Add the pin form field
+    // });
+    // var options = Options(headers: {'Content-Type': 'multipart/form-data'});
+    // var response =
+    //     await dio.post("$subUrl/app/upload", data: formData, options: options);
+    // if (response.statusCode == 200) {
+    //   dev.log('File uploaded successfully!');
+    //   file.deleteSync();
+    // } else {
+    //   dev.log('[✗ Noti] network: ${response.statusCode}');
+    // }
   }
 }

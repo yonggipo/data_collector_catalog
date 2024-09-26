@@ -1,4 +1,4 @@
-import 'package:data_collector_catalog/sampling_interval.dart';
+import 'sampling_interval.dart';
 
 abstract class SensorUtil {
   SamplingInterval get samplingInterval;
@@ -8,4 +8,5 @@ abstract class SensorUtil {
   void cancel();
   void onError(Object error);
   void onData(dynamic object);
+  void upload(String filePath, dynamic file);
 }

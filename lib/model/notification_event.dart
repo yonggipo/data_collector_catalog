@@ -1,52 +1,15 @@
 import 'dart:typed_data';
 
 final class NotificationEvent {
-  /// the notification id
   int? id;
-
-  /// check if we can reply the Notification
   bool? canReply;
-
-  /// if the notification has an extras image
   bool? haveExtraPicture;
-
-  /// if the notification has been removed
   bool? hasRemoved;
-
-  /// notification extras image
-  /// To display an image simply use the [Image.memory] widget.
-  /// Example:
-  ///
-  /// ```
-  /// Image.memory(notif.extrasPicture)
-  /// ```
   Uint8List? extrasPicture;
-
-  /// notification package name
   String? packageName;
-
-  /// notification title
   String? title;
-
-  /// the notification app icon
-  /// To display an image simply use the [Image.memory] widget.
-  /// Example:
-  ///
-  /// ```
-  /// Image.memory(notif.appIcon)
-  /// ```
   Uint8List? appIcon;
-
-  /// the notification large icon (ex: album covers)
-  /// To display an image simply use the [Image.memory] widget.
-  /// Example:
-  ///
-  /// ```
-  /// Image.memory(notif.largeIcon)
-  /// ```
   Uint8List? largeIcon;
-
-  /// the content of the notification
   String? content;
 
   NotificationEvent({

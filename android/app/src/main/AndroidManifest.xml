@@ -19,7 +19,7 @@
             </intent-filter>
         </service>
 
-         <!-- Notification Permission -->
+        <!-- Notification Permission -->
         <service 
         android:label="notifications"
         android:name="notification.listener.service.NotificationListener"
