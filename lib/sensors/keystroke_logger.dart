@@ -4,15 +4,15 @@ import 'dart:developer' as dev;
 import 'package:data_collector_catalog/sensors/key_event_listener.dart';
 import 'package:flutter/foundation.dart';
 
-import '../sampling_interval.dart';
+import '../model/sampling_interval.dart';
 import '../sensor_util.dart';
 
 /// AOS - https://developer.android.com/reference/android/view/KeyEvent
 /// iOS -
 final class KeystrokeLogger extends SensorUtil {
-  static final KeystrokeLogger shared = KeystrokeLogger._();
-  KeystrokeLogger._();
-  factory KeystrokeLogger() => shared;
+  // static final KeystrokeLogger shared = KeystrokeLogger._();
+  // KeystrokeLogger._();
+  // factory KeystrokeLogger() => shared;
   StreamSubscription? _subscription;
 
   @override
@@ -49,5 +49,10 @@ final class KeystrokeLogger extends SensorUtil {
   @override
   void upload(String filePath, file) {
     // TODO: implement upload
+  }
+
+  @override
+  void onLoad() {
+    // TODO: implement onLoad
   }
 }

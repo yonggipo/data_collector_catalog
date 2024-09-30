@@ -5,8 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../sensor_util.dart';
-import '../sampling_interval.dart';
+import '../../sensor_util.dart';
+import '../../model/sampling_interval.dart';
 
 class LightSensor {
   static const eventChannel = EventChannel("com.kane.light_sensor.stream");
@@ -22,9 +22,9 @@ class LightSensor {
 }
 
 final class LightSensorUtil implements SensorUtil {
-  static final LightSensorUtil shared = LightSensorUtil._();
-  LightSensorUtil._();
-  factory LightSensorUtil() => shared;
+  // static final LightSensorUtil shared = LightSensorUtil._();
+  // LightSensorUtil._();
+  // factory LightSensorUtil() => shared;
 
   @override
   final samplingInterval = SamplingInterval.test;
@@ -42,6 +42,31 @@ final class LightSensorUtil implements SensorUtil {
     if (kReleaseMode) print('[✓] lux: $object');
     cancel();
   }
+
+  // @override
+  // void onData(object) async {
+  //   dev.log('[✓ Noti]: events: ${object.toString()}');
+
+  //   // push to firebase
+  //   final timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
+  //   final event = LuxEvent(lux: object, timeStamp: timeStamp);
+  //   await Firebase.initializeApp();
+  //   final ref = FirebaseDatabase.instance.ref();
+  //   await ref.child("lux").push().set(event.toJson()).catchError((e) {
+  //     dev.log('[✗] error2: $e');
+  //   });
+
+  //   // send to ui
+  //   service?.invoke(
+  //     'update',
+  //   );
+
+  //   // save to json file
+  //   FileManager().toJsonFile(event.toJson());
+  //   // luxJson.clear();
+  //   // luxValues.clear();
+  //   // map.clear();
+  // }
 
   @override
   void onError(Object error) {
@@ -89,5 +114,10 @@ final class LightSensorUtil implements SensorUtil {
   @override
   void upload(String filePath, file) {
     // TODO: implement upload
+  }
+
+  @override
+  void onLoad() {
+    // TODO: implement onLoad
   }
 }

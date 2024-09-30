@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 
 final class KeyEventListener {
-  KeyEventListener._();
+  // KeyEventListener._();
 
   static const _eventChannel = EventChannel('keystroke_event_channel');
 
