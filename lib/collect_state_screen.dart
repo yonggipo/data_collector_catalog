@@ -4,8 +4,8 @@ import 'dart:developer' as dev;
 import 'package:data_collector_catalog/keystroke/focus_time_recorder.dart';
 import 'package:data_collector_catalog/model/sampling_interval.dart';
 import 'package:data_collector_catalog/sensors/keystroke_logger.dart';
-import 'package:data_collector_catalog/sensors/light_sensor_util/light_sensor_util.dart';
-import 'package:data_collector_catalog/sensors/notification_event_detector/notification_util.dart';
+import 'package:data_collector_catalog/sensors/lux_event/light_sensor_util.dart';
+import 'package:data_collector_catalog/sensors/noti_event/noti_event_detector_util.dart';
 import 'package:flutter/material.dart';
 
 import 'sensor_util.dart';
@@ -27,8 +27,8 @@ class _MyAppState extends State {
   void initState() {
     super.initState();
 
-    // setupSensor();
-    // startMonitoring();
+    setupSensor();
+    startMonitoring();
   }
 
   @override
@@ -47,10 +47,14 @@ class _MyAppState extends State {
 
   void setupSensor() {
     sensors = [
+      // LightSensorUtil(),
+      NotiEventDetectorUtil()
+
       //MicrophoneUtil(),
-      // LightSensorUtil.shared,    background type 변경
-      // NotificationUtil.shared,
-      KeystrokeLogger(),
+
+      //     background type 변경
+
+      // KeystrokeLogger(),
     ];
   }
 

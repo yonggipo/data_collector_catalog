@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-final class NotificationEvent {
+final class NotiEvent {
   int? id;
   bool? canReply;
   bool? haveExtraPicture;
@@ -12,7 +12,7 @@ final class NotificationEvent {
   Uint8List? largeIcon;
   String? content;
 
-  NotificationEvent({
+  NotiEvent({
     this.id,
     this.canReply,
     this.haveExtraPicture,
@@ -25,7 +25,7 @@ final class NotificationEvent {
     this.content,
   });
 
-  NotificationEvent.fromMap(Map<String, dynamic> map) {
+  NotiEvent.fromMap(Map<String, dynamic> map) {
     id = map['id'];
     canReply = map['canReply'];
     haveExtraPicture = map['haveExtraPicture'];
@@ -36,22 +36,6 @@ final class NotificationEvent {
     appIcon = map['appIcon'];
     largeIcon = map['largeIcon'];
     content = map['content'];
-  }
-
-  /// send a direct message reply to the incoming notification
-  Future<bool> sendReply(String message) async {
-    if (!(canReply ?? false))
-      throw Exception("The notification is not replyable");
-    try {
-      // return await methodeChannel.invokeMethod<bool>("sendReply", {
-      //       'message': message,
-      //       'notificationId': id,
-      //     }) ??
-      //     false;
-      return false;
-    } catch (e) {
-      rethrow;
-    }
   }
 
   @override

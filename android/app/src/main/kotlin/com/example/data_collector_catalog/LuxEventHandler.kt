@@ -11,7 +11,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.Result
 
-class LightSensorHandler(private val context: Context) : EventChannel.StreamHandler,
+class LuxEventHandler(private val context: Context) : EventChannel.StreamHandler,
     MethodChannel.MethodCallHandler {
     private var sensorEventListener: SensorEventListener? = null
     private val sensorManager: SensorManager by lazy {

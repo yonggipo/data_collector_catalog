@@ -7,12 +7,7 @@ import 'package:flutter/foundation.dart';
 import '../model/sampling_interval.dart';
 import '../sensor_util.dart';
 
-/// AOS - https://developer.android.com/reference/android/view/KeyEvent
-/// iOS -
 final class KeystrokeLogger extends SensorUtil {
-  // static final KeystrokeLogger shared = KeystrokeLogger._();
-  // KeystrokeLogger._();
-  // factory KeystrokeLogger() => shared;
   StreamSubscription? _subscription;
 
   @override

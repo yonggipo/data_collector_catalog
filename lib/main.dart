@@ -17,9 +17,9 @@ import 'keystroke/focus_time_recorder.dart';
 import 'model/sampling_interval.dart';
 import 'sensor_util.dart';
 import 'sensors/keystroke_logger.dart';
-import 'sensors/light_sensor_util/light_sensor_util.dart';
+import 'sensors/lux_event/light_sensor_util.dart';
 import 'sensors/microphone_util.dart';
-import 'sensors/notification_event_detector/notification_util.dart';
+import 'sensors/noti_event/noti_event_detector_util.dart';
 
 // MARK: Main
 Future<void> main() async {
@@ -34,8 +34,12 @@ Future<void> main() async {
 
 // MARK: - Firebase
 Future<void> _setupFirebase() async {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform)
-      .catchError((e) => dev.log('[✘ firebase] error: $e'));
+  try {
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
+  } catch (e) {
+    dev.log('[✘ firebase] error: $e');
+  }
 }
 
 // MARK: - Backgoround Service

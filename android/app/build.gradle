@@ -1,16 +1,9 @@
 plugins {
     id "com.android.application"
     id "kotlin-android"
+    // id "kotlin-android-extensions"
     id "dev.flutter.flutter-gradle-plugin"
 }
-
-// apply plugin: 'kotlin-android'
-// apply plugin: 'com.android.application'
-// apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
-
-// dependencies {
-//     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-// }
 
 android {
     compileSdkVersion 33
