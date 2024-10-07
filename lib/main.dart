@@ -18,7 +18,7 @@ import 'model/sampling_interval.dart';
 import 'sensor_util.dart';
 import 'sensors/keystroke_logger.dart';
 import 'sensors/lux_event/light_sensor_util.dart';
-import 'sensors/microphone_util.dart';
+import 'sensors/audio_event/microphone_util.dart';
 import 'sensors/noti_event/noti_event_detector_util.dart';
 
 // MARK: Main
