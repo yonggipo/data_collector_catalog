@@ -56,12 +56,12 @@ extension CollectionItemGetters on CollectionItem {
     }
   }
 
-  AudioCollector get collector {
+  Collector? get collector {
     switch (this) {
       case CollectionItem.microphone:
         return AudioCollector();
       default:
-        return AudioCollector();
+        return null;
     }
   }
 

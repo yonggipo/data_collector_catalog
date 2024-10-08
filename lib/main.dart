@@ -3,20 +3,23 @@ import 'dart:developer' as dev;
 import 'dart:io';
 
 import 'package:cron/cron.dart';
+import 'package:data_collector_catalog/collertor/collection_item.dart';
+import 'package:data_collector_catalog/collertor/sampling_interval.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'catalog_app.dart';
+import 'collertor/collector.dart';
 import 'common/device.dart';
 import 'firebase_options.dart';
 
 const _notificationChannelId = 'catalog_notification_channel_id';
 const _foregroundServiceNotificationId = 888;
 const _firebaseLogName = 'firebase';
-// ignore: unused_element
 const _backgroundServiceLogName = 'backgroundService';
+const _cronLogName = 'cron';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,7 +40,6 @@ Future<void> _setupFirebase() async {
 
 Future<void> _setupBackgroundService() async {
   final service = FlutterBackgroundService();
-  Cron cron = Cron();
 
   const channel = AndroidNotificationChannel(
     _notificationChannelId,
@@ -73,6 +75,7 @@ Future<void> _setupBackgroundService() async {
     iosConfiguration: IosConfiguration(),
   );
 
+  startCollectors();
   service.startService();
 }
 
@@ -131,23 +134,26 @@ void onStart(ServiceInstance service) async {
   }
 }
 
-// sensors = [
-//   // LightSensorUtil(),
-//   NotiEventDetectorUtil(),
-//   MicrophoneUtil()
-//   //MicrophoneUtil(),
-//   // background type 변경
-//   // KeystrokeLogger(),
-// ];
+Future<void> startCollectors() async {
+  Cron cron = Cron();
+  var items = CollectionItem.values;
 
-// void startMonitoring() {
-//   dev.log('start monitoring.. sensors: ${sensors.length}');
-//   for (var sensor in sensors) {
-//     sensor.start();
-//     if (sensor.samplingInterval != SamplingInterval.event) {
-//       Timer.periodic(sensor.samplingInterval.duration, (Timer timer) {
-//         sensor.start();
-//       });
-//     }
-//   }
-// }
+  List<(CollectionItem, Collector)> collectors = [];
+  for (var item in items) {
+    if (await item.permissionsGranted) {
+      final collector = item.collector;
+      if (collector != null) {
+        collectors.add((item, collector));
+      }
+    }
+  }
+
+  for (var (item, collector) in collectors) {
+    final duration = item.samplingInterval.duration;
+    final schedule = Schedule.parse('*/${duration.inMinutes} * * * *');
+    cron.schedule(schedule, () {
+      dev.log('start collect ${item.name}', name: _cronLogName);
+      collector.start();
+    });
+  }
+}

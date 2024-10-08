@@ -13,7 +13,7 @@ import '../../collertor/sampling_interval.dart';
 import '../../model/file_manager.dart';
 
 final class AudioCollector extends Collector {
-  static const logName = 'AudioCollector';
+  static const _logName = 'AudioCollector';
 
   AudioCollector._() : super();
   static final AudioCollector shared = AudioCollector._();
@@ -25,7 +25,7 @@ final class AudioCollector extends Collector {
   void processAudioBuffer(Float64List buffer) {
     double energy = calculateEnergy(buffer);
     double pitch = calculatePitch(buffer);
-    dev.log('energy: $energy, pitch: $pitch', name: logName);
+    dev.log('energy: $energy, pitch: $pitch', name: _logName);
   }
 
   double calculateEnergy(List<double> audioData) {
@@ -85,45 +85,47 @@ final class AudioCollector extends Collector {
   @override
   void start() async {
     super.start();
-    if (await requestPermission()) {
-      // final path = await FileManager.getPath();
-      final directoryPath = p.join(
-        'storage/emulated/0/Android/media/com.example.data_collector_catalog/files/',
-        'audio',
-      );
-      final fullPath = p.join(
-        directoryPath,
-        '${DateTime.now().millisecondsSinceEpoch}.m4a',
-      );
+    dev.log('test', name: _logName);
 
-      final directory = Directory(directoryPath);
+    // if (await requestPermission()) {
+    //   // final path = await FileManager.getPath();
+    //   final directoryPath = p.join(
+    //     'storage/emulated/0/Android/media/com.example.data_collector_catalog/files/',
+    //     'audio',
+    //   );
+    //   final fullPath = p.join(
+    //     directoryPath,
+    //     '${DateTime.now().millisecondsSinceEpoch}.m4a',
+    //   );
 
-      // 디렉토리가 존재하지 않으면 생성
-      if (!await directory.exists()) {
-        try {
-          await directory.create(recursive: true);
-          dev.log('[micro] add audio folder: $directoryPath');
-        } catch (e) {
-          dev.log('[micro] audio folder error: $e');
-          return;
-        }
-      } else {
-        dev.log('audio folder already exist: $directoryPath');
-      }
+    //   final directory = Directory(directoryPath);
 
-      const recordConfig =
-          RecordConfig(encoder: AudioEncoder.aacLc); // pcm16bits stram 의 경우
-      await record.start(recordConfig, path: fullPath);
+    //   // 디렉토리가 존재하지 않으면 생성
+    //   if (!await directory.exists()) {
+    //     try {
+    //       await directory.create(recursive: true);
+    //       dev.log('[micro] add audio folder: $directoryPath');
+    //     } catch (e) {
+    //       dev.log('[micro] audio folder error: $e');
+    //       return;
+    //     }
+    //   } else {
+    //     dev.log('audio folder already exist: $directoryPath');
+    //   }
 
-      // final stream = await record.startStream(recordConfig);
-      // _subscription = stream.listen(onData);
-      dev.log('[micro] start recording.. in path: $fullPath)');
+    //   const recordConfig =
+    //       RecordConfig(encoder: AudioEncoder.aacLc); // pcm16bits stram 의 경우
+    //   await record.start(recordConfig, path: fullPath);
 
-      // 1분 후에 녹음 종료
-      await Future.delayed(Duration(minutes: 1));
-      cancel();
-      dev.log('[micro] end recording..');
-    }
+    //   // final stream = await record.startStream(recordConfig);
+    //   // _subscription = stream.listen(onData);
+    //   dev.log('[micro] start recording.. in path: $fullPath)');
+
+    //   // 1분 후에 녹음 종료
+    //   await Future.delayed(Duration(minutes: 1));
+    //   cancel();
+    //   dev.log('[micro] end recording..');
+    // }
   }
 
   @override
