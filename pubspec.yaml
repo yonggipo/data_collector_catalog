@@ -25,6 +25,8 @@ dependencies:
   fftea: ^1.5.0+1
   path: ^1.9.0
   logging: ^1.2.0
+  gap: ^3.0.1
+  device_info_plus: ^10.1.2
 
 dev_dependencies:
   flutter_test:
@@ -34,3 +36,25 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+fonts:
+    - family: Pretendard
+      fonts:
+      - asset: assets/fonts/Pretendard-Thin.ttf
+        weight: 100
+      - asset: assets/fonts/Pretendard-ExtraLight.ttf
+        weight: 200
+      - asset: assets/fonts/Pretendard-Light.ttf
+        weight: 300
+      - asset: assets/fonts/Pretendard-Regular.ttf
+        weight: 400
+      - asset: assets/fonts/Pretendard-Medium.ttf
+        weight: 500
+      - asset: assets/fonts/Pretendard-SemiBold.ttf
+        weight: 600
+      - asset: assets/fonts/Pretendard-Bold.ttf
+        weight: 700
+      - asset: assets/fonts/Pretendard-ExtraBold.ttf
+        weight: 800
+      - asset: assets/fonts/Pretendard-Black.ttf
+        weight: 900

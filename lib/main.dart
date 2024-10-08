@@ -5,7 +5,6 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:cron/cron.dart';
-import 'package:data_collector_catalog/collect_state_screen.dart';
 import 'package:data_collector_catalog/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -13,23 +12,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import 'keystroke/focus_time_recorder.dart';
-import 'model/sampling_interval.dart';
-import 'sensor_util.dart';
-import 'sensors/keystroke_logger.dart';
-import 'sensors/lux_event/light_sensor_util.dart';
-import 'sensors/audio_event/microphone_util.dart';
-import 'sensors/noti_event/noti_event_detector_util.dart';
+import 'device.dart';
+import 'catalog_app.dart';
+// final cron = Cron();
+// cron.schedule(Schedule.parse('*/4 * * * *'), () async {
+//
+
+//   await record.start(recordConfig, path: 'aFullPath/myFile.m4a');
+//   dev.log("[kane-audio]: 오디오 녹음 시작 ${DateTime.now().toString()}");
+
+//   await Future.delayed(Duration(minutes: 1));
+//   dev.log("[kane-audio]: 오디오 녹음 종료 ${DateTime.now().toString()}");
+//   dev.log("[kane-audio]: 3분 대기");
+//   await Future.delayed(Duration(minutes: 3));
+//   dev.log("[kane-audio]: 다음 사이클 시작");
+// })
 
 // MARK: Main
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final _ = Device().checkAndroidVersion();
   await Permission.location.request();
   await Permission.notification.request();
 
   await _setupFirebase();
   // await _setupBackgroundService();
-  runApp(const MyApp());
+  runApp(const CatalogApp());
 }
 
 // MARK: - Firebase
@@ -38,11 +46,9 @@ Future<void> _setupFirebase() async {
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);
   } catch (e) {
-    dev.log('[✘ firebase] error: $e');
+    dev.log('[firebase] error: $e');
   }
 }
-
-// MARK: - Backgoround Service
 
 Future<void> _setupBackgroundService() async {
   // final service = FlutterBackgroundService();

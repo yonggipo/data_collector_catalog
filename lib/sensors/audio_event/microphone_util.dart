@@ -74,6 +74,23 @@ final class MicrophoneUtil extends SensorUtil {
     dev.log('[micro] onData: $object');
   }
 
+  void process() async {
+    // final path = await FileManager.getPath();
+    final filePath = p.join(
+      'storage/emulated/0/Android/media/com.example.data_collector_catalog/files/',
+      'audio',
+    );
+    final fileNames = await FileManager.findFileNames(filePath);
+    // 내림차순 정렬
+    fileNames.sort((l, r) {
+      final lt = int.parse(l.split('.').first);
+      final rt = int.parse(r.split('.').first);
+      return rt.compareTo(lt);
+    });
+    final lastedName = fileNames.first;
+    final lasted = await FileManager.getFile(filePath, lastedName);
+  }
+
   @override
   void start() async {
     if (await requestPermission()) {
@@ -110,7 +127,7 @@ final class MicrophoneUtil extends SensorUtil {
       // _subscription = stream.listen(onData);
       dev.log('[micro] start recording.. in path: $fullPath)');
 
-      // 1분(60초) 후에 녹음 종료
+      // 1분 후에 녹음 종료
       await Future.delayed(Duration(minutes: 1));
       cancel();
       dev.log('[micro] end recording..');

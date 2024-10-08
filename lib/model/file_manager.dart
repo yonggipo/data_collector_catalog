@@ -50,7 +50,7 @@ class FileManager {
     // uploadJsonFile(filePath, file);
   }
 
-  Future<List<String>> getFilesInDirectory(String filePath) async {
+  static Future<List<String>> findFileNames(String filePath) async {
     final directory = await getExternalStorageDirectory();
     var path = directory?.path;
     if (path == null) {
@@ -87,5 +87,22 @@ class FileManager {
       );
       return [];
     }
+  }
+
+  static Future<File?> getFile(String path, String name) async {
+    final filePath = p.join(path, name);
+    final fileDirectory = Directory(filePath);
+
+    if (!await fileDirectory.exists()) {
+      dev.log("[file] $name file) does not exists");
+      return null;
+    }
+
+    return fileDirectory
+        .listSync()
+        .whereType<File>()
+        .where((file) => file.path.endsWith(name))
+        .toList()
+        .first;
   }
 }

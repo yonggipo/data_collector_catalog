@@ -1,88 +1,138 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
-import 'package:data_collector_catalog/keystroke/focus_time_recorder.dart';
-import 'package:data_collector_catalog/model/file_manager.dart';
-import 'package:data_collector_catalog/model/sampling_interval.dart';
-// import 'package:data_collector_catalog/sensors/keystroke_logger.dart';
-// import 'package:data_collector_catalog/sensors/lux_event/light_sensor_util.dart';
-import 'package:data_collector_catalog/sensors/noti_event/noti_event_detector_util.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
-import 'sensor_util.dart';
-import 'sensors/audio_event/microphone_util.dart';
+import 'collertor/collection_item.dart';
+import 'collertor/collector_premission_state.dart';
+import 'sensors/constants.dart';
 
-// final cron = Cron();
-// cron.schedule(Schedule.parse('*/4 * * * *'), () async {
-//
-
-//   await record.start(recordConfig, path: 'aFullPath/myFile.m4a');
-//   dev.log("[kane-audio]: 오디오 녹음 시작 ${DateTime.now().toString()}");
-
-//   await Future.delayed(Duration(minutes: 1));
-//   dev.log("[kane-audio]: 오디오 녹음 종료 ${DateTime.now().toString()}");
-//   dev.log("[kane-audio]: 3분 대기");
-//   await Future.delayed(Duration(minutes: 3));
-//   dev.log("[kane-audio]: 다음 사이클 시작");
-// })
-
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+class CollectStateScreen extends StatefulWidget {
+  const CollectStateScreen({super.key});
 
   @override
   State<StatefulWidget> createState() {
-    return _MyAppState();
+    return _CollectStateScreenState();
   }
 }
 
-class _MyAppState extends State {
-  List<SensorUtil> sensors = [];
+class _CollectStateScreenState extends State<CollectStateScreen> {
+  static const logName = 'CollectStateScreen';
+  // List<SensorUtil> sensors = [];
+
+  List<CollectionItem> items = CollectionItem.values;
 
   @override
   void initState() {
     super.initState();
 
-    setupSensor();
-    startMonitoring();
+    // setupSensor();
+    // startMonitoring();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Data Collector Catalog'),
-        ),
-        body: const FocusTimeRecorder(),
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        backgroundColor: Colors.white,
+        middle: const Text('Data Collector Catalog'),
+      ),
+      child: ListView.builder(
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          return _createCollectStateView(items[index]);
+        },
       ),
     );
   }
 
-  // MARK: - private
-
   void setupSensor() {
-    sensors = [
-      // LightSensorUtil(),
-      NotiEventDetectorUtil(),
-      MicrophoneUtil()
+    // sensors = [
+    //   // LightSensorUtil(),
+    //   NotiEventDetectorUtil(),
+    //   MicrophoneUtil()
 
-      //MicrophoneUtil(),
+    //   //MicrophoneUtil(),
 
-      // background type 변경
+    //   // background type 변경
 
-      // KeystrokeLogger(),
-    ];
+    //   // KeystrokeLogger(),
+    // ];
   }
 
-  void startMonitoring() {
-    dev.log('start monitoring.. sensors: ${sensors.length}');
-    for (var sensor in sensors) {
-      sensor.start();
-      if (sensor.samplingInterval != SamplingInterval.event) {
-        Timer.periodic(sensor.samplingInterval.duration, (Timer timer) {
-          sensor.start();
-        });
-      }
-    }
+  // void startMonitoring() {
+  //   dev.log('start monitoring.. sensors: ${sensors.length}');
+  //   for (var sensor in sensors) {
+  //     sensor.start();
+  //     if (sensor.samplingInterval != SamplingInterval.event) {
+  //       Timer.periodic(sensor.samplingInterval.duration, (Timer timer) {
+  //         sensor.start();
+  //       });
+  //     }
+  //   }
+  // }
+  Widget _createCollectStateView(CollectionItem item) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: Colors.grey[200],
+      ),
+      width: 350,
+      height: 100,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Text(
+                  item.name,
+                  style: const TextStyle(fontSize: 18),
+                ),
+                Gap(4.0),
+                Text(
+                  item.unit,
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ],
+            ),
+            FutureBuilder<CollectorPermissionState>(
+              future: item.permissionStatus,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                } else {
+                  final status = snapshot.data ?? CollectorPermissionState.none;
+                  return CupertinoButton(
+                    color: status.indicatorColor,
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 12, vertical: 4.0),
+                    minSize: 0,
+                    onPressed: () async {
+                      if (status == CollectorPermissionState.required) {
+                        await item.requestRequiredPermissions();
+                        setState(() {});
+                      }
+                    },
+                    child: Text(
+                      status.title,
+                      style: TextStyle(
+                        fontFamily: Constants.pretendard,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

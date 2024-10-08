@@ -1,6 +1,8 @@
 class Constants {
   static final file = _File();
 
+  static final String pretendard = 'Pretendard';
+
   static const lightEvent = 'com.kane.light_sensor_plugin.event';
   static const lightMethod = 'com.kane.light_sensor_plugin.method';
 
