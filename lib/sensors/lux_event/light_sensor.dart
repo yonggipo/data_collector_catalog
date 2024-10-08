@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 
-import '../constants.dart';
+import '../../common/constants.dart';
 
 class LightSensor {
   LightSensor._();

@@ -3,7 +3,23 @@ enum SamplingInterval {
   event,
   min5,
   min15,
-  h4,
+  h4;
+
+  @override
+  String toString() {
+    switch (this) {
+      case SamplingInterval.test:
+        return 'test';
+      case SamplingInterval.event:
+        return 'event';
+      case SamplingInterval.min5:
+        return '5분';
+      case SamplingInterval.min15:
+        return '15분';
+      case SamplingInterval.h4:
+        return '4시간';
+    }
+  }
 }
 
 extension SamplingIntervalGetters on SamplingInterval {

@@ -3,12 +3,15 @@ import 'dart:developer' as dev;
 
 import 'package:flutter_background_service/flutter_background_service.dart';
 
-import '../../model/sampling_interval.dart';
-import '../../sensor_util.dart';
+import '../../collertor/sampling_interval.dart';
+import '../../collertor/collector.dart';
 import 'noti_event.dart';
 import 'noti_event_detector.dart';
 
-final class NotiEventDetectorUtil implements SensorUtil {
+final class NotiEventDetectorUtil extends Collector {
+  NotiEventDetectorUtil._() : super();
+  static final NotiEventDetectorUtil shared = NotiEventDetectorUtil._();
+  factory NotiEventDetectorUtil() => shared;
   // Dio dio = Dio();
   List<NotiEvent> envents = [];
   StreamSubscription? _subscription;

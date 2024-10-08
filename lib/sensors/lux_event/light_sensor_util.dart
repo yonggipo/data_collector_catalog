@@ -6,12 +6,15 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-import '../../model/sampling_interval.dart';
-import '../../sensor_util.dart';
+import '../../collertor/sampling_interval.dart';
+import '../../collertor/collector.dart';
 import 'light_sensor.dart';
 import 'lux_event.dart';
 
-final class LightSensorUtil implements SensorUtil {
+final class LightSensorUtil extends Collector {
+  LightSensorUtil._() : super();
+  static final LightSensorUtil shared = LightSensorUtil._();
+  factory LightSensorUtil() => shared;
   // Dio dio = Dio();
   @override
   final samplingInterval = SamplingInterval.event;

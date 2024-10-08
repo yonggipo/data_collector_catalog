@@ -1,7 +1,6 @@
 package com.example.data_collector_catalog
 
 import android.app.Notification
-import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
