@@ -20,6 +20,7 @@ const _foregroundServiceNotificationId = 888;
 const _firebaseLogName = 'firebase';
 const _backgroundServiceLogName = 'backgroundService';
 const _cronLogName = 'cron';
+const _initialCollectionLogName = 'initialCollection';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -76,7 +77,7 @@ Future<void> _setupBackgroundService() async {
   );
 
   startCollectors();
-  service.startService();
+  // service.startService();
 }
 
 @pragma('vm:entry-point')
@@ -148,11 +149,23 @@ Future<void> startCollectors() async {
     }
   }
 
+  dev.log('Granted controller count: ${collectors.length}',
+      name: _initialCollectionLogName);
+
   for (var (item, collector) in collectors) {
     final duration = item.samplingInterval.duration;
     final schedule = Schedule.parse('*/${duration.inMinutes} * * * *');
+    dev.log('${item.name}\'s schedule: */${duration.inMinutes} * * * *',
+        name: _cronLogName);
+
+    // 초기 시작
+    dev.log('Start initial ${item.name} collection..',
+        name: _initialCollectionLogName);
+    collector.start();
+
+    // 이후 주기적으로 시작
     cron.schedule(schedule, () {
-      dev.log('start collect ${item.name}', name: _cronLogName);
+      dev.log('Start ${item.name}\'s schedule..', name: _cronLogName);
       collector.start();
     });
   }
