@@ -36,8 +36,12 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/BoxArrowDown.svg
+    - assets/ClockCountdown.svg
+    - assets/WarningCircle.svg
 
-fonts:
+  fonts:
     - family: Pretendard
       fonts:
       - asset: assets/fonts/Pretendard-Thin.ttf

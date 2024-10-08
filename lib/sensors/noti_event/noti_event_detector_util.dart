@@ -3,7 +3,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter_background_service/flutter_background_service.dart';
 
-import '../../model/sampling_interval.dart';
+import '../../collertor/sampling_interval.dart';
 import '../../sensor_util.dart';
 import 'noti_event.dart';
 import 'noti_event_detector.dart';

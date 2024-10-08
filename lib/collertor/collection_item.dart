@@ -3,7 +3,7 @@ import 'dart:developer' as dev;
 import 'package:permission_handler/permission_handler.dart';
 
 import '../device.dart';
-import '../model/sampling_interval.dart';
+import 'sampling_interval.dart';
 import 'collector_premission_state.dart';
 
 enum CollectionItem {

@@ -6,7 +6,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-import '../../model/sampling_interval.dart';
+import '../../collertor/sampling_interval.dart';
 import '../../sensor_util.dart';
 import 'light_sensor.dart';
 import 'lux_event.dart';

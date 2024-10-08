@@ -1,4 +1,4 @@
-import 'dart:async';
+// ignore: unused_import
 import 'dart:developer' as dev;
 
 import 'package:flutter/cupertino.dart';
@@ -19,6 +19,7 @@ class CollectStateScreen extends StatefulWidget {
 }
 
 class _CollectStateScreenState extends State<CollectStateScreen> {
+  // ignore: unused_field
   static const logName = 'CollectStateScreen';
   // List<SensorUtil> sensors = [];
 
@@ -86,16 +87,28 @@ class _CollectStateScreenState extends State<CollectStateScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
+            // 대기 수집중  
+
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   item.name,
-                  style: const TextStyle(fontSize: 18),
+                  style: TextStyle(
+                    fontFamily: Constants.pretendard,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 Gap(4.0),
                 Text(
-                  item.unit,
-                  style: const TextStyle(fontSize: 16),
+                  '단위: ${item.unit} · 수집주기: ${item.samplingInterval.toString()}',
+                  style: TextStyle(
+                    fontFamily: Constants.pretendard,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ],
             ),
@@ -105,20 +118,20 @@ class _CollectStateScreenState extends State<CollectStateScreen> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const CircularProgressIndicator();
                 } else {
-                  final status = snapshot.data ?? CollectorPermissionState.none;
+                  final state = snapshot.data ?? CollectorPermissionState.none;
                   return CupertinoButton(
-                    color: status.indicatorColor,
+                    color: state.indicatorColor,
                     padding:
                         EdgeInsets.symmetric(horizontal: 12, vertical: 4.0),
                     minSize: 0,
                     onPressed: () async {
-                      if (status == CollectorPermissionState.required) {
+                      if (state == CollectorPermissionState.required) {
                         await item.requestRequiredPermissions();
                         setState(() {});
                       }
                     },
                     child: Text(
-                      status.title,
+                      state.title,
                       style: TextStyle(
                         fontFamily: Constants.pretendard,
                         fontSize: 14,

@@ -1,4 +1,4 @@
-import 'model/sampling_interval.dart';
+import 'collertor/sampling_interval.dart';
 
 abstract class SensorUtil {
   SensorUtil() {

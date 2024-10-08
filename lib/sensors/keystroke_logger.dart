@@ -4,7 +4,7 @@ import 'dart:developer' as dev;
 import 'package:data_collector_catalog/sensors/key_event_listener.dart';
 import 'package:flutter/foundation.dart';
 
-import '../model/sampling_interval.dart';
+import '../collertor/sampling_interval.dart';
 import '../sensor_util.dart';
 
 final class KeystrokeLogger extends SensorUtil {

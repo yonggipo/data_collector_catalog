@@ -9,7 +9,7 @@ import 'package:fftea/fftea.dart';
 import 'package:record/record.dart';
 import 'package:path/path.dart' as p;
 
-import '../../model/sampling_interval.dart';
+import '../../collertor/sampling_interval.dart';
 import '../../sensor_util.dart';
 
 final class MicrophoneUtil extends SensorUtil {

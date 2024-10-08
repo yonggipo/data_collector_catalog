@@ -28,7 +28,6 @@ import 'catalog_app.dart';
 //   dev.log("[kane-audio]: 다음 사이클 시작");
 // })
 
-// MARK: Main
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final _ = Device().checkAndroidVersion();
