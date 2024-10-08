@@ -1,135 +1,153 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:cron/cron.dart';
-import 'package:data_collector_catalog/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:permission_handler/permission_handler.dart';
 
-import 'common/device.dart';
 import 'catalog_app.dart';
-// final cron = Cron();
-// cron.schedule(Schedule.parse('*/4 * * * *'), () async {
-//
+import 'common/device.dart';
+import 'firebase_options.dart';
 
-//   await record.start(recordConfig, path: 'aFullPath/myFile.m4a');
-//   dev.log("[kane-audio]: 오디오 녹음 시작 ${DateTime.now().toString()}");
-
-//   await Future.delayed(Duration(minutes: 1));
-//   dev.log("[kane-audio]: 오디오 녹음 종료 ${DateTime.now().toString()}");
-//   dev.log("[kane-audio]: 3분 대기");
-//   await Future.delayed(Duration(minutes: 3));
-//   dev.log("[kane-audio]: 다음 사이클 시작");
-// })
+const _notificationChannelId = 'catalog_notification_channel_id';
+const _foregroundServiceNotificationId = 888;
+const _firebaseLogName = 'firebase';
+// ignore: unused_element
+const _backgroundServiceLogName = 'backgroundService';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final _ = Device().checkAndroidVersion();
-  await Permission.location.request();
-  await Permission.notification.request();
-
   await _setupFirebase();
-  // await _setupBackgroundService();
+  await _setupBackgroundService();
   runApp(const CatalogApp());
 }
 
-// MARK: - Firebase
 Future<void> _setupFirebase() async {
   try {
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);
   } catch (e) {
-    dev.log('[firebase] error: $e');
+    dev.log('error: $e', name: _firebaseLogName);
   }
 }
 
 Future<void> _setupBackgroundService() async {
-  // final service = FlutterBackgroundService();
-  Cron cronJob = Cron();
+  final service = FlutterBackgroundService();
+  Cron cron = Cron();
 
   const channel = AndroidNotificationChannel(
-    'my_foreground',
-    'channel_name',
-    description: 'channel_description',
+    _notificationChannelId,
+    'data_collector_catalog',
+    description: 'This channel is used for android foreground service',
     importance: Importance.max,
   );
 
-  final plugin = FlutterLocalNotificationsPlugin();
-  await plugin.initialize(
-    const InitializationSettings(
-      android: AndroidInitializationSettings('ic_bg_service_small'),
-    ),
-  );
+  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  if (Platform.isIOS || Platform.isAndroid) {
+    await flutterLocalNotificationsPlugin.initialize(
+      const InitializationSettings(
+        iOS: DarwinInitializationSettings(),
+        android: AndroidInitializationSettings('ic_bg_service_small'),
+      ),
+    );
+  }
 
-  await plugin
+  await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
-//   await service.configure(
-//     androidConfiguration: AndroidConfiguration(
-//       onStart: onBackgroundServiceStart,
-//       isForegroundMode: true,
-//       notificationChannelId: 'my_foreground',
-//       initialNotificationTitle: 'initial_title',
-//       initialNotificationContent: 'initial_content',
-//       foregroundServiceTypes: [
-//         AndroidForegroundType.location,
-//         AndroidForegroundType.shortService
-//       ],
-//     ),
-//     iosConfiguration: IosConfiguration(
-//       onForeground: onBackgroundServiceStart,
-//     ),
-//   );
+  await service.configure(
+    androidConfiguration: AndroidConfiguration(
+      onStart: onStart,
+      isForegroundMode: true,
+      notificationChannelId: _notificationChannelId,
+      initialNotificationTitle: 'title',
+      initialNotificationContent: 'content',
+      foregroundServiceNotificationId: _foregroundServiceNotificationId,
+    ),
+    iosConfiguration: IosConfiguration(),
+  );
 
-//   service.startService();
-
-//   // cronJob.schedule(Schedule.parse('0 */3 * * *'), () async {
-//   //   // var result = await HealthConnectFactory.isAvailable();
-//   //   await healthDataSender.healthDataCall(service);
-//   // });
+  service.startService();
 }
 
-// @pragma('vm:entry-point')
-// void onBackgroundServiceStart(ServiceInstance service) {
-//   DartPluginRegistrant.ensureInitialized();
-//   final plugin = FlutterLocalNotificationsPlugin();
-//   print('onBackgroundServiceStart');
+@pragma('vm:entry-point')
+void onStart(ServiceInstance service) async {
+  // DartPluginRegistrant.ensureInitialized();
+  dev.log('onStart', name: _backgroundServiceLogName);
+  // await Hive.initFlutter();
+  // var box = await Hive.openBox("user");
 
-//   service.on('stopService').listen((event) {
-//     service.stopSelf();
-//   });
+  service.on('stopService').listen((event) {
+    service.stopSelf();
+  });
 
-//   Timer.periodic(const Duration(seconds: 1), (timer) async {
-//     if (service is AndroidServiceInstance) {
-//       if (await service.isForegroundService()) {
-//         plugin.show(
-//           888,
-//           'COOL SERVICE',
-//           'Awesome ${DateTime.now()}',
-//           const NotificationDetails(
-//             android: AndroidNotificationDetails(
-//               'my_foreground',
-//               'MY FOREGROUND SERVICE',
-//               icon: 'ic_bg_service_small',
-//               ongoing: true,
-//             ),
-//           ),
-//         );
-//       }
+  // OPTIONAL when use custom notification
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
-//       // if you don't using custom notification, uncomment this
-//       service.setForegroundNotificationInfo(
-//         title: "My App Service",
-//         content: "Updated at ${DateTime.now()}",
-//       );
+  if (service is AndroidServiceInstance) {
+    service.on('setAsForeground').listen((event) {
+      service.setAsForegroundService();
+    });
+
+    service.on('setAsBackground').listen((event) {
+      service.setAsBackgroundService();
+    });
+  }
+
+  service.on('stopService').listen((event) {
+    service.stopSelf();
+  });
+
+  if (service is AndroidServiceInstance) {
+    if (await service.isForegroundService()) {
+      // OPTIONAL for use custom notification
+      flutterLocalNotificationsPlugin.show(
+        _foregroundServiceNotificationId,
+        'title',
+        'body',
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            _notificationChannelId,
+            'data_collector_catalog',
+            icon: 'ic_bg_service_small',
+            ongoing: true,
+          ),
+        ),
+      );
+
+      // if you don't using custom notification, uncomment this
+      service.setForegroundNotificationInfo(
+        title: "title",
+        content: "content",
+      );
+    }
+  }
+}
+
+// sensors = [
+//   // LightSensorUtil(),
+//   NotiEventDetectorUtil(),
+//   MicrophoneUtil()
+//   //MicrophoneUtil(),
+//   // background type 변경
+//   // KeystrokeLogger(),
+// ];
+
+// void startMonitoring() {
+//   dev.log('start monitoring.. sensors: ${sensors.length}');
+//   for (var sensor in sensors) {
+//     sensor.start();
+//     if (sensor.samplingInterval != SamplingInterval.event) {
+//       Timer.periodic(sensor.samplingInterval.duration, (Timer timer) {
+//         sensor.start();
+//       });
 //     }
-//   });
+//   }
 // }

@@ -1,13 +1,13 @@
 // ignore: unused_import
 import 'dart:developer' as dev;
 
-import 'package:data_collector_catalog/collertor/collector_state.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
 import 'collertor/collection_item.dart';
 import 'collertor/collector_premission_state.dart';
+import 'collertor/collector_state.dart';
 import 'common/constants.dart';
 
 class CollectStateScreen extends StatefulWidget {
@@ -22,16 +22,12 @@ class CollectStateScreen extends StatefulWidget {
 class _CollectStateScreenState extends State<CollectStateScreen> {
   // ignore: unused_field
   static const logName = 'CollectStateScreen';
-  // List<SensorUtil> sensors = [];
 
   List<CollectionItem> items = CollectionItem.values;
 
   @override
   void initState() {
     super.initState();
-
-    // setupSensor();
-    // startMonitoring();
   }
 
   @override
@@ -50,31 +46,6 @@ class _CollectStateScreenState extends State<CollectStateScreen> {
     );
   }
 
-  void setupSensor() {
-    // sensors = [
-    //   // LightSensorUtil(),
-    //   NotiEventDetectorUtil(),
-    //   MicrophoneUtil()
-
-    //   //MicrophoneUtil(),
-
-    //   // background type 변경
-
-    //   // KeystrokeLogger(),
-    // ];
-  }
-
-  // void startMonitoring() {
-  //   dev.log('start monitoring.. sensors: ${sensors.length}');
-  //   for (var sensor in sensors) {
-  //     sensor.start();
-  //     if (sensor.samplingInterval != SamplingInterval.event) {
-  //       Timer.periodic(sensor.samplingInterval.duration, (Timer timer) {
-  //         sensor.start();
-  //       });
-  //     }
-  //   }
-  // }
   Widget _createCollectStateView(CollectionItem item) {
     return Container(
       decoration: BoxDecoration(
@@ -86,10 +57,12 @@ class _CollectStateScreenState extends State<CollectStateScreen> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            item.collectorState.icon,
-            Gap(4.0),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: item.collectorState.icon,
+            ),
+            Gap(12),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,6 +86,7 @@ class _CollectStateScreenState extends State<CollectStateScreen> {
                 ),
               ],
             ),
+            Spacer(),
             FutureBuilder<CollectorPermissionState>(
               future: item.permissionStatus,
               builder: (context, snapshot) {
@@ -123,7 +97,7 @@ class _CollectStateScreenState extends State<CollectStateScreen> {
                   return CupertinoButton(
                     color: state.indicatorColor,
                     padding:
-                        EdgeInsets.symmetric(horizontal: 12, vertical: 4.0),
+                        EdgeInsets.symmetric(horizontal: 12, vertical: 8.0),
                     minSize: 0,
                     onPressed: () async {
                       if (state == CollectorPermissionState.required) {

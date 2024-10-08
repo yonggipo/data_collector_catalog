@@ -1,7 +1,9 @@
 import 'dart:developer' as dev;
 
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../common/constants.dart';
 import '../common/device.dart';
 import '../sensors/audio/audio_collector.dart';
 import 'collector.dart';
@@ -35,7 +37,12 @@ extension CollectionItemGetters on CollectionItem {
   }
 
   Stream<Map<String, dynamic>?> get dataStream {
-    return Stream.empty();
+    switch (this) {
+      case CollectionItem.microphone:
+        return FlutterBackgroundService().on(Constants.stream.audio);
+      default:
+        return Stream.empty();
+    }
   }
 
   CollectorState get collectorState {
