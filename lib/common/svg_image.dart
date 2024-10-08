@@ -5,10 +5,13 @@ enum SvgImage {
   // ignore: unused_field
   _;
 
-  static final Widget boxArrowDonw = SvgPicture.asset('BoxArrowDown.svg',
+  static final Widget boxArrowDonw = SvgPicture.asset(
+      'assets/icons/BoxArrowDown.svg',
       semanticsLabel: 'Collecting Data Icon');
-  static final Widget clockCountDown = SvgPicture.asset('ClockCountDown.svg',
+  static final Widget clockCountDown = SvgPicture.asset(
+      'assets/icons/ClockCountdown.svg',
       semanticsLabel: 'Waiting To Collect Data');
-  static final Widget warningCircle = SvgPicture.asset('WarningCircle.svg',
+  static final Widget warningCircle = SvgPicture.asset(
+      'assets/icons/WarningCircle.svg',
       semanticsLabel: 'Waiting For Permission');
 }

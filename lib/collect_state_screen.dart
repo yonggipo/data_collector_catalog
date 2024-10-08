@@ -1,6 +1,7 @@
 // ignore: unused_import
 import 'dart:developer' as dev;
 
+import 'package:data_collector_catalog/collertor/collector_state.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -87,8 +88,8 @@ class _CollectStateScreenState extends State<CollectStateScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // 대기 수집중  
-
+            item.collectorState.icon,
+            Gap(4.0),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,

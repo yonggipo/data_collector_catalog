@@ -2,7 +2,10 @@ import 'dart:developer' as dev;
 
 import 'package:permission_handler/permission_handler.dart';
 
-import '../device.dart';
+import '../common/device.dart';
+import '../sensors/audio/audio_collector.dart';
+import 'collector.dart';
+import 'collector_state.dart';
 import 'sampling_interval.dart';
 import 'collector_premission_state.dart';
 
@@ -33,6 +36,35 @@ extension CollectionItemGetters on CollectionItem {
 
   Stream<Map<String, dynamic>?> get dataStream {
     return Stream.empty();
+  }
+
+  CollectorState get collectorState {
+    final type = collectorType;
+    if (type == AudioCollector) {
+      return (AudioCollector.shared.isCollecting)
+          ? CollectorState.collecting
+          : CollectorState.waiting;
+    } else {
+      return CollectorState.waitingPermission;
+    }
+  }
+
+  AudioCollector get collector {
+    switch (this) {
+      case CollectionItem.microphone:
+        return AudioCollector();
+      default:
+        return AudioCollector();
+    }
+  }
+
+  Type get collectorType {
+    switch (this) {
+      case CollectionItem.microphone:
+        return AudioCollector;
+      default:
+        return Collector;
+    }
   }
 
   String get unit {

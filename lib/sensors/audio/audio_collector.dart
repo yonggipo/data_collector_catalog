@@ -4,17 +4,29 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:data_collector_catalog/model/file_manager.dart';
 import 'package:fftea/fftea.dart';
-import 'package:record/record.dart';
 import 'package:path/path.dart' as p;
+import 'package:record/record.dart';
 
+import '../../collertor/collector.dart';
 import '../../collertor/sampling_interval.dart';
-import '../../sensor_util.dart';
+import '../../model/file_manager.dart';
 
-final class MicrophoneUtil extends SensorUtil {
+final class AudioCollector extends Collector {
+  static const logName = 'AudioCollector';
+
+  AudioCollector._() : super();
+  static final AudioCollector shared = AudioCollector._();
+  factory AudioCollector() => shared;
+
   final record = AudioRecorder();
   StreamSubscription? _subscription;
+
+  void processAudioBuffer(Float64List buffer) {
+    double energy = calculateEnergy(buffer);
+    double pitch = calculatePitch(buffer);
+    dev.log('energy: $energy, pitch: $pitch', name: logName);
+  }
 
   double calculateEnergy(List<double> audioData) {
     double sum = 0.0;
@@ -45,35 +57,6 @@ final class MicrophoneUtil extends SensorUtil {
     return pitch;
   }
 
-  void processAudioBuffer(Float64List buffer) {
-    double energy = calculateEnergy(buffer);
-    double pitch = calculatePitch(buffer);
-    dev.log('[micro] energy: $energy, pitch: $pitch');
-  }
-
-  @override
-  final samplingInterval = SamplingInterval.event;
-
-  @override
-  void onError(Object e) {
-    dev.log('error: $e');
-  }
-
-  @override
-  void cancel() async {
-    final path = await record.stop();
-    dev.log('[micro] saved path: $path');
-    // await record.cancel();
-    record.dispose();
-    _subscription?.cancel();
-    _subscription = null;
-  }
-
-  @override
-  void onData(object) {
-    dev.log('[micro] onData: $object');
-  }
-
   void process() async {
     // final path = await FileManager.getPath();
     final filePath = p.join(
@@ -88,13 +71,22 @@ final class MicrophoneUtil extends SensorUtil {
       return rt.compareTo(lt);
     });
     final lastedName = fileNames.first;
-    final lasted = await FileManager.getFile(filePath, lastedName);
+    // final lasted = await FileManager.getFile(filePath, lastedName);
+  }
+
+  @override
+  final samplingInterval = SamplingInterval.event;
+
+  @override
+  Future<bool> requestPermission() async {
+    return await record.hasPermission();
   }
 
   @override
   void start() async {
+    super.start();
     if (await requestPermission()) {
-      final path = await FileManager.getPath();
+      // final path = await FileManager.getPath();
       final directoryPath = p.join(
         'storage/emulated/0/Android/media/com.example.data_collector_catalog/files/',
         'audio',
@@ -135,13 +127,18 @@ final class MicrophoneUtil extends SensorUtil {
   }
 
   @override
-  Future<bool> requestPermission() async {
-    return await record.hasPermission();
+  void cancel() async {
+    super.cancel();
+    final path = await record.stop();
+    dev.log('[micro] saved path: $path');
+    // await record.cancel();
+    record.dispose();
+    _subscription?.cancel();
+    _subscription = null;
   }
 
   @override
-  void upload(String filePath, file) {}
-
-  @override
-  void onLoad() {}
+  void onData(object) {
+    dev.log('[micro] onData: $object');
+  }
 }

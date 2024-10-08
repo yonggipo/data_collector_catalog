@@ -5,9 +5,13 @@ import 'package:data_collector_catalog/sensors/key_event_listener.dart';
 import 'package:flutter/foundation.dart';
 
 import '../collertor/sampling_interval.dart';
-import '../sensor_util.dart';
+import '../collertor/collector.dart';
 
-final class KeystrokeLogger extends SensorUtil {
+final class KeystrokeLogger extends Collector {
+  KeystrokeLogger._() : super();
+  static final KeystrokeLogger shared = KeystrokeLogger._();
+  factory KeystrokeLogger() => shared;
+
   StreamSubscription? _subscription;
 
   @override
