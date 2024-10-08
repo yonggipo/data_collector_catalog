@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
-import '../sensors/constants.dart';
+import '../common/constants.dart';
 
 class FileManager {
   static final FileManager shared = FileManager._();

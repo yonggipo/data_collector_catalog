@@ -38,9 +38,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/BoxArrowDown.svg
-    - assets/ClockCountdown.svg
-    - assets/WarningCircle.svg
+    - assets/icons/BoxArrowDown.svg
+    - assets/icons/ClockCountdown.svg
+    - assets/icons/WarningCircle.svg
 
   fonts:
     - family: Pretendard

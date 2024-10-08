@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 
-import '../constants.dart';
+import '../../common/constants.dart';
 import 'noti_event.dart';
 
 class NotiEventDetector {

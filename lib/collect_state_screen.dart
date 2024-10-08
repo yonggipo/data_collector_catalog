@@ -7,7 +7,7 @@ import 'package:gap/gap.dart';
 
 import 'collertor/collection_item.dart';
 import 'collertor/collector_premission_state.dart';
-import 'sensors/constants.dart';
+import 'common/constants.dart';
 
 class CollectStateScreen extends StatefulWidget {
   const CollectStateScreen({super.key});
