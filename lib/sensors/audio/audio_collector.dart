@@ -8,7 +8,7 @@ import 'package:record/record.dart';
 import '../../collertor/collector.dart';
 
 final class AudioCollector extends Collector {
-  static const _logName = 'AudioCollector';
+  static const _log = 'AudioCollector';
 
   AudioCollector._() : super();
   static final AudioCollector shared = AudioCollector._();
@@ -25,7 +25,7 @@ final class AudioCollector extends Collector {
   @override
   void start() async {
     super.start();
-    dev.log('Start collection..', name: _logName);
+    dev.log('Start collection..', name: _log);
 
     // await requestPermission();
 
@@ -42,9 +42,9 @@ final class AudioCollector extends Collector {
     if (!await directory.exists()) {
       try {
         await directory.create(recursive: true);
-        dev.log('Create audio directory: $directoryPath', name: _logName);
+        dev.log('Create audio directory: $directoryPath', name: _log);
       } catch (e) {
-        dev.log('Error: $e', name: _logName);
+        dev.log('Error: $e', name: _log);
         return;
       }
     }
@@ -59,19 +59,19 @@ final class AudioCollector extends Collector {
 
     // final stream = await record.startStream(recordConfig);
     // _subscription = stream.listen(onData);
-    dev.log('Start recording with $fileName', name: _logName);
+    dev.log('Start recording with $fileName', name: _log);
 
     // 1분 후에 녹음 종료
     await Future.delayed(Duration(minutes: 1));
     cancel();
-    dev.log('End recording..', name: _logName);
+    dev.log('End recording..', name: _log);
   }
 
   @override
   void cancel() async {
     super.cancel();
     final path = await record.stop();
-    dev.log('Save record in $path', name: _logName);
+    dev.log('Save record in $path', name: _log);
     // await record.cancel();
     _subscription?.cancel();
     _subscription = null;
@@ -81,6 +81,6 @@ final class AudioCollector extends Collector {
 
   @override
   void onData(object) {
-    dev.log('onData: $object', name: _logName);
+    dev.log('onData: $object', name: _log);
   }
 }
