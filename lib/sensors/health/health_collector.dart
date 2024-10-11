@@ -5,11 +5,12 @@ import 'dart:developer' as dev;
 class HealthCollector extends Collector {
   static const _log = 'HealthCollector';
 
-  
-
   @override
-  void start() async {
-    super.start();
-
+  Future<bool?> onRequest() async {
+    return null;
   }
+
+  // Future<bool?> isGranted() {}
+
+  void onStart() async {}
 }

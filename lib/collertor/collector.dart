@@ -25,7 +25,7 @@ abstract class Collector {
 
   bool _isCollecting = false;
 
-  Future<bool?> requestPermission() {
+  Future<bool?> onRequest() {
     return Future(() => null);
   }
 

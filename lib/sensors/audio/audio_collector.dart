@@ -18,7 +18,7 @@ final class AudioCollector extends Collector {
   StreamSubscription? _subscription;
 
   @override
-  Future<bool> requestPermission() async {
+  Future<bool> onRequest() async {
     return await record.hasPermission();
   }
 

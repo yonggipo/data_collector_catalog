@@ -33,14 +33,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
-  carp_serializable:
-    dependency: transitive
-    description:
-      name: carp_serializable
-      sha256: "39f7d315f49fecd4b7eddfa3c1a08b9416ae3c640dc888de5f798246bcc2d38e"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0"
   characters:
     dependency: transitive
     description:
@@ -206,6 +198,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_activity_recognition:
+    dependency: "direct main"
+    description:
+      name: flutter_activity_recognition
+      sha256: ffcf1693c4141f7ea7e9a23c6d7931add93e625e103f703e02c98b5952f77de0
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0"
   flutter_background_service:
     dependency: "direct main"
     description:
@@ -296,14 +296,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
-  health:
-    dependency: "direct main"
-    description:
-      name: health
-      sha256: "01d6318b2d813d4b87044f9adb5a588f672acd176434ac380259d28de1f321a4"
-      url: "https://pub.dev"
-    source: hosted
-    version: "11.1.0"
   http:
     dependency: transitive
     description:
@@ -320,22 +312,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
-  intl:
-    dependency: transitive
-    description:
-      name: intl
-      sha256: d6f56758b7d3014a48af9701c085700aac781a92a87a62b1333b46d8879661cf
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.19.0"
-  json_annotation:
-    dependency: transitive
-    description:
-      name: json_annotation
-      sha256: "1ce844379ca14835a50d2f019a3099f419082cfdd231cd86a142af94dd5c6bb1"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.9.0"
   leak_tracker:
     dependency: transitive
     description:
@@ -456,6 +432,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
+  pedometer:
+    dependency: "direct main"
+    description:
+      name: pedometer
+      sha256: "11cfba2de961893d79e65b7773b9462bc53979626b49a86972d63b40217969ee"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.2"
   permission_handler:
     dependency: "direct main"
     description:

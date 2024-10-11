@@ -57,7 +57,7 @@ final class NotiEventDetectorUtil extends Collector {
   }
 
   @override
-  Future<bool> requestPermission() async {
+  Future<bool> onRequest() async {
     if (await NotiEventDetector.hasP()) {
       return true;
     } else {
@@ -69,7 +69,7 @@ final class NotiEventDetectorUtil extends Collector {
   void start() async {
     dev.log('start listening noti event');
 
-    final hasP = await requestPermission();
+    final hasP = await onRequest();
     if (hasP) {
       _subscription =
           NotiEventDetector.notiStream.listen(onData, onError: onError);

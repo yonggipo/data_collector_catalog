@@ -77,7 +77,7 @@ final class LightSensorUtil extends Collector {
   void onLoad() {}
 
   @override
-  Future<bool> requestPermission() {
+  Future<bool> onRequest() {
     throw UnimplementedError();
   }
 }

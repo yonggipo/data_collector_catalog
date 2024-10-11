@@ -35,7 +35,7 @@ final class KeystrokeLogger extends Collector {
   }
 
   @override
-  Future<bool> requestPermission() {
+  Future<bool> onRequest() {
     // TODO: implement requestPermission
     throw UnimplementedError();
   }
