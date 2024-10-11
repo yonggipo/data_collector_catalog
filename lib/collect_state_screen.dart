@@ -67,10 +67,16 @@ class _CollectStateScreenState extends State<CollectStateScreen> {
           children: [
             Row(
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: item.collectorState.icon,
-                ),
+                StreamBuilder(
+                    stream: item.collectorStateStream,
+                    builder: (context, snapshot) {
+                      final state =
+                          snapshot.data ?? CollectorState.waitingPermission;
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: state.icon,
+                      );
+                    }),
                 Gap(12),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -100,14 +106,21 @@ class _CollectStateScreenState extends State<CollectStateScreen> {
                         final isGranted = snapshot.data ?? false;
                         return SizedBox(
                           width: 160,
-                          child: Visibility(
-                            visible: isGranted,
-                            child: LinearProgressIndicator(
-                              value: 0.5,
-                              backgroundColor: Colors.white,
-                              color: Color(0xFF4C71F5),
-                              borderRadius: BorderRadius.circular(2.0),
-                            ),
+                          child: ValueListenableBuilder<double>(
+                            valueListenable: item.collector?.progressNotifier ??
+                                ValueNotifier(0),
+                            builder: (BuildContext context, dynamic value,
+                                Widget? child) {
+                              return Visibility(
+                                visible: isGranted,
+                                child: LinearProgressIndicator(
+                                  value: value,
+                                  backgroundColor: Colors.white,
+                                  color: Color(0xFF4C71F5),
+                                  borderRadius: BorderRadius.circular(2.0),
+                                ),
+                              );
+                            },
                           ),
                         );
                       },

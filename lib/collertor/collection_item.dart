@@ -45,14 +45,19 @@ extension CollectionItemGetters on CollectionItem {
     }
   }
 
-  CollectorState get collectorState {
-    final type = collectorType;
-    if (type == AudioCollector) {
-      return (AudioCollector.shared.isCollecting)
-          ? CollectorState.collecting
-          : CollectorState.waiting;
+  Stream<CollectorState> get collectorStateStream {
+    if (collector == null) {
+      return Stream.value(CollectorState.waitingPermission);
     } else {
-      return CollectorState.waitingPermission;
+      return collector!.isCollectingStream.map((isCollecting) {
+        if (isCollecting == null) {
+          return CollectorState.waitingPermission;
+        } else {
+          return isCollecting
+              ? CollectorState.collecting
+              : CollectorState.waiting;
+        }
+      });
     }
   }
 
@@ -82,7 +87,6 @@ extension CollectionItemGetters on CollectionItem {
         return '도/초(°/s)';
       case CollectionItem.magneticFieldStrength:
         return 'μT';
-
       case CollectionItem.microphone:
         return 'm4a';
     }

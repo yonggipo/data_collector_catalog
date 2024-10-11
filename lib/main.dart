@@ -153,20 +153,6 @@ Future<void> startCollectors() async {
       name: _initialCollectionLogName);
 
   for (var (item, collector) in collectors) {
-    final duration = item.samplingInterval.duration;
-    final schedule = Schedule.parse('*/${duration.inMinutes} * * * *');
-    dev.log('${item.name}\'s schedule: */${duration.inMinutes} * * * *',
-        name: _cronLogName);
-
-    // 초기 시작
-    dev.log('Start initial ${item.name} collection..',
-        name: _initialCollectionLogName);
-    collector.start();
-
-    // 이후 주기적으로 시작
-    cron.schedule(schedule, () {
-      dev.log('Start ${item.name}\'s schedule..', name: _cronLogName);
-      collector.start();
-    });
+    collector.startWith(item);
   }
 }
