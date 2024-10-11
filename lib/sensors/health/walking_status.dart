@@ -4,7 +4,7 @@ enum WalkingType {
   unknown;
 
   @override
-  String toString() => toString().split('.').last;
+  String toString() => super.toString().split('.').last;
 }
 
 class WalkingStatus {
@@ -18,7 +18,7 @@ class WalkingStatus {
 
   Map<String, dynamic> toMap() {
     return {
-      'type': type.toString(),
+      'walkingType': type.toString(),
       'dateTime': dateTime.toIso8601String(),
     };
   }

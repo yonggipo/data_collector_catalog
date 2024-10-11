@@ -46,7 +46,7 @@ class ActivityEvent {
 
   Map<String, dynamic> toMap() {
     return {
-      'type': type.toString(),
+      'activityType': type.toString(),
       'confidence': confidence,
       'dateTime': dateTime.toIso8601String(),
     };

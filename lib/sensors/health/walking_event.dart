@@ -9,7 +9,7 @@ class WalkingEvent {
 
   Map<String, dynamic> toMap() {
     return {
-      'type': stepCount.toString(),
+      'stepCount': stepCount.toString(),
       'dateTime': dateTime.toIso8601String(),
     };
   }
