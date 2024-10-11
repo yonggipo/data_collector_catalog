@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer' as dev;
 import 'dart:io';
 
+import 'package:data_collector_catalog/collertor/collector_premission_state.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -138,7 +139,8 @@ Future<void> startCollectors() async {
 
   List<(CollectionItem, Collector)> collectors = [];
   for (var item in items) {
-    if (await item.permissionsGranted) {
+    final status = await item.permissionStatus;
+    if (status != CollectorPermissionState.required) {
       final collector = item.collector;
       if (collector != null) {
         collectors.add((item, collector));
@@ -150,6 +152,6 @@ Future<void> startCollectors() async {
       name: _initialCollectionLog);
 
   for (var (item, collector) in collectors) {
-    collector.startWith(item);
+    collector.start(item);
   }
 }

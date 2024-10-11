@@ -13,17 +13,16 @@ import 'lux_event.dart';
 
 final class LightSensorUtil extends Collector {
   LightSensorUtil._() : super();
-  static final LightSensorUtil shared = LightSensorUtil._();
+  static final shared = LightSensorUtil._();
   factory LightSensorUtil() => shared;
   // Dio dio = Dio();
-  @override
-  final samplingInterval = SamplingInterval.event;
+
   StreamSubscription? _subscription;
   // ServiceInstance? service;
   List<LuxEvent> envents = [];
 
   @override
-  void cancel() {
+  void onCancel() {
     _subscription?.cancel();
     _subscription = null;
   }
@@ -60,7 +59,7 @@ final class LightSensorUtil extends Collector {
   }
 
   @override
-  void start() async {
+  void onStart() async {
     final hasSensor = await LightSensor.hasSensor();
     if (hasSensor) {
       _subscription = LightSensor.luxStream().listen(onData);

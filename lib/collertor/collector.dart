@@ -22,7 +22,6 @@ abstract class Collector {
   Timer? _timer;
   var _progressValue = 1.0;
   Duration? _duration;
-
   bool _isCollecting = false;
 
   Future<bool?> onRequest() {
@@ -31,14 +30,14 @@ abstract class Collector {
 
   void onLoad() {}
 
-  void start() {
+  void onStart() {
     _isCollecting = true;
     _isCollectingStreamController.add(_isCollecting);
     _timer?.cancel();
     _timer = null;
   }
 
-  void cancel() {
+  void onCancel() {
     _isCollecting = false;
     _isCollectingStreamController.add(_isCollecting);
     _progressValue = 0.0;
@@ -61,21 +60,21 @@ abstract class Collector {
 extension CollectorProgress on Collector {
   static const _log = 'CollectorProgress';
 
-  void startWith(CollectionItem item) {
+  void start(CollectionItem item) {
     _duration = item.samplingInterval.duration;
 
-    final schedule = Schedule.parse('*/${_duration?.inMinutes} * * * *');
-    dev.log('${item.name}\'s schedule: $schedule', name: _log);
-
     // 초기 시작
-    start();
+    onStart();
     dev.log('Start initial ${item.name} collection..', name: _log);
 
     // 이후 주기적으로 시작
-    _cron.schedule(schedule, () {
-      dev.log('Start ${item.name}\'s schedule..', name: _log);
-      start();
-    });
+    if (item.samplingInterval != SamplingInterval.event) {
+      final schedule = Schedule.parse('*/${_duration?.inMinutes} * * * *');
+      _cron.schedule(schedule, () {
+        onStart();
+        dev.log('Start ${item.name}\'s schedule: $schedule', name: _log);
+      });
+    }
   }
 
   void tracking(Duration duration) {

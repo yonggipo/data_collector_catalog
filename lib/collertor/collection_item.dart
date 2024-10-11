@@ -1,5 +1,8 @@
+// ignore: unused_import
 import 'dart:developer' as dev;
 
+import 'package:data_collector_catalog/collertor/permission_list_ext.dart';
+import 'package:data_collector_catalog/sensors/health/health_collector.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -17,10 +20,12 @@ enum CollectionItem {
   magneticFieldStrength,
 
   microphone,
+  health,
 }
 
 extension CollectionItemGetters on CollectionItem {
-  static const _logName = 'CollectionItemGetters';
+  // ignore: unused_field
+  static const _log = 'CollectionItemGetters';
 
   String get name {
     switch (this) {
@@ -33,6 +38,23 @@ extension CollectionItemGetters on CollectionItem {
 
       case CollectionItem.microphone:
         return '오디오';
+      case CollectionItem.health:
+        return '건강(걸음수, 활동 상태 및 시간)';
+    }
+  }
+
+  String get unit {
+    switch (this) {
+      case CollectionItem.acceleration:
+        return 'm/s²';
+      case CollectionItem.angularVelocity:
+        return '도/초(°/s)';
+      case CollectionItem.magneticFieldStrength:
+        return 'μT';
+      case CollectionItem.microphone:
+        return 'm4a';
+      case CollectionItem.health:
+        return 'count, status, date';
     }
   }
 
@@ -65,6 +87,8 @@ extension CollectionItemGetters on CollectionItem {
     switch (this) {
       case CollectionItem.microphone:
         return AudioCollector();
+      case CollectionItem.health:
+        return HealthCollector();
       default:
         return null;
     }
@@ -74,26 +98,17 @@ extension CollectionItemGetters on CollectionItem {
     switch (this) {
       case CollectionItem.microphone:
         return AudioCollector;
+      case CollectionItem.health:
+        return HealthCollector;
       default:
         return Collector;
     }
   }
 
-  String get unit {
-    switch (this) {
-      case CollectionItem.acceleration:
-        return 'm/s²';
-      case CollectionItem.angularVelocity:
-        return '도/초(°/s)';
-      case CollectionItem.magneticFieldStrength:
-        return 'μT';
-      case CollectionItem.microphone:
-        return 'm4a';
-    }
-  }
-
   SamplingInterval get samplingInterval {
     switch (this) {
+      case CollectionItem.health:
+        return SamplingInterval.event;
       default:
         return SamplingInterval.min15;
     }
@@ -106,69 +121,49 @@ extension CollectionItemGetters on CollectionItem {
         final isAboveAndroid9 =
             ((Device.shared.androidVersion ?? 28) > android9);
         return isAboveAndroid9
-            ? ([
+            ? [
                 Permission.microphone, // RECORD_AUDIO
-              ])
-            : ([
+              ]
+            : [
                 Permission.microphone, // RECORD_AUDIO
                 Permission.storage // WRITE_EXTERNAL_STORAGE
-              ]);
+              ];
       default:
         return [];
     }
   }
 
   Future<CollectorPermissionState> get permissionStatus async {
-    if (permissions.isEmpty) return CollectorPermissionState.none;
+    bool isGranted;
 
-    if (await permissionsGranted) {
-      return CollectorPermissionState.granted;
-    } else {
-      return CollectorPermissionState.required;
+    switch (this) {
+      case CollectionItem.health:
+        if (collector is HealthCollector) {
+          final health = collector as HealthCollector;
+          isGranted = await health.isGranted();
+        } else {
+          return CollectorPermissionState.required;
+        }
+      default:
+        if (permissions.isEmpty) {
+          return CollectorPermissionState.none;
+        }
+
+        isGranted = await permissions.areGranted;
     }
+
+    return isGranted
+        ? CollectorPermissionState.granted
+        : CollectorPermissionState.required;
   }
 
-  Future<bool> get permissionsGranted async {
-    if (permissions.isEmpty) {
-      return true;
+  Future<bool> requestRequired() async {
+    switch (this) {
+      case CollectionItem.health:
+        final health = collector as HealthCollector;
+        return await health.onRequest() ?? false;
+      default:
+        return await permissions.requestRequired();
     }
-
-    for (var permission in permissions) {
-      if (await permission.isGranted == false) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  Future<bool> requestRequiredPermissions() async {
-    if (permissions.isEmpty) {
-      return true;
-    }
-
-    List<Permission> notGrantedPermissions = [];
-
-    for (var permission in permissions) {
-      if (await permission.isGranted == false) {
-        notGrantedPermissions.add(permission);
-      }
-    }
-
-    if (notGrantedPermissions.isEmpty) {
-      return true;
-    }
-
-    dev.log('notGranted count: ${notGrantedPermissions.length}',
-        name: _logName);
-
-    Map<Permission, PermissionStatus> statuses =
-        await notGrantedPermissions.request();
-
-    for (var entry in statuses.entries) {
-      dev.log('entry: ${entry.key}, entry status: ${entry.value}',
-          name: _logName);
-    }
-    return statuses.values.every((status) => status.isGranted);
   }
 }

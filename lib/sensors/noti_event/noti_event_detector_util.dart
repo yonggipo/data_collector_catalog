@@ -21,7 +21,7 @@ final class NotiEventDetectorUtil extends Collector {
   SamplingInterval samplingInterval = SamplingInterval.event;
 
   @override
-  void cancel() {
+  void onCancel() {
     _subscription?.cancel();
     _subscription = null;
   }
@@ -66,7 +66,7 @@ final class NotiEventDetectorUtil extends Collector {
   }
 
   @override
-  void start() async {
+  void onStart() async {
     dev.log('start listening noti event');
 
     final hasP = await onRequest();

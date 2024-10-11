@@ -4,6 +4,7 @@ import 'dart:developer' as dev;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'collertor/collection_item.dart';
 import 'collertor/collector_premission_state.dart';
@@ -92,18 +93,27 @@ class _CollectStateScreenState extends State<CollectStateScreen> {
                     ),
                     Gap(4.0),
                     Text(
-                      '단위: ${item.unit} · 수집주기: ${item.samplingInterval.toString()}',
+                      ' · 단위: ${item.unit}',
                       style: TextStyle(
                         fontFamily: Constants.pretendard,
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
-                    Gap(4.0),
-                    FutureBuilder<bool>(
-                      future: item.permissionsGranted,
+                    Text(
+                      ' · 주기: ${item.samplingInterval.toString()}',
+                      style: TextStyle(
+                        fontFamily: Constants.pretendard,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    Gap(8.0),
+                    FutureBuilder<CollectorPermissionState>(
+                      future: item.permissionStatus,
                       builder: (context, snapshot) {
-                        final isGranted = snapshot.data ?? false;
+                        final status =
+                            snapshot.data ?? CollectorPermissionState.required;
                         return SizedBox(
                           width: 160,
                           child: ValueListenableBuilder<double>(
@@ -112,7 +122,8 @@ class _CollectStateScreenState extends State<CollectStateScreen> {
                             builder: (BuildContext context, dynamic value,
                                 Widget? child) {
                               return Visibility(
-                                visible: isGranted,
+                                visible: (status !=
+                                    CollectorPermissionState.required),
                                 child: LinearProgressIndicator(
                                   value: value,
                                   backgroundColor: Colors.white,
@@ -143,7 +154,7 @@ class _CollectStateScreenState extends State<CollectStateScreen> {
                         minSize: 0,
                         onPressed: () async {
                           if (state == CollectorPermissionState.required) {
-                            await item.requestRequiredPermissions();
+                            await item.requestRequired();
                             setState(() {});
                           }
                         },

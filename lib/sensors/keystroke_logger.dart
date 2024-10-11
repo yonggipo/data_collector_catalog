@@ -18,7 +18,7 @@ final class KeystrokeLogger extends Collector {
   final samplingInterval = SamplingInterval.event;
 
   @override
-  void cancel() {
+  void onCancel() {
     _subscription?.cancel();
     _subscription = null;
   }
@@ -41,7 +41,7 @@ final class KeystrokeLogger extends Collector {
   }
 
   @override
-  void start() {
+  void onStart() {
     _subscription = KeyEventListener.keyEvnetStream.listen(onData);
   }
 

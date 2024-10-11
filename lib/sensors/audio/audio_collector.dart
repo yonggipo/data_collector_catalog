@@ -8,10 +8,10 @@ import 'package:record/record.dart';
 import '../../collertor/collector.dart';
 
 final class AudioCollector extends Collector {
-  static const _log = 'AudioCollector';
+  static const _log = 'Audio';
 
   AudioCollector._() : super();
-  static final AudioCollector shared = AudioCollector._();
+  static final shared = AudioCollector._();
   factory AudioCollector() => shared;
 
   final record = AudioRecorder();
@@ -23,11 +23,9 @@ final class AudioCollector extends Collector {
   }
 
   @override
-  void start() async {
-    super.start();
+  void onStart() async {
+    super.onStart();
     dev.log('Start collection..', name: _log);
-
-    // await requestPermission();
 
     final path =
         'storage/emulated/0/Android/media/com.example.data_collector_catalog/files/'; // await FileManager.getPath();
@@ -63,13 +61,13 @@ final class AudioCollector extends Collector {
 
     // 1분 후에 녹음 종료
     await Future.delayed(Duration(minutes: 1));
-    cancel();
+    onCancel();
     dev.log('End recording..', name: _log);
   }
 
   @override
-  void cancel() async {
-    super.cancel();
+  void onCancel() async {
+    super.onCancel();
     final path = await record.stop();
     dev.log('Save record in $path', name: _log);
     // await record.cancel();
