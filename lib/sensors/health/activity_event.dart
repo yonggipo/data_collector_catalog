@@ -25,15 +25,15 @@ enum ActivityType {
   }
 }
 
-class HealthItem {
-  HealthItem({
+class ActivityEvent {
+  ActivityEvent({
     required this.type,
     required this.confidence,
     required this.dateTime,
   });
 
-  factory HealthItem.fromMap(Map<String, dynamic> map) {
-    return HealthItem(
+  factory ActivityEvent.fromMap(Map<String, dynamic> map) {
+    return ActivityEvent(
       type: ActivityType.values.firstWhere((e) => e.toString() == map['type']),
       confidence: map['confidence'],
       dateTime: DateTime.now(),

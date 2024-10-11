@@ -1,12 +1,15 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
-import 'package:data_collector_catalog/sensors/health/health_item.dart';
+import 'package:data_collector_catalog/sensors/health/walking_event.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_activity_recognition/flutter_activity_recognition.dart';
+import 'package:pedometer/pedometer.dart';
 
 import '../../collertor/collector.dart';
+import 'activity_event.dart';
+import 'walking_status.dart';
 
 class HealthCollector extends Collector {
   HealthCollector._() : super();
@@ -15,17 +18,17 @@ class HealthCollector extends Collector {
 
   static const _log = 'Health';
 
-  final recognizer = FlutterActivityRecognition.instance;
-  StreamSubscription? _subscription;
+  final _recognizer = FlutterActivityRecognition.instance;
+  List<StreamSubscription> _subscriptions = [];
 
   @override
   Future<bool?> onRequest() async {
-    final permission = await recognizer.requestPermission();
+    final permission = await _recognizer.requestPermission();
     return (permission == ActivityPermission.GRANTED);
   }
 
   Future<bool> isGranted() async {
-    final permission = await recognizer.checkPermission();
+    final permission = await _recognizer.checkPermission();
     return (permission == ActivityPermission.GRANTED);
   }
 
@@ -33,9 +36,14 @@ class HealthCollector extends Collector {
   void onStart() {
     super.onStart();
     dev.log('Start collection', name: _log);
+    final recSubscription =
+        _recognizer.activityStream.handleError(onError).listen(onData);
+    final pedSubscription = Pedometer.pedestrianStatusStream.listen(onData);
+    pedSubscription.onError(onError);
+    final stpSubscription = Pedometer.stepCountStream.listen(onData);
+    stpSubscription.onError(onError);
 
-    _subscription =
-        recognizer.activityStream.handleError(onError).listen(onData);
+    _subscriptions = [recSubscription, pedSubscription, stpSubscription];
   }
 
   @override
@@ -44,16 +52,53 @@ class HealthCollector extends Collector {
     if (object is Activity) {
       Activity activity = object;
       dev.log(activity.toJson().toString(), name: _log);
-      final item = HealthItem.fromMap(activity.toJson());
+      final item = ActivityEvent.fromMap(activity.toJson());
 
       // Upload item to firebase
       await Firebase.initializeApp();
       final ref = FirebaseDatabase.instance.ref();
       await ref
           .child("health")
-          .child('activity')
+          .child('activityEvent')
           .push()
           .set(item.toMap())
+          .catchError((e) {
+        dev.log('error: $e', name: _log);
+      });
+    } else if (object is StepCount) {
+      StepCount stepCount = object;
+      dev.log(stepCount.toString(), name: _log);
+
+      final walking = WalkingEvent(
+          stepCount: stepCount.steps, dateTime: stepCount.timeStamp);
+
+      // Upload item to firebase
+      await Firebase.initializeApp();
+      final ref = FirebaseDatabase.instance.ref();
+      await ref
+          .child("health")
+          .child('walkingEvnet')
+          .push()
+          .set(walking.toMap())
+          .catchError((e) {
+        dev.log('error: $e', name: _log);
+      });
+    } else if (object is PedestrianStatus) {
+      PedestrianStatus pedestrianStatus = object;
+      dev.log(pedestrianStatus.toString(), name: _log);
+      final status = WalkingStatus(
+          type: WalkingType.values
+              .firstWhere((v) => v.toString() == pedestrianStatus.status),
+          dateTime: pedestrianStatus.timeStamp);
+
+      // Upload item to firebase
+      await Firebase.initializeApp();
+      final ref = FirebaseDatabase.instance.ref();
+      await ref
+          .child("health")
+          .child('walkingStatus')
+          .push()
+          .set(status.toMap())
           .catchError((e) {
         dev.log('error: $e', name: _log);
       });
@@ -63,7 +108,9 @@ class HealthCollector extends Collector {
   @override
   void onCancel() {
     super.onCancel();
-    _subscription?.cancel();
-    _subscription = null;
+    for (var subscription in _subscriptions) {
+      subscription.cancel();
+    }
+    _subscriptions = [];
   }
 }
