@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:record/record.dart';
 
-import '../../collertor/collector.dart';
+import '../../models/collector.dart';
 
 final class AudioCollector extends Collector {
   static const _log = 'Audio';

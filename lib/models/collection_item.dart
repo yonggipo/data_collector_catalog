@@ -1,8 +1,9 @@
 // ignore: unused_import
 import 'dart:developer' as dev;
 
-import 'package:data_collector_catalog/collectors/lux_event/light_collector.dart';
-import 'package:data_collector_catalog/collertor/permission_list_ext.dart';
+import 'package:data_collector_catalog/collectors/light/light_collector.dart';
+import 'package:data_collector_catalog/collectors/notification/notification_collector.dart';
+import 'package:data_collector_catalog/models/permission_list_ext.dart';
 import 'package:data_collector_catalog/collectors/calendar/calendar_collector.dart';
 import 'package:data_collector_catalog/collectors/health/health_collector.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -25,6 +26,7 @@ enum CollectionItem {
   health,
   calendar,
   light,
+  notification,
 }
 
 extension CollectionItemGetters on CollectionItem {
@@ -48,10 +50,12 @@ extension CollectionItemGetters on CollectionItem {
         return '켈린더';
       case CollectionItem.light:
         return '빛';
+      case CollectionItem.notification:
+        return '알림';
     }
   }
 
-  String get unit {
+  String get description {
     switch (this) {
       case CollectionItem.acceleration:
         return '조도 m/s²';
@@ -67,6 +71,8 @@ extension CollectionItemGetters on CollectionItem {
         return '일정';
       case CollectionItem.light:
         return '조도 lumen';
+      case CollectionItem.notification:
+        return '앱, 메세지, 시간, 클릭 여부';
     }
   }
 
@@ -105,6 +111,8 @@ extension CollectionItemGetters on CollectionItem {
         return CalendarCollector();
       case CollectionItem.light:
         return LightCollector();
+      case CollectionItem.notification:
+        return NotificationCollector();
       default:
         return null;
     }
@@ -112,11 +120,15 @@ extension CollectionItemGetters on CollectionItem {
 
   SamplingInterval get samplingInterval {
     switch (this) {
+      case CollectionItem.microphone:
+        return SamplingInterval.min15;
       case CollectionItem.health:
         return SamplingInterval.event;
       case CollectionItem.calendar:
         return SamplingInterval.event;
       case CollectionItem.light:
+        return SamplingInterval.event;
+      case CollectionItem.notification:
         return SamplingInterval.event;
       default:
         return SamplingInterval.min15;
@@ -126,10 +138,7 @@ extension CollectionItemGetters on CollectionItem {
   List<Permission> get permissions {
     switch (this) {
       case CollectionItem.microphone:
-        final android9 = 28;
-        final isAboveAndroid9 =
-            ((Device.shared.androidVersion ?? 28) > android9);
-        return isAboveAndroid9
+        return Device.shared.isAboveAndroid9
             ? [Permission.microphone]
             : [Permission.microphone, Permission.storage];
       case CollectionItem.calendar:
@@ -141,36 +150,35 @@ extension CollectionItemGetters on CollectionItem {
 
   // Status of the required permissions in the collector
   Future<CollectorPermissionState> get permissionStatus async {
-    switch (this) {
-      case CollectionItem.health:
-        if (collector is HealthCollector) {
-          final health = collector as HealthCollector;
-          final isGranted = await health.isGranted();
-          return isGranted
-              ? CollectorPermissionState.granted
-              : CollectorPermissionState.required;
-        } else {
-          return CollectorPermissionState.required;
-        }
-      default:
-        if (permissions.isEmpty) {
-          return CollectorPermissionState.none;
-        }
+    final isNeedCustomPermission = [
+      CollectionItem.health,
+      CollectionItem.notification,
+    ].contains(this);
 
-        final isGranted = await permissions.areGranted;
-        return isGranted
-            ? CollectorPermissionState.granted
-            : CollectorPermissionState.required;
+    if (isNeedCustomPermission) {
+      return (await collector?.onCheck() ?? false)
+          ? CollectorPermissionState.granted
+          : CollectorPermissionState.required;
+    } else {
+      if (permissions.isEmpty) {
+        return CollectorPermissionState.none;
+      }
+      return (await permissions.areGranted)
+          ? CollectorPermissionState.granted
+          : CollectorPermissionState.required;
     }
   }
-  
+
   Future<bool> requestRequired() async {
-    switch (this) {
-      case CollectionItem.health:
-        final health = collector as HealthCollector;
-        return await health.onRequest() ?? false;
-      default:
-        return await permissions.requestRequired();
+    final isNeedCustomPermission = [
+      CollectionItem.health,
+      CollectionItem.notification,
+    ].contains(this);
+
+    if (isNeedCustomPermission) {
+      return await collector?.onRequest() ?? false;
+    } else {
+      return await permissions.requestRequired();
     }
   }
 }

@@ -7,7 +7,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_activity_recognition/flutter_activity_recognition.dart';
 import 'package:pedometer/pedometer.dart';
 
-import '../../collertor/collector.dart';
+import '../../models/collector.dart';
 import 'activity_event.dart';
 import 'walking_status.dart';
 
@@ -27,7 +27,8 @@ class HealthCollector extends Collector {
     return (permission == ActivityPermission.GRANTED);
   }
 
-  Future<bool> isGranted() async {
+  @override
+  Future<bool> onCheck() async {
     final permission = await _recognizer.checkPermission();
     return (permission == ActivityPermission.GRANTED);
   }

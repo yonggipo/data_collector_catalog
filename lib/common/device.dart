@@ -10,6 +10,11 @@ class Device {
 
   int? androidVersion;
 
+  bool get isAboveAndroid9 {
+    final int android9 = 28;
+    return (androidVersion ?? 23) > android9;
+  }
+
   Future<void> checkAndroidVersion() async {
     final deviceInfo = DeviceInfoPlugin();
     final androidInfo = await deviceInfo.androidInfo;

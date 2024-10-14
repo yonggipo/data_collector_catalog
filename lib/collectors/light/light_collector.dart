@@ -4,7 +4,7 @@ import 'dart:developer' as dev;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 
-import '../../collertor/collector.dart';
+import '../../models/collector.dart';
 import 'light_adaptor.dart';
 import 'lux_event.dart';
 
@@ -19,6 +19,7 @@ final class LightCollector extends Collector {
 
   @override
   void onStart() async {
+    dev.log('Start collection', name: _log);
     final hasSensor = await LightAdaptor.hasSensor();
     if (hasSensor) {
       _subscription = LightAdaptor.luxStream().listen(onData);

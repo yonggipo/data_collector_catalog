@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:cron/cron.dart';
-import 'package:data_collector_catalog/collertor/collection_item.dart';
-import 'package:data_collector_catalog/collertor/sampling_interval.dart';
+import 'package:data_collector_catalog/models/collection_item.dart';
+import 'package:data_collector_catalog/models/sampling_interval.dart';
 import 'package:flutter/foundation.dart';
 
 abstract class Collector {
@@ -29,6 +29,10 @@ abstract class Collector {
   }
 
   void onLoad() {}
+
+  Future<bool> onCheck() {
+    return Future(() => false);
+  }
 
   void onStart() {
     _isCollecting = true;

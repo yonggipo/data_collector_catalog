@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
-import 'package:data_collector_catalog/collectors/key_event_listener.dart';
+import 'package:data_collector_catalog/collectors/keystroke/key_event_listener.dart';
 import 'package:flutter/foundation.dart';
 
-import '../collertor/sampling_interval.dart';
-import '../collertor/collector.dart';
+import '../../models/sampling_interval.dart';
+import '../../models/collector.dart';
 
 final class KeystrokeLogger extends Collector {
   KeystrokeLogger._() : super();

@@ -5,7 +5,25 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
-import '../common/constants.dart';
+import 'constants.dart';
+
+@override
+Future<void> upload(String filePath, dynamic file) async {
+  // var formData = FormData.fromMap({
+  //   'Lux': await MultipartFile.fromFile(filePath,
+  //       filename: 'Lux.json', contentType: MediaType('application', 'json')),
+  //   'pin': pin, // Add the pin form field
+  // });
+  // var options = Options(headers: {'Content-Type': 'multipart/form-data'});
+  // var response =
+  //     await dio.post("$subUrl/app/upload", data: formData, options: options);
+  // if (response.statusCode == 200) {
+  //   dev.log('File uploaded successfully!');
+  //   file.deleteSync();
+  // } else {
+  //   dev.log('[✗ Noti] network: ${response.statusCode}');
+  // }
+}
 
 class FileManager {
   static final FileManager shared = FileManager._();

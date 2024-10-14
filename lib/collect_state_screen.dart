@@ -4,11 +4,10 @@ import 'dart:developer' as dev;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:permission_handler/permission_handler.dart';
 
-import 'collertor/collection_item.dart';
-import 'collertor/collector_premission_state.dart';
-import 'collertor/collector_state.dart';
+import 'models/collection_item.dart';
+import 'models/collector_premission_state.dart';
+import 'models/collector_state.dart';
 import 'common/constants.dart';
 
 class CollectStateScreen extends StatefulWidget {
@@ -93,7 +92,7 @@ class _CollectStateScreenState extends State<CollectStateScreen> {
                     ),
                     Gap(4.0),
                     Text(
-                      ' · 단위: ${item.unit}',
+                      ' · 단위: ${item.description}',
                       style: TextStyle(
                         fontFamily: Constants.pretendard,
                         fontSize: 13,

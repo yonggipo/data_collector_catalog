@@ -5,40 +5,41 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 
 import '../../common/constants.dart';
-import 'noti_event.dart';
+import 'notification_event.dart';
 
-class NotiEventDetector {
-  NotiEventDetector._();
+class NotificationAdaptor {
+  NotificationAdaptor._();
 
+  static const _log = 'NotificationAdaptor';
   static const _eventChannel = EventChannel(Constants.notiEvent);
   static const _methodChannel = MethodChannel(Constants.notiMethod);
-  static Stream<NotiEvent>? _stream;
 
-  static Stream<NotiEvent> get notiStream {
+  static Stream<NotificationEvent>? _stream;
+  static Stream<NotificationEvent> get stream {
     if (!Platform.isAndroid) {
       throw Exception("Notifications API exclusively available on Android!");
     }
 
     _stream ??= _eventChannel
         .receiveBroadcastStream()
-        .map<NotiEvent>((e) => NotiEvent.fromMap(e));
+        .map<NotificationEvent>((e) => NotificationEvent.fromMap(e));
     return _stream!;
   }
 
-  static Future<bool> requestP() async {
+  static Future<bool> requestPermission() async {
     try {
-      return await _methodChannel.invokeMethod('requestP');
+      return await _methodChannel.invokeMethod('requestPermission');
     } on PlatformException catch (error) {
-      dev.log("$error");
-      return Future.value(false);
+      dev.log('$error', name: _log);
+      return false;
     }
   }
 
-  static Future<bool> hasP() async {
+  static Future<bool> hasPermission() async {
     try {
-      return await _methodChannel.invokeMethod('hasP');
+      return await _methodChannel.invokeMethod('hasPermission');
     } on PlatformException catch (error) {
-      dev.log("$error");
+      dev.log('$error', name: _log);
       return false;
     }
   }

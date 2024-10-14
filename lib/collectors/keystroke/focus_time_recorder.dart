@@ -1,4 +1,4 @@
-import 'package:data_collector_catalog/keystroke/keystroke_data.dart';
+import 'package:data_collector_catalog/collectors/keystroke/keystroke_data.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as dev;
 

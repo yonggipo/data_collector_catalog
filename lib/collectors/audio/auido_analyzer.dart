@@ -4,7 +4,7 @@ import 'package:fftea/fftea.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 
-import '../../model/file_manager.dart';
+import '../../common/file_manager.dart';
 
 class AuidoAnalyzer {
   static const _log = 'AuidoAnalyzer';

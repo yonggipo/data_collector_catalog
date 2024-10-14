@@ -5,7 +5,7 @@ import 'package:device_calendar/device_calendar.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 
-import '../../collertor/collector.dart';
+import '../../models/collector.dart';
 import 'calendar_adaptor.dart';
 import 'calendar_evnet.dart';
 

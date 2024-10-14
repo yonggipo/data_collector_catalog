@@ -19,6 +19,5 @@ class _Stream {
 
 class _File {
   final String lux = 'lux_events.json';
-
   final String audioPath = 'audio';
 }

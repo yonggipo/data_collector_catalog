@@ -2,15 +2,15 @@ import 'dart:async';
 import 'dart:developer' as dev;
 import 'dart:io';
 
-import 'package:data_collector_catalog/collertor/collector_premission_state.dart';
+import 'package:data_collector_catalog/models/collector_premission_state.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'catalog_app.dart';
-import 'collertor/collection_item.dart';
-import 'collertor/collector.dart';
+import 'models/collection_item.dart';
+import 'models/collector.dart';
 import 'common/device.dart';
 import 'firebase_options.dart';
 
