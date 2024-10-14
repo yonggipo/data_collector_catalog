@@ -9,15 +9,19 @@ import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.Result
+import java.lang.ref.WeakReference
 
 
-class NotiEventHandler(private val context: Context): EventChannel.StreamHandler, MethodChannel.MethodCallHandler {
+class NotiEventHandler(): EventChannel.StreamHandler, MethodChannel.MethodCallHandler {
 
-    private var eventSink: EventChannel.EventSink? = null
+    companion object {
+        var eventSink: EventChannel.EventSink? = null
+    }
+
+    var contextRef: WeakReference<Context>? = null
     private var pendingResult: Result? = null
 
     override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-        eventSink = NotiEventListenerService.eventSink
         eventSink = events
     }
 
@@ -26,30 +30,36 @@ class NotiEventHandler(private val context: Context): EventChannel.StreamHandler
     }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
-        when (call.method) {
-            "hasP" -> {
-                result.success(isPermissionGranted(context))
-            }
-            "requestP" -> {
-                pendingResult = result
-                val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
-                val activityContext = context as? Activity
-                activityContext?.startActivityForResult(intent, 1199)
-            }
-            else -> {
-                result.notImplemented()
+        contextRef?.get()?.let { context ->
+            when (call.method) {
+                "hasPermission" -> {
+                    result.success(isPermissionGranted(context))
+                }
+                "requestPermission" -> {
+                    pendingResult = result
+                    val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+                    val activityContext = context as? Activity
+                    activityContext?.startActivityForResult(intent, 1199)
+                }
+                else -> {
+                    result.notImplemented()
+                }
             }
         }
+
     }
 
     internal fun onActivityResult(requestCode: Int, resultCode: Int) {
+
         if (requestCode == 1199) {
             when (resultCode) {
                 Activity.RESULT_OK -> {
                     pendingResult?.success(true)
                 }
                 Activity.RESULT_CANCELED -> {
-                    pendingResult?.success(isPermissionGranted(context))
+                    contextRef?.get()?.let {
+                        pendingResult?.success(isPermissionGranted(it))
+                    }
                 }
                 else -> {
                     pendingResult?.success(false)
