@@ -11,7 +11,7 @@ import java.lang.ref.WeakReference
 
 class MainActivity : FlutterActivity() {
     private val luxEventHandler by lazy { LuxEventHandler(this) }
-    private val notiEventHandler by lazy { NotiEventHandler(this) }
+    private var notificationEventHandler: NotificationEventHandler? = null
     private var calendarObserver: CalendarObserver? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +25,7 @@ class MainActivity : FlutterActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        notiEventHandler.onActivityResult(requestCode, resultCode)
+        notificationEventHandler?.onActivityResult(requestCode, resultCode)
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -33,16 +33,20 @@ class MainActivity : FlutterActivity() {
         Log.d("kane", "configureFlutterEngine")
         calendarObserver = CalendarObserver()
         calendarObserver?.contextRef = WeakReference(this)
+        notificationEventHandler = NotificationEventHandler()
+        notificationEventHandler?.contextRef = WeakReference(this)
+
         EventChannel(flutterEngine.dartExecutor.binaryMessenger, "com.kane.calendar.event")
             .setStreamHandler(calendarObserver)
 
-        EventChannel(flutterEngine.dartExecutor.binaryMessenger, "com.kane.light_sensor_plugin.event")
+        EventChannel(flutterEngine.dartExecutor.binaryMessenger, "com.kane.light.event")
             .setStreamHandler(luxEventHandler)
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.kane.light_sensor_plugin.method")
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.kane.light.method")
             .setMethodCallHandler(luxEventHandler)
-        EventChannel(flutterEngine.dartExecutor.binaryMessenger, "com.kane.noti_detector_plugin.event")
-            .setStreamHandler(notiEventHandler)
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.kane.noti_detector_plugin.method")
-            .setMethodCallHandler(notiEventHandler)
+
+        EventChannel(flutterEngine.dartExecutor.binaryMessenger, "com.kane.notification.event")
+            .setStreamHandler(notificationEventHandler)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.kane.notification.method")
+            .setMethodCallHandler(notificationEventHandler)
     }
 }

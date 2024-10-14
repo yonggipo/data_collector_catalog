@@ -12,7 +12,7 @@ import io.flutter.plugin.common.MethodChannel.Result
 import java.lang.ref.WeakReference
 
 
-class NotiEventHandler(): EventChannel.StreamHandler, MethodChannel.MethodCallHandler {
+class NotificationEventHandler(): EventChannel.StreamHandler, MethodChannel.MethodCallHandler {
 
     companion object {
         var eventSink: EventChannel.EventSink? = null

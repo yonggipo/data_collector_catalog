@@ -4,11 +4,11 @@ class Constants {
 
   static final String pretendard = 'Pretendard';
 
-  static const lightEvent = 'com.kane.light_sensor_plugin.event';
-  static const lightMethod = 'com.kane.light_sensor_plugin.method';
+  static const lightEvent = 'com.kane.light.event';
+  static const lightMethod = 'com.kane.light.method';
 
-  static const notiEvent = 'com.kane.noti_detector_plugin.event';
-  static const notiMethod = 'com.kane.noti_detector_plugin.method';
+  static const notiEvent = 'com.kane.notification.event';
+  static const notiMethod = 'com.kane.notification.method';
 
   static const calendarEvent = 'com.kane.calendar.event';
 }

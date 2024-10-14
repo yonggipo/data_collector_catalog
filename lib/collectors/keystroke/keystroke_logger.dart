@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
-import 'package:data_collector_catalog/collectors/keystroke/key_event_listener.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../models/sampling_interval.dart';
 import '../../models/collector.dart';
+import 'key_event_listener.dart';
 
 final class KeystrokeLogger extends Collector {
   KeystrokeLogger._() : super();
@@ -13,9 +12,6 @@ final class KeystrokeLogger extends Collector {
   factory KeystrokeLogger() => shared;
 
   StreamSubscription? _subscription;
-
-  @override
-  final samplingInterval = SamplingInterval.event;
 
   @override
   void onCancel() {
