@@ -9,6 +9,8 @@ class Constants {
 
   static const notiEvent = 'com.kane.noti_detector_plugin.event';
   static const notiMethod = 'com.kane.noti_detector_plugin.method';
+
+  static const calendarEvent = 'com.kane.calendar.event';
 }
 
 class _Stream {
