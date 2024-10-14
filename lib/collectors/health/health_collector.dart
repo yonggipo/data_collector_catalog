@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
-import 'package:data_collector_catalog/sensors/health/walking_event.dart';
+import 'package:data_collector_catalog/collectors/health/walking_event.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_activity_recognition/flutter_activity_recognition.dart';

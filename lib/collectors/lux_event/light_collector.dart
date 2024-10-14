@@ -5,7 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 import '../../collertor/collector.dart';
-import 'light_sensor.dart';
+import 'light_adaptor.dart';
 import 'lux_event.dart';
 
 final class LightCollector extends Collector {
@@ -14,18 +14,14 @@ final class LightCollector extends Collector {
   factory LightCollector() => shared;
 
   static const _log = 'Light';
-
-  // Dio dio = Dio();
-
   StreamSubscription? _subscription;
-  // ServiceInstance? service;
   List<LuxEvent> envents = [];
 
   @override
   void onStart() async {
-    final hasSensor = await LightSensor.hasSensor();
+    final hasSensor = await LightAdaptor.hasSensor();
     if (hasSensor) {
-      _subscription = LightSensor.luxStream().listen(onData);
+      _subscription = LightAdaptor.luxStream().listen(onData);
       _subscription?.onError(onError);
     }
   }
@@ -39,15 +35,11 @@ final class LightCollector extends Collector {
     await Firebase.initializeApp();
     final ref = FirebaseDatabase.instance.ref();
     await ref.child("lux").push().set(event.toJson()).catchError((e) {
-      dev.log('[✗] error2: $e');
+      dev.log('error: $e', name: _log);
     });
 
-    // service?.invoke(
-    //   'update',
-    // );
-
-    // save to json file
-    // FileManager().toJsonFile(event.toJson());
+    await Future.delayed(Duration(seconds: 10));
+    onCancel();
   }
 
   @override

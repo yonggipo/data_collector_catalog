@@ -2,8 +2,8 @@ import 'package:flutter/services.dart';
 
 import '../../common/constants.dart';
 
-class LightSensor {
-  LightSensor._();
+class LightAdaptor {
+  LightAdaptor._();
 
   static const eventChannel = EventChannel(Constants.lightEvent);
   static const methodChannel = MethodChannel(Constants.lightMethod);

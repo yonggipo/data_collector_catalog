@@ -1,15 +1,16 @@
 // ignore: unused_import
 import 'dart:developer' as dev;
 
+import 'package:data_collector_catalog/collectors/lux_event/light_collector.dart';
 import 'package:data_collector_catalog/collertor/permission_list_ext.dart';
-import 'package:data_collector_catalog/sensors/calendar/calendar_collector.dart';
-import 'package:data_collector_catalog/sensors/health/health_collector.dart';
+import 'package:data_collector_catalog/collectors/calendar/calendar_collector.dart';
+import 'package:data_collector_catalog/collectors/health/health_collector.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../common/constants.dart';
 import '../common/device.dart';
-import '../sensors/audio/audio_collector.dart';
+import '../collectors/audio/audio_collector.dart';
 import 'collector.dart';
 import 'collector_state.dart';
 import 'sampling_interval.dart';
@@ -23,6 +24,7 @@ enum CollectionItem {
   microphone,
   health,
   calendar,
+  light,
 }
 
 extension CollectionItemGetters on CollectionItem {
@@ -44,6 +46,8 @@ extension CollectionItemGetters on CollectionItem {
         return '건강(걸음수, 활동 상태 및 시간)';
       case CollectionItem.calendar:
         return '켈린더';
+      case CollectionItem.light:
+        return '빛';
     }
   }
 
@@ -61,6 +65,8 @@ extension CollectionItemGetters on CollectionItem {
         return '걸음수, 활동 상태 및 시간';
       case CollectionItem.calendar:
         return '일정';
+      case CollectionItem.light:
+        return '조도 lumen';
     }
   }
 
@@ -97,19 +103,10 @@ extension CollectionItemGetters on CollectionItem {
         return HealthCollector();
       case CollectionItem.calendar:
         return CalendarCollector();
+      case CollectionItem.light:
+        return LightCollector();
       default:
         return null;
-    }
-  }
-
-  Type get collectorType {
-    switch (this) {
-      case CollectionItem.microphone:
-        return AudioCollector;
-      case CollectionItem.health:
-        return HealthCollector;
-      default:
-        return Collector;
     }
   }
 
@@ -118,6 +115,8 @@ extension CollectionItemGetters on CollectionItem {
       case CollectionItem.health:
         return SamplingInterval.event;
       case CollectionItem.calendar:
+        return SamplingInterval.event;
+      case CollectionItem.light:
         return SamplingInterval.event;
       default:
         return SamplingInterval.min15;
@@ -164,7 +163,7 @@ extension CollectionItemGetters on CollectionItem {
             : CollectorPermissionState.required;
     }
   }
-
+  
   Future<bool> requestRequired() async {
     switch (this) {
       case CollectionItem.health:

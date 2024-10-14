@@ -10,6 +10,10 @@ import 'calendar_adaptor.dart';
 import 'calendar_evnet.dart';
 
 class CalendarCollector extends Collector {
+  CalendarCollector._() : super();
+  static final shared = CalendarCollector._();
+  factory CalendarCollector() => shared;
+
   static const _log = 'calender';
   final _plugin = DeviceCalendarPlugin();
   StreamSubscription? _subscription;
@@ -28,10 +32,10 @@ class CalendarCollector extends Collector {
   @override
   void onStart() async {
     super.onStart();
-
+    // 앱시작시, 그리고 일정 변경을 감지시 3달(-30 +60)에 해당하는 일정을 읽어와 전송
+    await _uploadEvents();
     _subscription = CalendarAdaptor.signalStream().listen(onData);
     _subscription?.onError(onError);
-    await _uploadEvents();
   }
 
   Future<void> _uploadEvents() async {

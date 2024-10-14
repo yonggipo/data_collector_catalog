@@ -39,7 +39,7 @@ class LuxEventHandler(private val context: Context) : EventChannel.StreamHandler
 
             override fun onSensorChanged(event: SensorEvent) {
                 val lux = event.values[0].toInt()
-                Log.d("kane", "light value changed: $lux")
+                Log.d("LuxEventHandler", "Light has been changed: $lux")
                 eventSink?.success(lux)
             }
         }
