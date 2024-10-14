@@ -7,10 +7,12 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
+import java.lang.ref.WeakReference
 
 class MainActivity : FlutterActivity() {
     private val luxEventHandler by lazy { LuxEventHandler(this) }
     private val notiEventHandler by lazy { NotiEventHandler(this) }
+    private var calendarObserver: CalendarObserver? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +31,10 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         Log.d("kane", "configureFlutterEngine")
+        calendarObserver = CalendarObserver()
+        calendarObserver?.contextRef = WeakReference(this)
+        EventChannel(flutterEngine.dartExecutor.binaryMessenger, "com.kane.calendar.event")
+            .setStreamHandler(calendarObserver)
 
         EventChannel(flutterEngine.dartExecutor.binaryMessenger, "com.kane.light_sensor_plugin.event")
             .setStreamHandler(luxEventHandler)
