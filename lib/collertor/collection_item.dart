@@ -2,6 +2,7 @@
 import 'dart:developer' as dev;
 
 import 'package:data_collector_catalog/collertor/permission_list_ext.dart';
+import 'package:data_collector_catalog/sensors/calendar/calendar_collector.dart';
 import 'package:data_collector_catalog/sensors/health/health_collector.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -21,6 +22,7 @@ enum CollectionItem {
 
   microphone,
   health,
+  calendar,
 }
 
 extension CollectionItemGetters on CollectionItem {
@@ -40,21 +42,25 @@ extension CollectionItemGetters on CollectionItem {
         return '오디오';
       case CollectionItem.health:
         return '건강(걸음수, 활동 상태 및 시간)';
+      case CollectionItem.calendar:
+        return '켈린더';
     }
   }
 
   String get unit {
     switch (this) {
       case CollectionItem.acceleration:
-        return 'm/s²';
+        return '조도 m/s²';
       case CollectionItem.angularVelocity:
-        return '도/초(°/s)';
+        return '각속도 도/초(°/s)';
       case CollectionItem.magneticFieldStrength:
-        return 'μT';
+        return '자기장 세기 μT';
       case CollectionItem.microphone:
-        return 'm4a';
+        return 'audio m4a';
       case CollectionItem.health:
-        return 'count, status, date';
+        return '걸음수, 활동 상태 및 시간';
+      case CollectionItem.calendar:
+        return '일정';
     }
   }
 
@@ -89,6 +95,8 @@ extension CollectionItemGetters on CollectionItem {
         return AudioCollector();
       case CollectionItem.health:
         return HealthCollector();
+      case CollectionItem.calendar:
+        return CalendarCollector();
       default:
         return null;
     }
@@ -109,6 +117,8 @@ extension CollectionItemGetters on CollectionItem {
     switch (this) {
       case CollectionItem.health:
         return SamplingInterval.event;
+      case CollectionItem.calendar:
+        return SamplingInterval.event;
       default:
         return SamplingInterval.min15;
     }
@@ -121,26 +131,25 @@ extension CollectionItemGetters on CollectionItem {
         final isAboveAndroid9 =
             ((Device.shared.androidVersion ?? 28) > android9);
         return isAboveAndroid9
-            ? [
-                Permission.microphone, // RECORD_AUDIO
-              ]
-            : [
-                Permission.microphone, // RECORD_AUDIO
-                Permission.storage // WRITE_EXTERNAL_STORAGE
-              ];
+            ? [Permission.microphone]
+            : [Permission.microphone, Permission.storage];
+      case CollectionItem.calendar:
+        return [Permission.calendarFullAccess];
       default:
         return [];
     }
   }
 
+  // Status of the required permissions in the collector
   Future<CollectorPermissionState> get permissionStatus async {
-    bool isGranted;
-
     switch (this) {
       case CollectionItem.health:
         if (collector is HealthCollector) {
           final health = collector as HealthCollector;
-          isGranted = await health.isGranted();
+          final isGranted = await health.isGranted();
+          return isGranted
+              ? CollectorPermissionState.granted
+              : CollectorPermissionState.required;
         } else {
           return CollectorPermissionState.required;
         }
@@ -149,12 +158,11 @@ extension CollectionItemGetters on CollectionItem {
           return CollectorPermissionState.none;
         }
 
-        isGranted = await permissions.areGranted;
+        final isGranted = await permissions.areGranted;
+        return isGranted
+            ? CollectorPermissionState.granted
+            : CollectorPermissionState.required;
     }
-
-    return isGranted
-        ? CollectorPermissionState.granted
-        : CollectorPermissionState.required;
   }
 
   Future<bool> requestRequired() async {
