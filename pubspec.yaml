@@ -28,6 +28,7 @@ dependencies:
   flutter_svg: ^2.0.10+1
   pedometer: ^4.0.2
   flutter_activity_recognition: ^4.0.0
+  device_calendar: ^4.3.3
 
 dev_dependencies:
   flutter_test:
