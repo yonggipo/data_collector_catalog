@@ -4,6 +4,7 @@ import 'dart:developer' as dev;
 import 'package:data_collector_catalog/collectors/light/light_collector.dart';
 import 'package:data_collector_catalog/collectors/notification/notification_collector.dart';
 import 'package:data_collector_catalog/collectors/screen_state/screen_state_collector.dart';
+import 'package:data_collector_catalog/collectors/volume/volume_collector.dart';
 import 'package:data_collector_catalog/models/permission_list_ext.dart';
 import 'package:data_collector_catalog/collectors/calendar/calendar_collector.dart';
 import 'package:data_collector_catalog/collectors/health/health_collector.dart';
@@ -28,7 +29,7 @@ enum CollectionItem {
   calendar,
   light,
   notification,
-
+  volume,
   screenState,
 }
 
@@ -55,7 +56,8 @@ extension CollectionItemGetters on CollectionItem {
         return '빛';
       case CollectionItem.notification:
         return '알림';
-
+      case CollectionItem.volume:
+        return '볼륨';
       case CollectionItem.screenState:
         return '화면 상태';
     }
@@ -79,7 +81,8 @@ extension CollectionItemGetters on CollectionItem {
         return '조도 lumen';
       case CollectionItem.notification:
         return '앱, 메세지, 시간, 클릭 여부';
-
+      case CollectionItem.volume:
+        return '벨소리 모드, 음량';
       case CollectionItem.screenState:
         return 'on, off, unlocked';
     }
@@ -122,7 +125,8 @@ extension CollectionItemGetters on CollectionItem {
         return LightCollector();
       case CollectionItem.notification:
         return NotificationCollector();
-
+      case CollectionItem.volume:
+        return VolumeCollector();
       case CollectionItem.screenState:
         return ScreenStateCollector();
       default:
@@ -131,21 +135,10 @@ extension CollectionItemGetters on CollectionItem {
   }
 
   SamplingInterval get samplingInterval {
-    switch (this) {
-      case CollectionItem.microphone:
-        return SamplingInterval.min15;
-      case CollectionItem.health:
-        return SamplingInterval.event;
-      case CollectionItem.calendar:
-        return SamplingInterval.event;
-      case CollectionItem.light:
-        return SamplingInterval.event;
-      case CollectionItem.notification:
-        return SamplingInterval.event;
-      case CollectionItem.screenState:
-        return SamplingInterval.event;
-      default:
-        return SamplingInterval.min15;
+    if (this == CollectionItem.microphone) {
+      return SamplingInterval.min15;
+    } else {
+      return SamplingInterval.event;
     }
   }
 
@@ -162,13 +155,15 @@ extension CollectionItemGetters on CollectionItem {
     }
   }
 
-  // Status of the required permissions in the collector
-  Future<CollectorPermissionState> get permissionStatus async {
-    final isNeedCustomPermission = [
+  bool get isNeedCustomPermission {
+    return [
       CollectionItem.health,
       CollectionItem.notification,
     ].contains(this);
+  }
 
+  // Status of the required permissions in the collector
+  Future<CollectorPermissionState> get permissionStatus async {
     if (isNeedCustomPermission) {
       return (await collector?.onCheck() ?? false)
           ? CollectorPermissionState.granted
@@ -184,11 +179,6 @@ extension CollectionItemGetters on CollectionItem {
   }
 
   Future<bool> requestRequired() async {
-    final isNeedCustomPermission = [
-      CollectionItem.health,
-      CollectionItem.notification,
-    ].contains(this);
-
     if (isNeedCustomPermission) {
       return await collector?.onRequest() ?? false;
     } else {

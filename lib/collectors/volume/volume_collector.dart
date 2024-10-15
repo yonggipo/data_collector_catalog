@@ -16,22 +16,6 @@ final class VolumeCollector extends Collector {
   List<StreamSubscription>? _subscriptions;
 
   @override
-  Future<bool> onCheck() async {
-    super.onCheck();
-    if ((Platform.isAndroid) && (Device.shared.android!.version.sdkInt >= 6)) {
-      return await RealVolume.isPermissionGranted() ?? false;
-    } else {
-      return false;
-    }
-  }
-
-  @override
-  Future<bool?> onRequest() async {
-    super.onRequest();
-    return await RealVolume.openDoNotDisturbSettings() ?? false;
-  }
-
-  @override
   void onStart() async {
     super.onStart();
     dev.log('Start collection', name: _log);
@@ -54,4 +38,3 @@ final class VolumeCollector extends Collector {
     _subscriptions?.clear();
   }
 }
-
