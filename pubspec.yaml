@@ -28,7 +28,6 @@ dependencies:
   flutter_activity_recognition: ^4.0.0
   device_calendar: ^4.3.3
   real_volume: ^1.0.9
-  is_lock_screen2: ^2.0.1
 
 dev_dependencies:
   flutter_test:

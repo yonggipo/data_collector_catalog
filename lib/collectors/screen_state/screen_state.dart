@@ -1,7 +1,7 @@
 enum ScreenState {
   on,
   off,
-  lock;
+  unlocked;
 
   static ScreenState fromString(String value) {
     switch (value) {
@@ -9,8 +9,8 @@ enum ScreenState {
         return ScreenState.on;
       case 'off':
         return ScreenState.off;
-      case 'lock':
-        return ScreenState.lock;
+      case 'unlocked':
+        return ScreenState.unlocked;
       default:
         throw ArgumentError('Invalid screen state: $value');
     }

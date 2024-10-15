@@ -4,11 +4,10 @@ import 'dart:io';
 import 'package:data_collector_catalog/collectors/screen_state/screen_state_event.dart';
 import 'package:flutter/services.dart';
 
-import 'screen_state.dart';
-
 class ScreenAdaptor {
   ScreenAdaptor._();
 
+  // ignore: unused_field
   static const _log = 'ScreenAdaptor';
   static const _eventChannel = EventChannel("com.kane.screen.event");
 

@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 
 import 'package:data_collector_catalog/collectors/light/light_collector.dart';
 import 'package:data_collector_catalog/collectors/notification/notification_collector.dart';
+import 'package:data_collector_catalog/collectors/screen_state/screen_state_collector.dart';
 import 'package:data_collector_catalog/models/permission_list_ext.dart';
 import 'package:data_collector_catalog/collectors/calendar/calendar_collector.dart';
 import 'package:data_collector_catalog/collectors/health/health_collector.dart';
@@ -27,6 +28,8 @@ enum CollectionItem {
   calendar,
   light,
   notification,
+
+  screenState,
 }
 
 extension CollectionItemGetters on CollectionItem {
@@ -52,6 +55,9 @@ extension CollectionItemGetters on CollectionItem {
         return '빛';
       case CollectionItem.notification:
         return '알림';
+
+      case CollectionItem.screenState:
+        return '화면 상태';
     }
   }
 
@@ -73,6 +79,9 @@ extension CollectionItemGetters on CollectionItem {
         return '조도 lumen';
       case CollectionItem.notification:
         return '앱, 메세지, 시간, 클릭 여부';
+
+      case CollectionItem.screenState:
+        return 'on, off, unlocked';
     }
   }
 
@@ -113,6 +122,9 @@ extension CollectionItemGetters on CollectionItem {
         return LightCollector();
       case CollectionItem.notification:
         return NotificationCollector();
+
+      case CollectionItem.screenState:
+        return ScreenStateCollector();
       default:
         return null;
     }
@@ -129,6 +141,8 @@ extension CollectionItemGetters on CollectionItem {
       case CollectionItem.light:
         return SamplingInterval.event;
       case CollectionItem.notification:
+        return SamplingInterval.event;
+      case CollectionItem.screenState:
         return SamplingInterval.event;
       default:
         return SamplingInterval.min15;

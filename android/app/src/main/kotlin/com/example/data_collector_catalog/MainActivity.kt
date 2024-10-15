@@ -13,6 +13,7 @@ class MainActivity : FlutterActivity() {
     private val luxEventHandler by lazy { LuxEventHandler(this) }
     private var notificationEventHandler: NotificationEventHandler? = null
     private var calendarObserver: CalendarObserver? = null
+    private var screenEventHandler: ScreenEventHandler? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +36,8 @@ class MainActivity : FlutterActivity() {
         calendarObserver?.contextRef = WeakReference(this)
         notificationEventHandler = NotificationEventHandler()
         notificationEventHandler?.contextRef = WeakReference(this)
+        screenEventHandler = ScreenEventHandler()
+        screenEventHandler?.contextRef = WeakReference(this)
 
         EventChannel(flutterEngine.dartExecutor.binaryMessenger, "com.kane.calendar.event")
             .setStreamHandler(calendarObserver)
@@ -48,5 +51,8 @@ class MainActivity : FlutterActivity() {
             .setStreamHandler(notificationEventHandler)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.kane.notification.method")
             .setMethodCallHandler(notificationEventHandler)
+
+        EventChannel(flutterEngine.dartExecutor.binaryMessenger, "com.kane.screen.event")
+            .setStreamHandler(screenEventHandler)
     }
 }
