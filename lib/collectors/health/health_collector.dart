@@ -19,7 +19,7 @@ class HealthCollector extends Collector {
   static const _log = 'Health';
 
   final _recognizer = FlutterActivityRecognition.instance;
-  List<StreamSubscription> _subscriptions = [];
+  List<StreamSubscription>? _subscriptions = [];
 
   @override
   Future<bool?> onRequest() async {
@@ -37,14 +37,12 @@ class HealthCollector extends Collector {
   void onStart() {
     super.onStart();
     dev.log('Start collection', name: _log);
-    final recSubscription =
-        _recognizer.activityStream.listen(onData, onError: onError);
-    final pedSubscription =
-        Pedometer.pedestrianStatusStream.listen(onData, onError: onError);
-    final stpSubscription =
-        Pedometer.stepCountStream.listen(onData, onError: onError);
 
-    _subscriptions = [recSubscription, pedSubscription, stpSubscription];
+    _subscriptions ??= [
+      _recognizer.activityStream.listen(onData, onError: onError),
+      Pedometer.pedestrianStatusStream.listen(onData, onError: onError),
+      Pedometer.stepCountStream.listen(onData, onError: onError),
+    ];
   }
 
   @override
@@ -109,9 +107,7 @@ class HealthCollector extends Collector {
   @override
   void onCancel() {
     super.onCancel();
-    for (var subscription in _subscriptions) {
-      subscription.cancel();
-    }
-    _subscriptions = [];
+    _subscriptions?.forEach((e) => e.cancel());
+    _subscriptions = null;
   }
 }

@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'dart:developer' as dev;
-import 'dart:io';
+
 import 'package:real_volume/real_volume.dart';
 
-import '../../common/device.dart';
 import '../../models/collector.dart';
 
 final class VolumeCollector extends Collector {
@@ -35,6 +34,6 @@ final class VolumeCollector extends Collector {
   void onCancel() {
     super.onCancel();
     _subscriptions?.forEach((e) => e.cancel());
-    _subscriptions?.clear();
+    _subscriptions = null;
   }
 }
