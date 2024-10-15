@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:io';
 
@@ -22,6 +23,7 @@ class NotificationAdaptor {
 
     _stream ??= _eventChannel
         .receiveBroadcastStream()
+        .map((event) => jsonDecode(event))
         .map<NotificationEvent>((e) => NotificationEvent.fromMap(e));
     return _stream!;
   }

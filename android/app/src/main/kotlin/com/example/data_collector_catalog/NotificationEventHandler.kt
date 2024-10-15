@@ -5,6 +5,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
+import android.util.Log
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -46,11 +47,9 @@ class NotificationEventHandler(): EventChannel.StreamHandler, MethodChannel.Meth
                 }
             }
         }
-
     }
 
     internal fun onActivityResult(requestCode: Int, resultCode: Int) {
-
         if (requestCode == 1199) {
             when (resultCode) {
                 Activity.RESULT_OK -> {

@@ -20,29 +20,34 @@ final class NotificationCollector extends Collector {
 
   @override
   Future<bool> onCheck() async {
+    super.onCheck();
     return NotificationAdaptor.hasPermission();
   }
 
   @override
   Future<bool> onRequest() async {
+    super.onRequest();
     return NotificationAdaptor.requestPermission();
   }
 
   @override
   void onData(object) async {
+    super.onData(object);
     dev.log('notification: ${object.toString()}', name: _log);
-    final event = NotificationEvent.fromMap(object);
+    final event = object as NotificationEvent;
     FirebaseService.shared.upload(path: 'notification', serializable: event);
   }
 
   @override
   void onStart() async {
+    super.onStart();
     dev.log('Start collection', name: _log);
     _subscription = NotificationAdaptor.stream.listen(onData, onError: onError);
   }
 
   @override
   void onCancel() {
+    super.onCancel();
     _subscription?.cancel();
     _subscription = null;
   }

@@ -38,11 +38,11 @@ class HealthCollector extends Collector {
     super.onStart();
     dev.log('Start collection', name: _log);
     final recSubscription =
-        _recognizer.activityStream.handleError(onError).listen(onData);
-    final pedSubscription = Pedometer.pedestrianStatusStream.listen(onData);
-    pedSubscription.onError(onError);
-    final stpSubscription = Pedometer.stepCountStream.listen(onData);
-    stpSubscription.onError(onError);
+        _recognizer.activityStream.listen(onData, onError: onError);
+    final pedSubscription =
+        Pedometer.pedestrianStatusStream.listen(onData, onError: onError);
+    final stpSubscription =
+        Pedometer.stepCountStream.listen(onData, onError: onError);
 
     _subscriptions = [recSubscription, pedSubscription, stpSubscription];
   }

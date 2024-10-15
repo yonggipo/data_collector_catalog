@@ -19,6 +19,7 @@ final class LightCollector extends Collector {
 
   @override
   void onStart() async {
+    super.onStart();
     dev.log('Start collection', name: _log);
     final hasSensor = await LightAdaptor.hasSensor();
     if (hasSensor) {
@@ -29,6 +30,7 @@ final class LightCollector extends Collector {
 
   @override
   void onData(object) async {
+    super.onData(object);
     dev.log('lux: $object', name: _log);
     final timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
     final event = LuxEvent(lux: object, timeStamp: timeStamp);
@@ -44,12 +46,8 @@ final class LightCollector extends Collector {
   }
 
   @override
-  void onError(Object error) {
-    dev.log('error: $error', name: _log);
-  }
-
-  @override
   void onCancel() {
+    super.onCancel();
     _subscription?.cancel();
     _subscription = null;
   }
