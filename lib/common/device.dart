@@ -1,5 +1,7 @@
 import 'dart:developer' as dev;
+import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 
 class Device {
   Device._();
@@ -7,6 +9,7 @@ class Device {
   factory Device() => shared;
 
   static const _logName = 'Device';
+  final DeviceInfoPlugin _plugin = DeviceInfoPlugin();
 
   int? androidVersion;
 
@@ -16,9 +19,28 @@ class Device {
   }
 
   Future<void> checkAndroidVersion() async {
-    final deviceInfo = DeviceInfoPlugin();
-    final androidInfo = await deviceInfo.androidInfo;
+    final androidInfo = await _plugin.androidInfo;
     androidVersion = androidInfo.version.sdkInt;
     dev.log('Android version: $androidVersion', name: _logName);
+  }
+
+  final ValueNotifier<AndroidDeviceInfo?> _andInfo = ValueNotifier(null);
+  final ValueNotifier<IosDeviceInfo?> _iosInfo = ValueNotifier(null);
+  final ValueNotifier<BaseDeviceInfo?> _deviceInfo = ValueNotifier(null);
+
+  AndroidDeviceInfo? get android => _andInfo.value;
+  IosDeviceInfo? get ios => _iosInfo.value;
+  BaseDeviceInfo? get device => _deviceInfo.value;
+
+  void initInfo() async {
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo andInfo = await _plugin.androidInfo;
+      _andInfo.value = andInfo;
+    } else {
+      IosDeviceInfo iosInfo = await _plugin.iosInfo;
+      _iosInfo.value = iosInfo;
+    }
+    BaseDeviceInfo deviceInfo = await _plugin.deviceInfo;
+    _deviceInfo.value = deviceInfo;
   }
 }
