@@ -15,7 +15,6 @@ import '../common/constants.dart';
 import '../common/device.dart';
 import '../collectors/audio/audio_collector.dart';
 import 'collector.dart';
-import 'collector_state.dart';
 import 'sampling_interval.dart';
 import 'collector_premission_state.dart';
 
@@ -94,22 +93,6 @@ extension CollectionItemGetters on CollectionItem {
         return FlutterBackgroundService().on(Constants.stream.audio);
       default:
         return Stream.empty();
-    }
-  }
-
-  Stream<CollectorState> get collectorStateStream {
-    if (collector == null) {
-      return Stream.value(CollectorState.waitingPermission);
-    } else {
-      return collector!.isCollectingStream.map((isCollecting) {
-        if (isCollecting == null) {
-          return CollectorState.waitingPermission;
-        } else {
-          return isCollecting
-              ? CollectorState.collecting
-              : CollectorState.waiting;
-        }
-      });
     }
   }
 

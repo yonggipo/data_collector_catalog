@@ -26,6 +26,9 @@ final class LightCollector extends Collector {
       _subscription = LightAdaptor.luxStream().listen(onData);
       _subscription?.onError(onError);
     }
+    
+    await Future.delayed(Duration(seconds: 10));
+    onCancel();
   }
 
   @override
@@ -40,9 +43,6 @@ final class LightCollector extends Collector {
     await ref.child("lux").push().set(event.toJson()).catchError((e) {
       dev.log('error: $e', name: _log);
     });
-
-    await Future.delayed(Duration(seconds: 10));
-    onCancel();
   }
 
   @override

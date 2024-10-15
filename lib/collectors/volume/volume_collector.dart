@@ -28,6 +28,10 @@ final class VolumeCollector extends Collector {
   void onData(object) {
     super.onData(object);
     dev.log('onData: $object', name: _log);
+    // VolumeObj
+    // [VolumeCollector] onData: RingerMode.NORMAL
+    // [VolumeCollector] onData: RingerMode.VIBRATE
+    // [VolumeCollector] onData: RingerMode.SILENT
   }
 
   @override

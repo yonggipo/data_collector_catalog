@@ -5,9 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
+import 'common/svg_image.dart';
 import 'models/collection_item.dart';
 import 'models/collector_premission_state.dart';
-import 'models/collector_state.dart';
 import 'common/constants.dart';
 
 class CollectStateScreen extends StatefulWidget {
@@ -67,16 +67,17 @@ class _CollectStateScreenState extends State<CollectStateScreen> {
           children: [
             Row(
               children: [
-                StreamBuilder(
-                    stream: item.collectorStateStream,
-                    builder: (context, snapshot) {
-                      final state =
-                          snapshot.data ?? CollectorState.waitingPermission;
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: state.icon,
-                      );
-                    }),
+                ValueListenableBuilder(
+                  valueListenable: item.collector!.isCollectingNotifier,
+                  builder:
+                      (BuildContext context, dynamic value, Widget? child) {
+                    return Padding(
+                        padding: const EdgeInsets.all(6.0),
+                        child: value
+                            ? SvgImage.cloudArrowUp
+                            : SvgImage.cloudSlash);
+                  },
+                ),
                 Gap(12),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,

@@ -22,7 +22,7 @@ class HealthCollector extends Collector {
   List<StreamSubscription>? _subscriptions = [];
 
   @override
-  Future<bool?> onRequest() async {
+  Future<bool> onRequest() async {
     final permission = await _recognizer.requestPermission();
     return (permission == ActivityPermission.GRANTED);
   }

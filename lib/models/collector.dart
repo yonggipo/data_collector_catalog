@@ -9,13 +9,7 @@ import 'package:flutter/foundation.dart';
 abstract class Collector {
   static const _log = 'Collector';
 
-  Collector() {
-    onLoad();
-  }
-
-  final _isCollectingStreamController = StreamController<bool?>.broadcast();
-  Stream<bool?> get isCollectingStream => _isCollectingStreamController.stream;
-
+  final isCollectingNotifier = ValueNotifier<bool>(false);
   final progressNotifier = ValueNotifier<double>(1.0);
 
   final _cron = Cron();
@@ -24,26 +18,24 @@ abstract class Collector {
   Duration? _duration;
   bool _isCollecting = false;
 
-  Future<bool?> onRequest() {
-    return Future(() => null);
+  Future<bool> onCheck() {
+    return Future(() => false);
   }
 
-  void onLoad() {}
-
-  Future<bool> onCheck() {
+  Future<bool> onRequest() {
     return Future(() => false);
   }
 
   void onStart() {
     _isCollecting = true;
-    _isCollectingStreamController.add(_isCollecting);
+    isCollectingNotifier.value = _isCollecting;
     _timer?.cancel();
     _timer = null;
   }
 
   void onCancel() {
     _isCollecting = false;
-    _isCollectingStreamController.add(_isCollecting);
+    isCollectingNotifier.value = _isCollecting;
     _progressValue = 0.0;
     if (_duration != null) {
       tracking(_duration!);
@@ -57,8 +49,6 @@ abstract class Collector {
     dev.log('error: $error', name: _log);
     _isCollecting = false;
   }
-
-  void upload(String filePath, dynamic file) {}
 }
 
 extension CollectorProgress on Collector {
