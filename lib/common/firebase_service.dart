@@ -15,9 +15,10 @@ class FirebaseService {
   Future<void> upload(
       {required String path, required Serializable serializable}) async {
     return await _ref
+        .child("android")
         .child(path)
         .push()
-        .set(serializable.toMap)
+        .set(serializable.toMap())
         .catchError((e) {
       dev.log("error: $e", name: _log);
     });
