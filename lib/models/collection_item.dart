@@ -130,6 +130,8 @@ extension CollectionItemGetters on CollectionItem {
         (this == CollectionItem.microphone) ||
         (this == CollectionItem.light)) {
       return SamplingInterval.min15;
+    } else if (this == CollectionItem.network) {
+      return SamplingInterval.min5;
     } else {
       return SamplingInterval.event;
     }

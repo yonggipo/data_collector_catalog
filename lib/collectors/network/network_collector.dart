@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:wifi_iot/wifi_iot.dart';
 
 import '../../common/firebase_service.dart';
@@ -8,9 +10,12 @@ class NetworkCollector extends Collector {
   static final NetworkCollector shared = NetworkCollector._();
   factory NetworkCollector() => shared;
 
+  static const _log = 'NetworkCollector';
+
   @override
   void onStart() async {
     super.onStart();
+    dev.log('Start collection', name: _log);
 
     final String? ssid = await WiFiForIoTPlugin.getSSID();
     final String? bssid = await WiFiForIoTPlugin.getBSSID();
@@ -25,5 +30,7 @@ class NetworkCollector extends Collector {
       'frequency': frequency,
       'timestamp': DateTime.now().toIso8601String(),
     });
+
+    super.onCancel();
   }
 }
