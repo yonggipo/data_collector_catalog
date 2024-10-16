@@ -1,6 +1,7 @@
 // ignore: unused_import
 import 'dart:developer' as dev;
 
+import 'package:data_collector_catalog/models/sampling_interval.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -68,7 +69,8 @@ class _CollectStateScreenState extends State<CollectStateScreen> {
             Row(
               children: [
                 ValueListenableBuilder(
-                  valueListenable: item.collector!.isCollectingNotifier,
+                  valueListenable: item.collector?.isCollectingNotifier ??
+                      ValueNotifier(false),
                   builder:
                       (BuildContext context, dynamic value, Widget? child) {
                     return Padding(
@@ -122,8 +124,10 @@ class _CollectStateScreenState extends State<CollectStateScreen> {
                             builder: (BuildContext context, dynamic value,
                                 Widget? child) {
                               return Visibility(
-                                visible: (status !=
-                                    CollectorPermissionState.required),
+                                visible: ((status !=
+                                        CollectorPermissionState.required) &&
+                                    item.samplingInterval !=
+                                        SamplingInterval.event),
                                 child: LinearProgressIndicator(
                                   value: value,
                                   backgroundColor: Colors.white,

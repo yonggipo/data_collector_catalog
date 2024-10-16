@@ -19,7 +19,7 @@ class HealthCollector extends Collector {
   static const _log = 'Health';
 
   final _recognizer = FlutterActivityRecognition.instance;
-  List<StreamSubscription>? _subscriptions = [];
+  List<StreamSubscription>? _subscriptions;
 
   @override
   Future<bool> onRequest() async {
