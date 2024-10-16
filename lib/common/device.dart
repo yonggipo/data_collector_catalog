@@ -11,17 +11,17 @@ class Device {
   static const _logName = 'Device';
   final DeviceInfoPlugin _plugin = DeviceInfoPlugin();
 
-  int? androidVersion;
+  int? andSdk;
 
   bool get isAboveAndroid9 {
     final int android9 = 28;
-    return (androidVersion ?? 23) > android9;
+    return (andSdk ?? 23) > android9;
   }
 
   Future<void> checkAndroidVersion() async {
     final androidInfo = await _plugin.androidInfo;
-    androidVersion = androidInfo.version.sdkInt;
-    dev.log('Android version: $androidVersion', name: _logName);
+    andSdk = androidInfo.version.sdkInt;
+    dev.log('Android version: $andSdk', name: _logName);
   }
 
   final ValueNotifier<AndroidDeviceInfo?> _andInfo = ValueNotifier(null);

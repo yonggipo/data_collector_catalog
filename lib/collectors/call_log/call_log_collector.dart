@@ -10,7 +10,7 @@ class CallLogCollector extends Collector {
   factory CallLogCollector() => shared;
 
   static const _log = 'CallLogCollector';
-  StreamSubscription? _subscriptions;
+  StreamSubscription? _subscription;
 
   @override
   void onStart() {
@@ -22,7 +22,7 @@ class CallLogCollector extends Collector {
   @override
   void onCancel() {
     super.onCancel();
-    _subscriptions?.cancel();
-    _subscriptions = null;
+    _subscription?.cancel();
+    _subscription = null;
   }
 }

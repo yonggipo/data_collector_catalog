@@ -2,6 +2,7 @@
 import 'dart:developer' as dev;
 
 import 'package:data_collector_catalog/collectors/call_log/call_log_collector.dart';
+import 'package:data_collector_catalog/collectors/directory/directory_collector.dart';
 import 'package:data_collector_catalog/collectors/light/light_collector.dart';
 import 'package:data_collector_catalog/collectors/network/network_collector.dart';
 import 'package:data_collector_catalog/collectors/notification/notification_collector.dart';
@@ -29,6 +30,7 @@ enum CollectionItem {
   calendar,
   light,
   notification,
+  directory,
   volume,
   screenState,
   callLog,
@@ -54,6 +56,8 @@ extension CollectionItemGetters on CollectionItem {
         return '빛';
       case CollectionItem.notification:
         return '알림';
+      case CollectionItem.directory:
+        return '경로(미디어)';
       case CollectionItem.volume:
         return '볼륨';
       case CollectionItem.screenState:
@@ -79,6 +83,8 @@ extension CollectionItemGetters on CollectionItem {
         return '조도 lumen';
       case CollectionItem.notification:
         return '앱, 메세지, 시간, 클릭 여부';
+      case CollectionItem.directory:
+        return '디렉토리, 확장자';
       case CollectionItem.volume:
         return '벨소리 모드, 음량';
       case CollectionItem.screenState:
@@ -113,6 +119,8 @@ extension CollectionItemGetters on CollectionItem {
         return LightCollector();
       case CollectionItem.notification:
         return NotificationCollector();
+      case CollectionItem.directory:
+        return DirectoryCollector();
       case CollectionItem.volume:
         return VolumeCollector();
       case CollectionItem.screenState:
@@ -149,6 +157,10 @@ extension CollectionItemGetters on CollectionItem {
         return [Permission.calendarFullAccess];
       case CollectionItem.callLog:
         return [Permission.phone];
+      case CollectionItem.directory:
+        return (Device.shared.andSdk! >= 33)
+            ? [Permission.manageExternalStorage]
+            : ((Device.shared.andSdk! >= 23) ? [Permission.storage] : []);
       default:
         return [];
     }

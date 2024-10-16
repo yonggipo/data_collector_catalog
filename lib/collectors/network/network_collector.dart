@@ -31,6 +31,7 @@ class NetworkCollector extends Collector {
       'timestamp': DateTime.now().toIso8601String(),
     });
 
+    // Call to calculate the remaining time
     super.onCancel();
   }
 }
