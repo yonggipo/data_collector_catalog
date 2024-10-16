@@ -29,6 +29,9 @@ dependencies:
   device_calendar: ^4.3.3
   real_volume: ^1.0.9
   sensors_plus: ^6.0.1
+  phone_state:
+    git:
+      url: https://github.com/andreamainella98/phone_state
 
 dev_dependencies:
   flutter_test:

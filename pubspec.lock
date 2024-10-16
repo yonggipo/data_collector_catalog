@@ -512,6 +512,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.2"
+  phone_state:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "1096c6d47de7337bc376de6eddd159a482930baa"
+      url: "https://github.com/andreamainella98/phone_state"
+    source: git
+    version: "1.0.4"
   platform:
     dependency: transitive
     description:

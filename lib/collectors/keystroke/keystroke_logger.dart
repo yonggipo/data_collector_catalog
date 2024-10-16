@@ -40,14 +40,4 @@ final class KeystrokeLogger extends Collector {
   void onStart() {
     _subscription = KeyEventListener.keyEvnetStream.listen(onData);
   }
-
-  @override
-  void upload(String filePath, file) {
-    // TODO: implement upload
-  }
-
-  @override
-  void onLoad() {
-    // TODO: implement onLoad
-  }
 }

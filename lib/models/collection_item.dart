@@ -1,9 +1,11 @@
 // ignore: unused_import
 import 'dart:developer' as dev;
 
+import 'package:data_collector_catalog/collectors/call_log/call_log_collector.dart';
 import 'package:data_collector_catalog/collectors/light/light_collector.dart';
 import 'package:data_collector_catalog/collectors/notification/notification_collector.dart';
 import 'package:data_collector_catalog/collectors/screen_state/screen_state_collector.dart';
+import 'package:data_collector_catalog/collectors/sensor/sensor_event_collector.dart';
 import 'package:data_collector_catalog/collectors/volume/volume_collector.dart';
 import 'package:data_collector_catalog/models/permission_list_ext.dart';
 import 'package:data_collector_catalog/collectors/calendar/calendar_collector.dart';
@@ -19,10 +21,7 @@ import 'sampling_interval.dart';
 import 'collector_premission_state.dart';
 
 enum CollectionItem {
-  acceleration,
-  angularVelocity,
-  magneticFieldStrength,
-
+  sensorEvnets,
   microphone,
   health,
   calendar,
@@ -30,6 +29,7 @@ enum CollectionItem {
   notification,
   volume,
   screenState,
+  callLog,
 }
 
 extension CollectionItemGetters on CollectionItem {
@@ -38,13 +38,8 @@ extension CollectionItemGetters on CollectionItem {
 
   String get name {
     switch (this) {
-      case CollectionItem.acceleration:
-        return '가속도';
-      case CollectionItem.angularVelocity:
-        return '각속도';
-      case CollectionItem.magneticFieldStrength:
-        return '자기장 강도';
-
+      case CollectionItem.sensorEvnets:
+        return '가속도, 각속도, 자기장';
       case CollectionItem.microphone:
         return '오디오';
       case CollectionItem.health:
@@ -59,17 +54,15 @@ extension CollectionItemGetters on CollectionItem {
         return '볼륨';
       case CollectionItem.screenState:
         return '화면 상태';
+      case CollectionItem.callLog:
+        return '전화 기록';
     }
   }
 
   String get description {
     switch (this) {
-      case CollectionItem.acceleration:
-        return '조도 m/s²';
-      case CollectionItem.angularVelocity:
-        return '각속도 도/초(°/s)';
-      case CollectionItem.magneticFieldStrength:
-        return '자기장 세기 μT';
+      case CollectionItem.sensorEvnets:
+        return 'm/s², °/s, μT';
       case CollectionItem.microphone:
         return 'audio m4a';
       case CollectionItem.health:
@@ -84,6 +77,8 @@ extension CollectionItemGetters on CollectionItem {
         return '벨소리 모드, 음량';
       case CollectionItem.screenState:
         return 'on, off, unlocked';
+      case CollectionItem.callLog:
+        return '유형, 전화번호, 시간';
     }
   }
 
@@ -98,6 +93,8 @@ extension CollectionItemGetters on CollectionItem {
 
   Collector? get collector {
     switch (this) {
+      case CollectionItem.sensorEvnets:
+        return SensorEventCollector();
       case CollectionItem.microphone:
         return AudioCollector();
       case CollectionItem.health:
@@ -112,13 +109,16 @@ extension CollectionItemGetters on CollectionItem {
         return VolumeCollector();
       case CollectionItem.screenState:
         return ScreenStateCollector();
+      case CollectionItem.callLog:
+        return CallLogCollector();
       default:
         return null;
     }
   }
 
   SamplingInterval get samplingInterval {
-    if (this == CollectionItem.microphone) {
+    if ((this == CollectionItem.microphone) ||
+        (this == CollectionItem.sensorEvnets)) {
       return SamplingInterval.min15;
     } else {
       return SamplingInterval.event;
@@ -133,6 +133,8 @@ extension CollectionItemGetters on CollectionItem {
             : [Permission.microphone, Permission.storage];
       case CollectionItem.calendar:
         return [Permission.calendarFullAccess];
+      case CollectionItem.callLog:
+        return [Permission.phone];
       default:
         return [];
     }
@@ -142,6 +144,7 @@ extension CollectionItemGetters on CollectionItem {
     return [
       CollectionItem.health,
       CollectionItem.notification,
+      // CollectionItem.callLog,
     ].contains(this);
   }
 
