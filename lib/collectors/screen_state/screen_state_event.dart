@@ -1,7 +1,6 @@
-import '../../common/serializable.dart';
 import 'screen_state.dart';
 
-class ScreenStateEvent implements Serializable {
+class ScreenStateEvent {
   ScreenStateEvent({this.screenState, this.timeStamp});
 
   ScreenState? screenState;
@@ -17,7 +16,6 @@ class ScreenStateEvent implements Serializable {
     );
   }
 
-  @override
   Map<String, dynamic> toMap() {
     return {
       'screenState': screenState?.toString(),

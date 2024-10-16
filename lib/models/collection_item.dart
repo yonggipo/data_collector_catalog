@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 
 import 'package:data_collector_catalog/collectors/call_log/call_log_collector.dart';
 import 'package:data_collector_catalog/collectors/light/light_collector.dart';
+import 'package:data_collector_catalog/collectors/network/network_collector.dart';
 import 'package:data_collector_catalog/collectors/notification/notification_collector.dart';
 import 'package:data_collector_catalog/collectors/screen_state/screen_state_collector.dart';
 import 'package:data_collector_catalog/collectors/sensor/sensor_event_collector.dart';
@@ -22,6 +23,7 @@ import 'collector_premission_state.dart';
 
 enum CollectionItem {
   sensorEvnets,
+  network,
   microphone,
   health,
   calendar,
@@ -40,6 +42,8 @@ extension CollectionItemGetters on CollectionItem {
     switch (this) {
       case CollectionItem.sensorEvnets:
         return '가속도, 각속도, 자기장';
+      case CollectionItem.network:
+        return '네트워크';
       case CollectionItem.microphone:
         return '오디오';
       case CollectionItem.health:
@@ -63,6 +67,8 @@ extension CollectionItemGetters on CollectionItem {
     switch (this) {
       case CollectionItem.sensorEvnets:
         return 'm/s², °/s, μT';
+      case CollectionItem.network:
+        return 'ssid, bssid, 주파수, 신호 강도';
       case CollectionItem.microphone:
         return 'audio m4a';
       case CollectionItem.health:
@@ -95,6 +101,8 @@ extension CollectionItemGetters on CollectionItem {
     switch (this) {
       case CollectionItem.sensorEvnets:
         return SensorEventCollector();
+      case CollectionItem.network:
+        return NetworkCollector();
       case CollectionItem.microphone:
         return AudioCollector();
       case CollectionItem.health:
@@ -117,8 +125,9 @@ extension CollectionItemGetters on CollectionItem {
   }
 
   SamplingInterval get samplingInterval {
-    if ((this == CollectionItem.microphone) ||
-        (this == CollectionItem.sensorEvnets) ||
+    if ((this == CollectionItem.sensorEvnets) ||
+        (this == CollectionItem.network) ||
+        (this == CollectionItem.microphone) ||
         (this == CollectionItem.light)) {
       return SamplingInterval.min15;
     } else {
@@ -128,6 +137,8 @@ extension CollectionItemGetters on CollectionItem {
 
   List<Permission> get permissions {
     switch (this) {
+      case CollectionItem.network:
+        return [Permission.location];
       case CollectionItem.microphone:
         return Device.shared.isAboveAndroid9
             ? [Permission.microphone]

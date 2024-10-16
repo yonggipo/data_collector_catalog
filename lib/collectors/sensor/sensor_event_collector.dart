@@ -43,7 +43,6 @@ class SensorEventCollector extends Collector {
 
     if (object is UserAccelerometerEvent) {
       final acc = object;
-      dev.log('acc: ${acc.timestamp}');
       FirebaseService.shared.upload(
         path: 'sensors/user_accelerometer',
         map: {

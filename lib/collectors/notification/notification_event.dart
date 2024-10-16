@@ -1,6 +1,4 @@
-import '../../common/serializable.dart';
-
-final class NotificationEvent implements Serializable {
+final class NotificationEvent {
   int? id;
   bool? hasRemoved;
   String? packageName;
@@ -23,7 +21,6 @@ final class NotificationEvent implements Serializable {
     content = map['content'];
   }
 
-  @override
   Map<String, dynamic> toMap() {
     return {
       'id': id,
