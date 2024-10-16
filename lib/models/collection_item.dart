@@ -118,7 +118,8 @@ extension CollectionItemGetters on CollectionItem {
 
   SamplingInterval get samplingInterval {
     if ((this == CollectionItem.microphone) ||
-        (this == CollectionItem.sensorEvnets)) {
+        (this == CollectionItem.sensorEvnets) ||
+        (this == CollectionItem.light)) {
       return SamplingInterval.min15;
     } else {
       return SamplingInterval.event;

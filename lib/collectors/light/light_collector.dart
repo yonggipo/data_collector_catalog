@@ -27,7 +27,7 @@ final class LightCollector extends Collector {
       _subscription?.onError(onError);
     }
     
-    await Future.delayed(Duration(seconds: 10));
+    await Future.delayed(Duration(seconds: 3));
     onCancel();
   }
 

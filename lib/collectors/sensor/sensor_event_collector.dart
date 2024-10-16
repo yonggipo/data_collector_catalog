@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:data_collector_catalog/common/firebase_service.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'dart:developer' as dev;
 
@@ -10,32 +11,82 @@ class SensorEventCollector extends Collector {
   static final SensorEventCollector shared = SensorEventCollector._();
   factory SensorEventCollector() => shared;
 
-  static const _log = 'Health';
+  static const _log = 'SensorEventCollector';
   List<StreamSubscription>? _subscriptions;
-  final Duration _duration = const Duration(minutes: 15);
 
   @override
-  void onStart() {
+  void onStart() async {
     super.onStart();
     dev.log('Start collection', name: _log);
 
     _subscriptions ??= [
       // 장치의 가속도를 m/s²
-      userAccelerometerEventStream(samplingPeriod: _duration)
-          .listen(onData, onError: onError),
+      userAccelerometerEventStream().listen(onData, onError: onError),
 
       // 중력의 영향을 포함한 장치의 가속도 m/s²
-      accelerometerEventStream(samplingPeriod: _duration)
-          .listen(onData, onError: onError),
+      accelerometerEventStream().listen(onData, onError: onError),
 
       // 장치의 회전
-      gyroscopeEventStream(samplingPeriod: _duration)
-          .listen(onData, onError: onError),
+      gyroscopeEventStream().listen(onData, onError: onError),
 
       // 장치를 둘러싼 자기장
-      magnetometerEventStream(samplingPeriod: _duration)
-          .listen(onData, onError: onError),
+      magnetometerEventStream().listen(onData, onError: onError),
     ];
+
+    await Future.delayed(Duration(seconds: 3));
+    onCancel();
+  }
+
+  @override
+  void onData(object) {
+    super.onData(object);
+
+    if (object is UserAccelerometerEvent) {
+      final acc = object;
+      dev.log('acc: ${acc.timestamp}');
+      FirebaseService.shared.upload(
+        path: 'sensors/user_accelerometer',
+        map: {
+          'x': acc.x,
+          'y': acc.y,
+          'z': acc.z,
+          'timestamp': acc.timestamp.toIso8601String()
+        },
+      );
+    } else if (object is AccelerometerEvent) {
+      final acc = object;
+      FirebaseService.shared.upload(
+        path: 'sensors/accelerometer',
+        map: {
+          'x': acc.x,
+          'y': acc.y,
+          'z': acc.z,
+          'timestamp': acc.timestamp.toIso8601String()
+        },
+      );
+    } else if (object is GyroscopeEvent) {
+      final gyr = object;
+      FirebaseService.shared.upload(
+        path: 'sensors/gyroscope',
+        map: {
+          'x': gyr.x,
+          'y': gyr.y,
+          'z': gyr.z,
+          'timestamp': gyr.timestamp.toIso8601String()
+        },
+      );
+    } else if (object is MagnetometerEvent) {
+      final mag = object;
+      FirebaseService.shared.upload(
+        path: 'sensors/magnetometer',
+        map: {
+          'x': mag.x,
+          'y': mag.y,
+          'z': mag.z,
+          'timestamp': mag.timestamp.toIso8601String()
+        },
+      );
+    }
   }
 
   @override

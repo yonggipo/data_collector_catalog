@@ -25,7 +25,7 @@ final class AudioCollector extends Collector {
   @override
   void onStart() async {
     super.onStart();
-    dev.log('Start collection..', name: _log);
+    dev.log('Start collection', name: _log);
 
     final path =
         'storage/emulated/0/Android/media/com.example.data_collector_catalog/files/'; // await FileManager.getPath();

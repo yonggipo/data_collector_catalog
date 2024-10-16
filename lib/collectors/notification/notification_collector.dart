@@ -35,7 +35,7 @@ final class NotificationCollector extends Collector {
     super.onData(object);
     dev.log('notification: ${object.toString()}', name: _log);
     final event = object as NotificationEvent;
-    FirebaseService.shared.upload(path: 'notification', serializable: event);
+    FirebaseService.shared.upload(path: 'notification', map: event.toMap());
   }
 
   @override

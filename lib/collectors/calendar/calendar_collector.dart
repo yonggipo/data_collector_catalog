@@ -32,6 +32,8 @@ class CalendarCollector extends Collector {
   @override
   void onStart() async {
     super.onStart();
+    dev.log('Start collection', name: _log);
+
     // 앱시작시, 그리고 일정 변경을 감지시 3달(-30 +60)에 해당하는 일정을 읽어와 전송
     await _uploadEvents();
     _subscription = CalendarAdaptor.signalStream().listen(onData);
