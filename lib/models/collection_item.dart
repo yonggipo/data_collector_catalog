@@ -4,6 +4,7 @@ import 'dart:developer' as dev;
 import 'package:data_collector_catalog/collectors/call_log/call_log_collector.dart';
 import 'package:data_collector_catalog/collectors/directory/directory_collector.dart';
 import 'package:data_collector_catalog/collectors/light/light_collector.dart';
+import 'package:data_collector_catalog/collectors/location/location_collector.dart';
 import 'package:data_collector_catalog/collectors/network/network_collector.dart';
 import 'package:data_collector_catalog/collectors/notification/notification_collector.dart';
 import 'package:data_collector_catalog/collectors/screen_state/screen_state_collector.dart';
@@ -24,6 +25,7 @@ import 'collector_premission_state.dart';
 
 enum CollectionItem {
   sensorEvnets,
+  location,
   network,
   microphone,
   health,
@@ -44,6 +46,8 @@ extension CollectionItemGetters on CollectionItem {
     switch (this) {
       case CollectionItem.sensorEvnets:
         return '가속도, 각속도, 자기장';
+      case CollectionItem.location:
+        return '위치';
       case CollectionItem.network:
         return '네트워크';
       case CollectionItem.microphone:
@@ -71,6 +75,8 @@ extension CollectionItemGetters on CollectionItem {
     switch (this) {
       case CollectionItem.sensorEvnets:
         return 'm/s², °/s, μT';
+      case CollectionItem.location:
+        return '위도, 경도, 고도';
       case CollectionItem.network:
         return 'ssid, bssid, 주파수, 신호 강도';
       case CollectionItem.microphone:
@@ -107,6 +113,8 @@ extension CollectionItemGetters on CollectionItem {
     switch (this) {
       case CollectionItem.sensorEvnets:
         return SensorEventCollector();
+      case CollectionItem.location:
+        return LocationCollector();
       case CollectionItem.network:
         return NetworkCollector();
       case CollectionItem.microphone:
@@ -147,6 +155,8 @@ extension CollectionItemGetters on CollectionItem {
 
   List<Permission> get permissions {
     switch (this) {
+      case CollectionItem.location:
+        return [Permission.location];
       case CollectionItem.network:
         return [Permission.location];
       case CollectionItem.microphone:
@@ -168,6 +178,7 @@ extension CollectionItemGetters on CollectionItem {
 
   bool get isNeedCustomPermission {
     return [
+      CollectionItem.location,
       CollectionItem.health,
       CollectionItem.notification,
       // CollectionItem.callLog,
@@ -177,22 +188,34 @@ extension CollectionItemGetters on CollectionItem {
   // Status of the required permissions in the collector
   Future<CollectorPermissionState> get permissionStatus async {
     if (isNeedCustomPermission) {
-      return (await collector?.onCheck() ?? false)
-          ? CollectorPermissionState.granted
-          : CollectorPermissionState.required;
-    } else {
-      if (permissions.isEmpty) {
-        return CollectorPermissionState.none;
+      final customCheck = await collector?.onCheck() ?? false;
+      if (!customCheck) {
+        return CollectorPermissionState.required;
       }
-      return (await permissions.areGranted)
-          ? CollectorPermissionState.granted
-          : CollectorPermissionState.required;
+
+      if (permissions.isEmpty) {
+        return CollectorPermissionState.granted;
+      }
+    } else if (permissions.isEmpty) {
+      return CollectorPermissionState.none;
     }
+
+    return (await permissions.areGranted)
+        ? CollectorPermissionState.granted
+        : CollectorPermissionState.required;
   }
 
   Future<bool> requestRequired() async {
     if (isNeedCustomPermission) {
-      return await collector?.onRequest() ?? false;
+      final customPermission = await collector?.onRequest() ?? false;
+
+      if (!customPermission) {
+        return false;
+      }
+    }
+
+    if (permissions.isEmpty) {
+      return true;
     } else {
       return await permissions.requestRequired();
     }

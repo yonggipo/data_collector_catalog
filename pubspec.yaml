@@ -34,6 +34,8 @@ dependencies:
       url: https://github.com/andreamainella98/phone_state
   wifi_iot: ^0.3.19+1
   watcher: ^1.1.0
+  geolocator: ^13.0.1
+  location: ^7.0.1
 
 dev_dependencies:
   flutter_test:

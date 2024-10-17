@@ -23,6 +23,7 @@ class NetworkCollector extends Collector {
         await WiFiForIoTPlugin.getCurrentSignalStrength();
     final int? frequency = await WiFiForIoTPlugin.getFrequency();
 
+    // Upload item to firebase
     FirebaseService.shared.upload(path: 'network', map: {
       'ssid': ssid,
       'bssid': bssid,

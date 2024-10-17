@@ -43,9 +43,9 @@ abstract class Collector {
     progressNotifier.value = _progressValue;
   }
 
-  void onData(dynamic object) {}
+  void onData(dynamic data) {}
 
-  void onError(Object error) {
+  FutureOr<void> onError(Object error, StackTrace stackTrace) async {
     dev.log('error: $error', name: _log);
     _isCollecting = false;
   }

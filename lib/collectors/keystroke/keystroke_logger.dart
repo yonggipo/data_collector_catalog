@@ -20,20 +20,9 @@ final class KeystrokeLogger extends Collector {
   }
 
   @override
-  void onData(object) {
-    if (kReleaseMode) print('[✓] key stroke event $object');
-    dev.log('key stroke event: $object');
-  }
-
-  @override
-  void onError(Object error) {
-    // TODO: implement onError
-  }
-
-  @override
-  Future<bool> onRequest() {
-    // TODO: implement requestPermission
-    throw UnimplementedError();
+  void onData(data) {
+    if (kReleaseMode) print('[✓] key stroke event $data');
+    dev.log('key stroke event: $data');
   }
 
   @override
