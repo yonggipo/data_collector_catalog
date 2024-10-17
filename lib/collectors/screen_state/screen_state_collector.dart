@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:data_collector_catalog/collectors/screen_state/screen_adaptor.dart';
+import 'package:data_collector_catalog/collectors/screen_state/screen_state_event.dart';
+import 'package:data_collector_catalog/common/firebase_service.dart';
 
 import '../../models/collector.dart';
 
@@ -24,9 +26,17 @@ class ScreenStateCollector extends Collector {
   }
 
   @override
-  void onData(object) {
-    super.onData(object);
-    dev.log('onData: $object', name: _log);
+  void onData(data) {
+    super.onData(data);
+    // dev.log('onData: $data', name: _log);
+
+    // Upload item to firebase
+    if (data is ScreenStateEvent) {
+      final event = data;
+      FirebaseService.shared
+          .upload(path: 'screen_state', map: event.toMap())
+          .onError(onError);
+    }
   }
 
   @override

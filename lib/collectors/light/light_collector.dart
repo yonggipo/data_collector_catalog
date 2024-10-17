@@ -1,10 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
-import 'package:data_collector_catalog/common/firebase_service.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart';
-
+import '../../common/firebase_service.dart';
 import '../../models/collector.dart';
 import 'light_adaptor.dart';
 import 'lux_event.dart';

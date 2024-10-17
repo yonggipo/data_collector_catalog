@@ -31,11 +31,15 @@ final class NotificationCollector extends Collector {
   }
 
   @override
-  void onData(object) async {
-    super.onData(object);
-    dev.log('notification: ${object.toString()}', name: _log);
-    final event = object as NotificationEvent;
-    FirebaseService.shared.upload(path: 'notification', map: event.toMap());
+  void onData(data) async {
+    super.onData(data);
+    // dev.log('notification: ${data.toString()}', name: _log);
+
+    // Upload item to firebase
+    if (data is NotificationEvent) {
+      final event = data;
+      FirebaseService.shared.upload(path: 'notification', map: event.toMap());
+    }
   }
 
   @override

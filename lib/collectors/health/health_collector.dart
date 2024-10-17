@@ -53,7 +53,7 @@ class HealthCollector extends Collector {
 
       // Upload item to firebase
       FirebaseService.shared
-          .upload(path: 'health/activityEvent', map: item.toMap())
+          .upload(path: 'health/activity', map: item.toMap())
           .onError(onError);
     } else if (data is StepCount) {
       StepCount stepCount = data;
@@ -62,7 +62,7 @@ class HealthCollector extends Collector {
 
       // Upload item to firebase
       FirebaseService.shared
-          .upload(path: 'health/walkingEvnet', map: walking.toMap())
+          .upload(path: 'health/walking', map: walking.toMap())
           .onError(onError);
     } else if (data is PedestrianStatus) {
       PedestrianStatus pedestrianStatus = data;
@@ -74,7 +74,7 @@ class HealthCollector extends Collector {
 
       // Upload item to firebase
       FirebaseService.shared
-          .upload(path: 'health/walkingStatus', map: status.toMap())
+          .upload(path: 'health/walking_status', map: status.toMap())
           .onError(onError);
     }
   }
