@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 
 import 'package:data_collector_catalog/collectors/call_log/call_log_collector.dart';
 import 'package:data_collector_catalog/collectors/directory/directory_collector.dart';
+import 'package:data_collector_catalog/collectors/enviroment/enviroment_collector.dart';
 import 'package:data_collector_catalog/collectors/light/light_collector.dart';
 import 'package:data_collector_catalog/collectors/location/location_collector.dart';
 import 'package:data_collector_catalog/collectors/network/network_collector.dart';
@@ -36,6 +37,7 @@ enum CollectionItem {
   volume,
   screenState,
   callLog,
+  environment,
 }
 
 extension CollectionItemGetters on CollectionItem {
@@ -68,6 +70,8 @@ extension CollectionItemGetters on CollectionItem {
         return '화면 상태';
       case CollectionItem.callLog:
         return '전화 기록';
+      case CollectionItem.environment:
+        return '환경';
     }
   }
 
@@ -97,6 +101,8 @@ extension CollectionItemGetters on CollectionItem {
         return 'on, off, unlocked';
       case CollectionItem.callLog:
         return '유형, 전화번호, 시간';
+      case CollectionItem.environment:
+        return '주변온도 습도, 압력';
     }
   }
 
@@ -135,6 +141,8 @@ extension CollectionItemGetters on CollectionItem {
         return ScreenStateCollector();
       case CollectionItem.callLog:
         return CallLogCollector();
+      case CollectionItem.environment:
+        return EnviromentCollector();
       default:
         return null;
     }
@@ -145,7 +153,8 @@ extension CollectionItemGetters on CollectionItem {
         (this == CollectionItem.location) ||
         (this == CollectionItem.network) ||
         (this == CollectionItem.microphone) ||
-        (this == CollectionItem.light)) {
+        (this == CollectionItem.light) ||
+        (this == CollectionItem.environment)) {
       return SamplingInterval.min15;
     } else if (this == CollectionItem.network) {
       return SamplingInterval.min5;

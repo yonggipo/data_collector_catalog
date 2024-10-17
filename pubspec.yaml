@@ -36,6 +36,7 @@ dependencies:
   watcher: ^1.1.0
   geolocator: ^13.0.1
   location: ^7.0.1
+  environment_sensors: ^0.3.0
 
 dev_dependencies:
   flutter_test:
