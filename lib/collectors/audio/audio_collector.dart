@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:record/record.dart';
 
+import '../../common/firebase_service.dart';
 import '../../models/collector.dart';
 
 final class AudioCollector extends Collector {
@@ -35,29 +36,25 @@ final class AudioCollector extends Collector {
     );
 
     final directory = Directory(directoryPath);
+    await directory.create(recursive: true);
 
     // 디렉토리가 존재하지 않으면 생성
     if (!await directory.exists()) {
-      try {
-        await directory.create(recursive: true);
-        dev.log('Create audio directory: $directoryPath', name: _log);
-      } catch (e) {
-        dev.log('Error: $e', name: _log);
-        return;
-      }
+      await directory.create(recursive: true);
+      dev.log('Create audio directory: $directoryPath', name: _log);
     }
 
     final fileName = '${DateTime.now().millisecondsSinceEpoch}.m4a';
     final filePath = p.join(directoryPath, fileName);
+    dev.log('Start recording with $fileName', name: _log);
 
     // stram - pcm16bits
+    // final stream = await record.startStream(recordConfig);
+    // _subscription = stream.listen(onData);
+
     // record - aacLc
     const recordConfig = RecordConfig(encoder: AudioEncoder.aacLc);
     await record.start(recordConfig, path: filePath);
-
-    // final stream = await record.startStream(recordConfig);
-    // _subscription = stream.listen(onData);
-    dev.log('Start recording with $fileName', name: _log);
 
     // 1분 후에 녹음 종료
     await Future.delayed(Duration(minutes: 1));
@@ -70,15 +67,16 @@ final class AudioCollector extends Collector {
     super.onCancel();
     final path = await record.stop();
     dev.log('Save record in $path', name: _log);
-    // await record.cancel();
+
+    FirebaseService.shared.upload(path: 'microphone', map: {
+      'path': path,
+      'timestamp': DateTime.now().toIso8601String()
+    }).onError(onError);
+
     _subscription?.cancel();
     _subscription = null;
-  }
 
-  // record.dispose(); deinit
-
-  @override
-  void onData(object) {
-    dev.log('onData: $object', name: _log);
+    // As always, don't forget this one.
+    record.dispose();
   }
 }

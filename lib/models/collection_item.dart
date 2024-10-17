@@ -142,6 +142,7 @@ extension CollectionItemGetters on CollectionItem {
 
   SamplingInterval get samplingInterval {
     if ((this == CollectionItem.sensorEvnets) ||
+        (this == CollectionItem.location) ||
         (this == CollectionItem.network) ||
         (this == CollectionItem.microphone) ||
         (this == CollectionItem.light)) {
