@@ -1,14 +1,13 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
-import 'package:data_collector_catalog/collectors/health/walking_event.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_activity_recognition/flutter_activity_recognition.dart';
 import 'package:pedometer/pedometer.dart';
 
+import '../../common/firebase_service.dart';
 import '../../models/collector.dart';
 import 'activity_event.dart';
+import 'walking_event.dart';
 import 'walking_status.dart';
 
 class HealthCollector extends Collector {
@@ -46,44 +45,27 @@ class HealthCollector extends Collector {
   }
 
   @override
-  void onData(object) async {
-    super.onData(object);
-    if (object is Activity) {
-      Activity activity = object;
-      dev.log(activity.toJson().toString(), name: _log);
+  void onData(data) async {
+    super.onData(data);
+    if (data is Activity) {
+      Activity activity = data;
       final item = ActivityEvent.fromMap(activity.toJson());
 
       // Upload item to firebase
-      await Firebase.initializeApp();
-      final ref = FirebaseDatabase.instance.ref();
-      await ref
-          .child("health")
-          .child('activityEvent')
-          .push()
-          .set(item.toMap())
-          .catchError((e) {
-        dev.log('error: $e', name: _log);
-      });
-    } else if (object is StepCount) {
-      StepCount stepCount = object;
-      dev.log(stepCount.toString(), name: _log);
-
+      FirebaseService.shared
+          .upload(path: 'health/activityEvent', map: item.toMap())
+          .onError(onError);
+    } else if (data is StepCount) {
+      StepCount stepCount = data;
       final walking = WalkingEvent(
           stepCount: stepCount.steps, dateTime: stepCount.timeStamp);
 
       // Upload item to firebase
-      await Firebase.initializeApp();
-      final ref = FirebaseDatabase.instance.ref();
-      await ref
-          .child("health")
-          .child('walkingEvnet')
-          .push()
-          .set(walking.toMap())
-          .catchError((e) {
-        dev.log('error: $e', name: _log);
-      });
-    } else if (object is PedestrianStatus) {
-      PedestrianStatus pedestrianStatus = object;
+      FirebaseService.shared
+          .upload(path: 'health/walkingEvnet', map: walking.toMap())
+          .onError(onError);
+    } else if (data is PedestrianStatus) {
+      PedestrianStatus pedestrianStatus = data;
       dev.log(pedestrianStatus.toString(), name: _log);
       final status = WalkingStatus(
           type: WalkingType.values
@@ -91,16 +73,9 @@ class HealthCollector extends Collector {
           dateTime: pedestrianStatus.timeStamp);
 
       // Upload item to firebase
-      await Firebase.initializeApp();
-      final ref = FirebaseDatabase.instance.ref();
-      await ref
-          .child("health")
-          .child('walkingStatus')
-          .push()
-          .set(status.toMap())
-          .catchError((e) {
-        dev.log('error: $e', name: _log);
-      });
+      FirebaseService.shared
+          .upload(path: 'health/walkingStatus', map: status.toMap())
+          .onError(onError);
     }
   }
 

@@ -55,25 +55,25 @@ class DirectoryCollector extends Collector {
   }
 
   @override
-  void onData(object) {
-    super.onData(object);
-    switch (object.type) {
+  void onData(data) {
+    super.onData(data);
+    switch (data.type) {
       case ChangeType.ADD:
-        dev.log('File added: ${object.path}', name: _log);
+        dev.log('File added: ${data.path}', name: _log);
         break;
       case ChangeType.REMOVE:
-        dev.log('File removed: ${object.path}', name: _log);
+        dev.log('File removed: ${data.path}', name: _log);
         break;
       case ChangeType.MODIFY:
-        dev.log('File modified: ${object.path}', name: _log);
+        dev.log('File modified: ${data.path}', name: _log);
         break;
     }
 
     // Upload item to firebase
     FirebaseService.shared.upload(path: 'media', map: {
-      'path': object.path,
-      'type': object.type.toString(),
-      'extension': p.extension(object.path),
+      'path': data.path,
+      'type': data.type.toString(),
+      'extension': p.extension(data.path),
       'timestamp': DateTime.now().toIso8601String()
     });
   }
