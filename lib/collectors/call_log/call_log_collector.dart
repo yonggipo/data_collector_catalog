@@ -33,7 +33,7 @@ class CallLogCollector extends Collector {
     if (data is PhoneState) {
       final log = data;
       FirebaseService.shared.upload(path: 'call_log', map: {
-        'state': log.status.toString().split('.').last,
+        'state': log.status.name,
         'phoneNumber': log.number,
         'timestamp': DateTime.now().toIso8601String()
       }).onError(onError);

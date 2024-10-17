@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 
 import 'package:real_volume/real_volume.dart';
 
+import '../../common/firebase_service.dart';
 import '../../models/collector.dart';
 
 final class VolumeCollector extends Collector {
@@ -25,13 +26,25 @@ final class VolumeCollector extends Collector {
   }
 
   @override
-  void onData(object) {
-    super.onData(object);
-    dev.log('onData: $object', name: _log);
-    // VolumeObj
-    // [VolumeCollector] onData: RingerMode.NORMAL
-    // [VolumeCollector] onData: RingerMode.VIBRATE
-    // [VolumeCollector] onData: RingerMode.SILENT
+  void onData(data) {
+    super.onData(data);
+    dev.log('onData: $data', name: _log);
+
+    // Upload item to firebase
+    if (data is RingerMode) {
+      final event = data;
+      FirebaseService.shared.upload(path: 'ringer_mode', map: {
+        'mode': event.name,
+        'timestamp': DateTime.now().toIso8601String(),
+      }).onError(onError);
+    } else if (data is VolumeObj) {
+      final event = data;
+      FirebaseService.shared.upload(path: 'volume', map: {
+        'level': event.volumeLevel,
+        'type': event.streamType?.name,
+        'timestamp': DateTime.now().toIso8601String(),
+      }).onError(onError);
+    }
   }
 
   @override

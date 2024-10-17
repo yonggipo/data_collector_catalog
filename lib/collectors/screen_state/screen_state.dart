@@ -15,7 +15,4 @@ enum ScreenState {
         throw ArgumentError('Invalid screen state: $value');
     }
   }
-
-  @override
-  String toString() => super.toString().split('.').last;
 }
