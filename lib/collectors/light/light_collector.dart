@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
+import 'package:data_collector_catalog/common/firebase_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 
@@ -26,23 +27,22 @@ final class LightCollector extends Collector {
       _subscription = LightAdaptor.luxStream().listen(onData);
       _subscription?.onError(onError);
     }
-    
+
     await Future.delayed(Duration(seconds: 3));
     onCancel();
   }
 
   @override
-  void onData(object) async {
-    super.onData(object);
-    dev.log('lux: $object', name: _log);
+  void onData(data) async {
+    super.onData(data);
+    dev.log('lux: $data', name: _log);
     final timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
-    final event = LuxEvent(lux: object, timeStamp: timeStamp);
+    final event = LuxEvent(lux: data, timeStamp: timeStamp);
 
-    await Firebase.initializeApp();
-    final ref = FirebaseDatabase.instance.ref();
-    await ref.child("lux").push().set(event.toJson()).catchError((e) {
-      dev.log('error: $e', name: _log);
-    });
+    // Upload item to firebase
+    FirebaseService.shared
+        .upload(path: 'light', map: event.toMap())
+        .onError(onError);
   }
 
   @override

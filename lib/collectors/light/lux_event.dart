@@ -4,7 +4,7 @@ class LuxEvent {
 
   LuxEvent({required this.lux, required this.timeStamp});
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toMap() => {
         'lux': lux,
         'timeStamp': timeStamp,
       };
