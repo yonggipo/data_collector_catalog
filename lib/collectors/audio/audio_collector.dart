@@ -55,6 +55,7 @@ final class AudioCollector extends Collector {
     // record - aacLc
     const recordConfig = RecordConfig(encoder: AudioEncoder.aacLc);
     await record.start(recordConfig, path: filePath);
+    // TODO 여기서 에러 1729470600030.m4a
 
     // 1분 후에 녹음 종료
     await Future.delayed(Duration(minutes: 1));
@@ -77,6 +78,6 @@ final class AudioCollector extends Collector {
     _subscription = null;
 
     // As always, don't forget this one.
-    record.dispose();
+    // record.dispose();
   }
 }

@@ -1,9 +1,15 @@
 // ignore: unused_import
 import 'dart:developer' as dev;
 
+import 'package:data_collector_catalog/collectors/bluetooth/bluetooth_collector.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+import 'package:data_collector_catalog/collectors/calendar/calendar_collector.dart';
 import 'package:data_collector_catalog/collectors/call_log/call_log_collector.dart';
 import 'package:data_collector_catalog/collectors/directory/directory_collector.dart';
 import 'package:data_collector_catalog/collectors/enviroment/enviroment_collector.dart';
+import 'package:data_collector_catalog/collectors/health/health_collector.dart';
 import 'package:data_collector_catalog/collectors/light/light_collector.dart';
 import 'package:data_collector_catalog/collectors/location/location_collector.dart';
 import 'package:data_collector_catalog/collectors/network/network_collector.dart';
@@ -12,17 +18,13 @@ import 'package:data_collector_catalog/collectors/screen_state/screen_state_coll
 import 'package:data_collector_catalog/collectors/sensor/sensor_event_collector.dart';
 import 'package:data_collector_catalog/collectors/volume/volume_collector.dart';
 import 'package:data_collector_catalog/models/permission_list_ext.dart';
-import 'package:data_collector_catalog/collectors/calendar/calendar_collector.dart';
-import 'package:data_collector_catalog/collectors/health/health_collector.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:permission_handler/permission_handler.dart';
 
+import '../collectors/audio/audio_collector.dart';
 import '../common/constants.dart';
 import '../common/device.dart';
-import '../collectors/audio/audio_collector.dart';
 import 'collector.dart';
-import 'sampling_interval.dart';
 import 'collector_premission_state.dart';
+import 'sampling_interval.dart';
 
 enum CollectionItem {
   sensorEvnets,
@@ -38,6 +40,7 @@ enum CollectionItem {
   screenState,
   callLog,
   environment,
+  bluetooth,
 }
 
 extension CollectionItemGetters on CollectionItem {
@@ -72,6 +75,8 @@ extension CollectionItemGetters on CollectionItem {
         return '전화 기록';
       case CollectionItem.environment:
         return '환경';
+      case CollectionItem.bluetooth:
+        return '블루투스';
     }
   }
 
@@ -103,6 +108,8 @@ extension CollectionItemGetters on CollectionItem {
         return '유형, 전화번호, 시간';
       case CollectionItem.environment:
         return '주변온도 습도, 압력';
+      case CollectionItem.bluetooth:
+        return 'MAC주소, CoD, 신호 강도';
     }
   }
 
@@ -143,6 +150,8 @@ extension CollectionItemGetters on CollectionItem {
         return CallLogCollector();
       case CollectionItem.environment:
         return EnviromentCollector();
+      case CollectionItem.bluetooth:
+        return BluetoothCollector();
       default:
         return null;
     }
@@ -156,7 +165,8 @@ extension CollectionItemGetters on CollectionItem {
         (this == CollectionItem.light) ||
         (this == CollectionItem.environment)) {
       return SamplingInterval.min15;
-    } else if (this == CollectionItem.network) {
+    } else if ((this == CollectionItem.network) || false) {
+      // (this == CollectionItem.bluetooth)
       return SamplingInterval.min5;
     } else {
       return SamplingInterval.event;
@@ -166,9 +176,9 @@ extension CollectionItemGetters on CollectionItem {
   List<Permission> get permissions {
     switch (this) {
       case CollectionItem.location:
-        return [Permission.location];
+        return [Permission.locationAlways];
       case CollectionItem.network:
-        return [Permission.location];
+        return [Permission.locationAlways];
       case CollectionItem.microphone:
         return Device.shared.isAboveAndroid9
             ? [Permission.microphone]
@@ -181,6 +191,10 @@ extension CollectionItemGetters on CollectionItem {
         return (Device.shared.andSdk! >= 33)
             ? [Permission.manageExternalStorage]
             : ((Device.shared.andSdk! >= 23) ? [Permission.storage] : []);
+      case CollectionItem.bluetooth:
+        return (Device.shared.andSdk! >= 31)
+            ? [Permission.bluetoothScan, Permission.bluetoothConnect]
+            : ((Device.shared.andSdk! <= 28) ? [] : []);
       default:
         return [];
     }

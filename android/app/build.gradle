@@ -13,17 +13,17 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
         // Deprecated 및 unchecked 연산 경고 활성화
         tasks.withType(JavaCompile) {
             options.compilerArgs += ['-Xlint:deprecation', '-Xlint:unchecked']
         }
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
-    }
+    // kotlinOptions {
+    //     jvmTarget = JavaVersion.VERSION_1_8
+    // }
 
     defaultConfig {
         applicationId = "com.example.data_collector_catalog"

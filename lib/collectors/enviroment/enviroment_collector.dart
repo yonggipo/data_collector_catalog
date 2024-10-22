@@ -12,52 +12,52 @@ class EnviromentCollector extends Collector {
 
   // ignore: unused_field
   static const _log = 'EnviromentCollector';
-  final _sensors = EnvironmentSensors();
+  // final _sensors = EnvironmentSensors();
   List<StreamSubscription>? _subscriptions;
 
   @override
   void onStart() async {
     super.onStart();
+    // lightAvailable
+    // final tempAvailable =
+    //     await _sensors.getSensorAvailable(SensorType.AmbientTemperature);
+    // final humidityAvailable =
+    //     await _sensors.getSensorAvailable(SensorType.Humidity);
+    // final pressureAvailable =
+    //     await _sensors.getSensorAvailable(SensorType.Pressure);
 
-    final isTemAvailable =
-        await _sensors.getSensorAvailable(SensorType.AmbientTemperature);
-    final isHumAvailable =
-        await _sensors.getSensorAvailable(SensorType.Humidity);
-    final isPreAvailable =
-        await _sensors.getSensorAvailable(SensorType.Pressure);
-
-    _subscriptions ??= [
-      if (isTemAvailable)
-        _sensors.temperature
-            .map((event) => [
-                  'temperature',
-                  {
-                    'value': event,
-                    'timestamp': DateTime.now().toIso8601String()
-                  }
-                ])
-            .listen(onData, onError: onError),
-      if (isHumAvailable)
-        _sensors.humidity
-            .map((event) => [
-                  'humidity',
-                  {
-                    'value': event,
-                    'timestamp': DateTime.now().toIso8601String()
-                  }
-                ])
-            .listen(onData, onError: onError),
-      if (isPreAvailable)
-        _sensors.pressure
-            .map((event) => [
-                  'pressure',
-                  {
-                    'value': event,
-                    'timestamp': DateTime.now().toIso8601String()
-                  }
-                ])
-            .listen(onData, onError: onError),
-    ];
+    // _subscriptions ??= [
+    //   if (tempAvailable)
+    //     _sensors.temperature
+    //         .map((event) => [
+    //               'temperature',
+    //               {
+    //                 'value': event,
+    //                 'timestamp': DateTime.now().toIso8601String()
+    //               }
+    //             ])
+    //         .listen(onData, onError: onError),
+    //   if (humidityAvailable)
+    //     _sensors.humidity
+    //         .map((event) => [
+    //               'humidity',
+    //               {
+    //                 'value': event,
+    //                 'timestamp': DateTime.now().toIso8601String()
+    //               }
+    //             ])
+    //         .listen(onData, onError: onError),
+    //   if (pressureAvailable)
+    //     _sensors.pressure
+    //         .map((event) => [
+    //               'pressure',
+    //               {
+    //                 'value': event,
+    //                 'timestamp': DateTime.now().toIso8601String()
+    //               }
+    //             ])
+    //         .listen(onData, onError: onError),
+    // ];
 
     await Future.delayed(Duration(seconds: 3));
     onCancel();

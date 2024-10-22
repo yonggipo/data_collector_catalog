@@ -11,6 +11,7 @@ class Constants {
   static const notiMethod = 'com.kane.notification.method';
 
   static const calendarEvent = 'com.kane.calendar.event';
+  static const bluetoothEvent = 'com.kane.bluetooth.event';
 }
 
 class _Stream {

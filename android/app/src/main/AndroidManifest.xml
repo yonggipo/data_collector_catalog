@@ -16,10 +16,22 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
-    <!-- Directory Permission -->
+    <!-- Tell Google Play Store that your app uses Bluetooth LE
+        Set android:required="true" if bluetooth is necessary -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+
+    <!-- Bluetooth Permission -->
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
+    <!-- New Bluetooth permissions in Android 12
+        https://developer.android.com/about/versions/12/features/bluetooth-permissions -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+    <!-- legacy for Android 11 or lower -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
 
     <application        
         android:label="data_collector_catalog"
@@ -64,6 +76,18 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <!-- BluetoothBroadcastReceiver -->
+        <receiver
+            android:name=".BluetoothBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <!-- <action android:name="android.bluetooth.device.action.FOUND"/>  -->
+                <action android:name="android.bluetooth.device.action.ACL_CONNECTED"/>
+                <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED"/>
+                <!-- <action android:name="android.bluetooth.adapter.action.CONNECTION_STATE_CHANGED"/> -->
+            </intent-filter>
+        </receiver>
 
         <!-- ScreenBroadcastReceiver -->
         <receiver
