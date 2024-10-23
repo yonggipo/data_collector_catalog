@@ -11,9 +11,14 @@
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
-    <!-- Location && Network Permission -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+    <!-- Location Permission -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- New Location permissions in Android 10 -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" /> 
+
+    <!-- Network Permission -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <!-- Tell Google Play Store that your app uses Bluetooth LE

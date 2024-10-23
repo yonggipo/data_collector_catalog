@@ -4,7 +4,6 @@ import 'dart:developer' as dev;
 import '../../common/firebase_service.dart';
 import '../../models/collector.dart';
 import 'light_adaptor.dart';
-import 'lux_event.dart';
 
 final class LightCollector extends Collector {
   LightCollector._() : super();
@@ -13,7 +12,6 @@ final class LightCollector extends Collector {
 
   static const _log = 'Light';
   StreamSubscription? _subscription;
-  List<LuxEvent> envents = [];
 
   @override
   void onStart() async {
@@ -33,13 +31,9 @@ final class LightCollector extends Collector {
   void onData(data) async {
     super.onData(data);
     dev.log('lux: $data', name: _log);
-    final timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
-    final event = LuxEvent(lux: data, timeStamp: timeStamp);
-
     // Upload item to firebase
     FirebaseService.shared
-        .upload(path: 'light', map: event.toMap())
-        .onError(onError);
+        .upload(path: 'light', map: {'lux': data}).onError(onError);
   }
 
   @override

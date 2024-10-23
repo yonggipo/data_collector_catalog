@@ -30,6 +30,7 @@ import 'sampling_interval.dart';
 enum CollectionItem {
   sensorEvnets,
   location,
+  environment,
   network,
   microphone,
   health,
@@ -41,7 +42,6 @@ enum CollectionItem {
   screenState,
   battery,
   callLog,
-  environment,
   bluetooth,
 }
 
@@ -55,6 +55,8 @@ extension CollectionItemGetters on CollectionItem {
         return '가속도, 각속도, 자기장';
       case CollectionItem.location:
         return '위치';
+      case CollectionItem.environment:
+        return '환경';
       case CollectionItem.network:
         return '네트워크';
       case CollectionItem.microphone:
@@ -77,8 +79,6 @@ extension CollectionItemGetters on CollectionItem {
         return '배터리';
       case CollectionItem.callLog:
         return '전화 기록';
-      case CollectionItem.environment:
-        return '환경';
       case CollectionItem.bluetooth:
         return '블루투스';
     }
@@ -90,6 +90,8 @@ extension CollectionItemGetters on CollectionItem {
         return 'm/s², °/s, μT';
       case CollectionItem.location:
         return '위도, 경도, 고도';
+      case CollectionItem.environment:
+        return '주변온도 습도, 압력';
       case CollectionItem.network:
         return 'ssid, bssid, 주파수, 신호 강도';
       case CollectionItem.microphone:
@@ -112,8 +114,6 @@ extension CollectionItemGetters on CollectionItem {
         return '배터리 잔량, 상태';
       case CollectionItem.callLog:
         return '유형, 전화번호, 시간';
-      case CollectionItem.environment:
-        return '주변온도 습도, 압력';
       case CollectionItem.bluetooth:
         return 'MAC주소, CoD, 신호 강도';
     }
@@ -134,6 +134,8 @@ extension CollectionItemGetters on CollectionItem {
         return SensorEventCollector();
       case CollectionItem.location:
         return LocationCollector();
+      case CollectionItem.environment:
+        return EnviromentCollector();
       case CollectionItem.network:
         return NetworkCollector();
       case CollectionItem.microphone:
@@ -156,8 +158,6 @@ extension CollectionItemGetters on CollectionItem {
         return BatteryCollector();
       case CollectionItem.callLog:
         return CallLogCollector();
-      case CollectionItem.environment:
-        return EnviromentCollector();
       case CollectionItem.bluetooth:
         return BluetoothCollector();
       default:
@@ -170,10 +170,10 @@ extension CollectionItemGetters on CollectionItem {
       return SamplingInterval.h4;
     } else if ((this == CollectionItem.sensorEvnets) ||
         (this == CollectionItem.location) ||
+        (this == CollectionItem.environment) ||
         (this == CollectionItem.network) ||
         (this == CollectionItem.microphone) ||
-        (this == CollectionItem.light) ||
-        (this == CollectionItem.environment)) {
+        (this == CollectionItem.light)) {
       return SamplingInterval.min15;
     } else if ((this == CollectionItem.network) || false) {
       // (this == CollectionItem.bluetooth)
@@ -186,9 +186,9 @@ extension CollectionItemGetters on CollectionItem {
   List<Permission> get permissions {
     switch (this) {
       case CollectionItem.location:
-        return [Permission.locationAlways];
+        return [Permission.locationWhenInUse, Permission.locationAlways];
       case CollectionItem.network:
-        return [Permission.locationAlways];
+        return [Permission.locationWhenInUse, Permission.locationAlways];
       case CollectionItem.microphone:
         return Device.shared.isAboveAndroid9
             ? [Permission.microphone]

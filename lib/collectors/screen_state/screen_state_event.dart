@@ -19,7 +19,7 @@ class ScreenStateEvent {
   Map<String, dynamic> toMap() {
     return {
       'screenState': screenState?.name,
-      'timeStamp': timeStamp?.toIso8601String(),
+      // 'timeStamp': timeStamp?.toIso8601String(),
     };
   }
 }

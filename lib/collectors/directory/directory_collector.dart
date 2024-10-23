@@ -74,7 +74,6 @@ class DirectoryCollector extends Collector {
       'path': data.path,
       'type': data.type.toString(),
       'extension': p.extension(data.path),
-      'timestamp': DateTime.now().toIso8601String()
     });
   }
 

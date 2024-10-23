@@ -38,51 +38,47 @@ class SensorEventCollector extends Collector {
   }
 
   @override
-  void onData(object) {
-    super.onData(object);
+  void onData(data) {
+    super.onData(data);
 
-    if (object is UserAccelerometerEvent) {
-      final acc = object;
+    if (data is UserAccelerometerEvent) {
+      final acc = data;
       FirebaseService.shared.upload(
         path: 'sensors/user_accelerometer',
         map: {
           'x': acc.x,
           'y': acc.y,
           'z': acc.z,
-          'timestamp': acc.timestamp.toIso8601String()
         },
       );
-    } else if (object is AccelerometerEvent) {
-      final acc = object;
+    } else if (data is AccelerometerEvent) {
+      final acc = data;
       FirebaseService.shared.upload(
         path: 'sensors/accelerometer',
         map: {
           'x': acc.x,
           'y': acc.y,
           'z': acc.z,
-          'timestamp': acc.timestamp.toIso8601String()
         },
       );
-    } else if (object is GyroscopeEvent) {
-      final gyr = object;
+    } else if (data is GyroscopeEvent) {
+      final gyr = data;
       FirebaseService.shared.upload(
         path: 'sensors/gyroscope',
         map: {
           'x': gyr.x,
           'y': gyr.y,
           'z': gyr.z,
-          'timestamp': gyr.timestamp.toIso8601String()
         },
       );
-    } else if (object is MagnetometerEvent) {
-      final mag = object;
+    } else if (data is MagnetometerEvent) {
+      final mag = data;
       FirebaseService.shared.upload(
         path: 'sensors/magnetometer',
         map: {
           'x': mag.x,
           'y': mag.y,
           'z': mag.z,
-          'timestamp': mag.timestamp.toIso8601String()
         },
       );
     }

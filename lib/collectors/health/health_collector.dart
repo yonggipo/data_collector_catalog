@@ -6,9 +6,6 @@ import 'package:pedometer/pedometer.dart';
 
 import '../../common/firebase_service.dart';
 import '../../models/collector.dart';
-import 'activity_event.dart';
-import 'walking_event.dart';
-import 'walking_status.dart';
 
 class HealthCollector extends Collector {
   HealthCollector._() : super();
@@ -47,34 +44,24 @@ class HealthCollector extends Collector {
   @override
   void onData(data) async {
     super.onData(data);
-    if (data is Activity) {
-      Activity activity = data;
-      final item = ActivityEvent.fromMap(activity.toJson());
 
-      // Upload item to firebase
+    // Upload item to firebase
+    if (data is Activity) {
+      final activity = data;
       FirebaseService.shared
-          .upload(path: 'health/activity', map: item.toMap())
+          .upload(path: 'health/activity', map: activity.toJson())
           .onError(onError);
     } else if (data is StepCount) {
-      StepCount stepCount = data;
-      final walking = WalkingEvent(
-          stepCount: stepCount.steps, dateTime: stepCount.timeStamp);
-
-      // Upload item to firebase
+      final stepCount = data;
+      final map = {'stepCount': stepCount.steps};
       FirebaseService.shared
-          .upload(path: 'health/walking', map: walking.toMap())
+          .upload(path: 'health/step_count', map: map)
           .onError(onError);
     } else if (data is PedestrianStatus) {
-      PedestrianStatus pedestrianStatus = data;
-      dev.log(pedestrianStatus.toString(), name: _log);
-      final status = WalkingStatus(
-          type: WalkingType.values
-              .firstWhere((v) => v.toString() == pedestrianStatus.status),
-          dateTime: pedestrianStatus.timeStamp);
-
-      // Upload item to firebase
+      final status = data;
+      final map = {'status': status.status};
       FirebaseService.shared
-          .upload(path: 'health/walking_status', map: status.toMap())
+          .upload(path: 'health/pedestrian_status', map: map)
           .onError(onError);
     }
   }

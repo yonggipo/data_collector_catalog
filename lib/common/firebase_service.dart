@@ -12,13 +12,20 @@ class FirebaseService {
   static final _ref = FirebaseDatabase.instance.ref();
 
   Future<void> upload({required String path, required Map map}) async {
-    map['timestamp2'] = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
+    map['timestamp'] = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
     return await _ref
         .child("android")
         .child(path)
         .push()
         .set(map)
         .catchError((e) {
+      dev.log("error: $e", name: _log);
+    });
+  }
+
+  Future<void> clear() async {
+    dev.log("Clear all data", name: _log);
+    return await _ref.child("android").remove().catchError((e) {
       dev.log("error: $e", name: _log);
     });
   }

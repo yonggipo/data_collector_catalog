@@ -35,7 +35,6 @@ class CallLogCollector extends Collector {
       FirebaseService.shared.upload(path: 'call_log', map: {
         'state': log.status.name,
         'phoneNumber': log.number,
-        'timestamp': DateTime.now().toIso8601String()
       }).onError(onError);
     }
   }

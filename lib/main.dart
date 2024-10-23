@@ -33,6 +33,7 @@ Future<void> _setupFirebase() async {
   try {
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);
+    // FirebaseService.shared.clear();
   } catch (e) {
     dev.log('error: $e', name: _firebaseLog);
   }

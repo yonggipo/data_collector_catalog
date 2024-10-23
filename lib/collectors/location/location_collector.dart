@@ -34,17 +34,17 @@ class LocationCollector extends Collector {
   @override
   void onStart() async {
     super.onStart();
+    dev.log('Start collection', name: _log);
 
-    final position = await geo.Geolocator.getCurrentPosition(
-        locationSettings:
-            geo.AndroidSettings(accuracy: geo.LocationAccuracy.low));
+    final setting = geo.AndroidSettings(accuracy: geo.LocationAccuracy.low);
+    final position =
+        await geo.Geolocator.getCurrentPosition(locationSettings: setting);
 
     // Upload item to firebase
     FirebaseService.shared.upload(path: 'location', map: {
       'latitude': position.latitude,
       'longitude': position.longitude,
       'altitude': position.altitude,
-      'timestamp': DateTime.now().toIso8601String(),
     }).onError(onError);
 
     // Call to calculate the remaining time

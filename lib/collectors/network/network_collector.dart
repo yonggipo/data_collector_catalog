@@ -29,7 +29,6 @@ class NetworkCollector extends Collector {
       'bssid': bssid,
       'signalStrength': signalStrength,
       'frequency': frequency,
-      'timestamp': DateTime.now().toIso8601String(),
     });
 
     // Call to calculate the remaining time

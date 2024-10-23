@@ -33,16 +33,14 @@ final class VolumeCollector extends Collector {
     // Upload item to firebase
     if (data is RingerMode) {
       final event = data;
-      FirebaseService.shared.upload(path: 'ringer_mode', map: {
-        'mode': event.name,
-        'timestamp': DateTime.now().toIso8601String(),
-      }).onError(onError);
+      FirebaseService.shared.upload(
+          path: 'volume/ringer_mode',
+          map: {'mode': event.name}).onError(onError);
     } else if (data is VolumeObj) {
       final event = data;
-      FirebaseService.shared.upload(path: 'volume', map: {
+      FirebaseService.shared.upload(path: 'volume/level', map: {
         'level': event.volumeLevel,
         'type': event.streamType?.name,
-        'timestamp': DateTime.now().toIso8601String(),
       }).onError(onError);
     }
   }
