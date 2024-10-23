@@ -1,6 +1,7 @@
 // ignore: unused_import
 import 'dart:developer' as dev;
 
+import 'package:data_collector_catalog/collectors/battery/battery_collector.dart';
 import 'package:data_collector_catalog/collectors/bluetooth/bluetooth_collector.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -38,6 +39,7 @@ enum CollectionItem {
   directory,
   volume,
   screenState,
+  battery,
   callLog,
   environment,
   bluetooth,
@@ -71,6 +73,8 @@ extension CollectionItemGetters on CollectionItem {
         return '볼륨';
       case CollectionItem.screenState:
         return '화면 상태';
+      case CollectionItem.battery:
+        return '배터리';
       case CollectionItem.callLog:
         return '전화 기록';
       case CollectionItem.environment:
@@ -104,6 +108,8 @@ extension CollectionItemGetters on CollectionItem {
         return '벨소리 모드, 음량';
       case CollectionItem.screenState:
         return 'on, off, unlocked';
+      case CollectionItem.battery:
+        return '배터리 잔량, 상태';
       case CollectionItem.callLog:
         return '유형, 전화번호, 시간';
       case CollectionItem.environment:
@@ -146,6 +152,8 @@ extension CollectionItemGetters on CollectionItem {
         return VolumeCollector();
       case CollectionItem.screenState:
         return ScreenStateCollector();
+      case CollectionItem.battery:
+        return BatteryCollector();
       case CollectionItem.callLog:
         return CallLogCollector();
       case CollectionItem.environment:
@@ -158,7 +166,9 @@ extension CollectionItemGetters on CollectionItem {
   }
 
   SamplingInterval get samplingInterval {
-    if ((this == CollectionItem.sensorEvnets) ||
+    if (this == CollectionItem.battery) {
+      return SamplingInterval.h4;
+    } else if ((this == CollectionItem.sensorEvnets) ||
         (this == CollectionItem.location) ||
         (this == CollectionItem.network) ||
         (this == CollectionItem.microphone) ||

@@ -12,6 +12,7 @@ class FirebaseService {
   static final _ref = FirebaseDatabase.instance.ref();
 
   Future<void> upload({required String path, required Map map}) async {
+    map['timestamp2'] = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
     return await _ref
         .child("android")
         .child(path)

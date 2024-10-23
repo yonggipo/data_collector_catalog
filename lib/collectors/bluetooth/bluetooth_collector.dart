@@ -1,8 +1,5 @@
 import 'dart:async';
 import 'dart:developer' as dev;
-import 'dart:io';
-
-// import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 import 'package:data_collector_catalog/collectors/bluetooth/bluetooth_adaptor.dart';
 
@@ -29,7 +26,7 @@ class BluetoothCollector extends Collector {
   void onData(data) async {
     super.onData(data);
     dev.log('onData: $data', name: _log);
-    FirebaseService.shared.upload(path: 'microphone', map: data);
+    FirebaseService.shared.upload(path: 'bluetooth', map: data);
   }
 
   @override
