@@ -9,6 +9,7 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'catalog_app.dart';
+import 'common/firebase_service.dart';
 import 'models/collection_item.dart';
 import 'models/collector.dart';
 import 'common/device.dart';
@@ -33,7 +34,7 @@ Future<void> _setupFirebase() async {
   try {
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);
-    // FirebaseService.shared.clear();
+    FirebaseService.shared.clear();
   } catch (e) {
     dev.log('error: $e', name: _firebaseLog);
   }

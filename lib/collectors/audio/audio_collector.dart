@@ -9,11 +9,11 @@ import '../../common/firebase_service.dart';
 import '../../models/collector.dart';
 
 final class AudioCollector extends Collector {
-  static const _log = 'Audio';
-
   AudioCollector._() : super();
   static final shared = AudioCollector._();
   factory AudioCollector() => shared;
+
+  static const _log = 'AudioCollector';
 
   final record = AudioRecorder();
   StreamSubscription? _subscription;
