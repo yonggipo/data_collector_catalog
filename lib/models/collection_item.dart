@@ -1,6 +1,7 @@
 // ignore: unused_import
 import 'dart:developer' as dev;
 
+import 'package:data_collector_catalog/collectors/application/application_collector.dart';
 import 'package:data_collector_catalog/collectors/battery/battery_collector.dart';
 import 'package:data_collector_catalog/collectors/bluetooth/bluetooth_collector.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -38,6 +39,7 @@ enum CollectionItem {
   light,
   notification,
   directory,
+  application,
   volume,
   screenState,
   battery,
@@ -71,6 +73,8 @@ extension CollectionItemGetters on CollectionItem {
         return '알림';
       case CollectionItem.directory:
         return '경로(미디어)';
+      case CollectionItem.application:
+        return '어플리케이션';
       case CollectionItem.volume:
         return '볼륨';
       case CollectionItem.screenState:
@@ -106,6 +110,8 @@ extension CollectionItemGetters on CollectionItem {
         return '앱, 메세지, 시간, 클릭 여부';
       case CollectionItem.directory:
         return '디렉토리, 확장자';
+      case CollectionItem.application:
+        return '앱 카테고리, 이름, 사용시간';
       case CollectionItem.volume:
         return '벨소리 모드, 음량';
       case CollectionItem.screenState:
@@ -150,6 +156,8 @@ extension CollectionItemGetters on CollectionItem {
         return NotificationCollector();
       case CollectionItem.directory:
         return DirectoryCollector();
+      case CollectionItem.application:
+        return ApplicationCollector();
       case CollectionItem.volume:
         return VolumeCollector();
       case CollectionItem.screenState:
@@ -216,6 +224,7 @@ extension CollectionItemGetters on CollectionItem {
       CollectionItem.health,
       CollectionItem.notification,
       // CollectionItem.callLog,
+      CollectionItem.application,
     ].contains(this);
   }
 

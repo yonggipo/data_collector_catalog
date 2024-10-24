@@ -15,6 +15,7 @@ class MainActivity : FlutterActivity() {
     private var calendarObserver: CalendarObserver? = null
     private var screenEventHandler: ScreenEventHandler? = null
     private var bluetoothEventHandler: BluetoothEventHandler? = null
+    private var applicationEventHandler: ApplicationEventHandler? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +29,7 @@ class MainActivity : FlutterActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         notificationEventHandler?.onActivityResult(requestCode, resultCode)
+        applicationEventHandler?.onActivityResult(requestCode, resultCode)
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -41,6 +43,8 @@ class MainActivity : FlutterActivity() {
         screenEventHandler?.contextRef = WeakReference(this)
         bluetoothEventHandler = BluetoothEventHandler()
         bluetoothEventHandler?.contextRef = WeakReference(this)
+        applicationEventHandler = ApplicationEventHandler()
+        applicationEventHandler?.contextRef = WeakReference(this)
 
         EventChannel(flutterEngine.dartExecutor.binaryMessenger, "com.kane.calendar.event")
             .setStreamHandler(calendarObserver)
@@ -60,5 +64,10 @@ class MainActivity : FlutterActivity() {
 
         EventChannel(flutterEngine.dartExecutor.binaryMessenger, "com.kane.bluetooth.event")
             .setStreamHandler(bluetoothEventHandler)
+
+        EventChannel(flutterEngine.dartExecutor.binaryMessenger, "com.kane.application.event")
+            .setStreamHandler(applicationEventHandler)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.kane.application.method")
+            .setMethodCallHandler(applicationEventHandler)
     }
 }

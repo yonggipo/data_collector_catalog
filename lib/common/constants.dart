@@ -12,6 +12,9 @@ class Constants {
 
   static const calendarEvent = 'com.kane.calendar.event';
   static const bluetoothEvent = 'com.kane.bluetooth.event';
+
+  static const applicationEvnet = 'com.kane.application.event';
+  static const applicationMethod = 'com.kane.application.method';
 }
 
 class _Stream {

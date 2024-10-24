@@ -1,6 +1,5 @@
 package com.example.data_collector_catalog
 
-import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.util.Log
 import io.flutter.plugin.common.EventChannel

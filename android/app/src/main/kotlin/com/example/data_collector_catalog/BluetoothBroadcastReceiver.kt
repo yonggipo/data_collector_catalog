@@ -1,17 +1,14 @@
 package com.example.data_collector_catalog
 
 import android.Manifest
-import android.R.attr.action
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Log
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import com.example.data_collector_catalog.BluetoothEventHandler.Companion.eventSink
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -30,22 +27,30 @@ class BluetoothBroadcastReceiver: BroadcastReceiver() {
 //        }
 
         if (BluetoothDevice.ACTION_ACL_CONNECTED == intent.action) {
-            var device :BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
+            var device :BluetoothDevice? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
+            } else {
+                intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE) as? BluetoothDevice
+            }
             val rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE).toInt()
             Log.d("BluetoothBroadcastReceiver", "ACTION_ACL_CONNECTED RSSI: $rssi dBm")
             Log.d("BluetoothBroadcastReceiver", "ACTION_ACL_CONNECTED ${device?.name}")
             device?.let {
-                handleEvnet("CONNECTED", it, rssi)
+                handleEvnet(context,"CONNECTED", it, rssi)
             }
         }
 
         if (BluetoothDevice.ACTION_ACL_DISCONNECTED == intent.action) {
-            var device :BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
+            var device :BluetoothDevice? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
+            } else {
+                intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE) as? BluetoothDevice
+            }
             val rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE).toInt()
             Log.d("BluetoothBroadcastReceiver", "ACTION_ACL_DISCONNECTED RSSI: $rssi dBm")
             Log.d("BluetoothBroadcastReceiver", "ACTION_ACL_DISCONNECTED ${device?.name}")
             device?.let {
-                handleEvnet("DISCONNECTED", it, rssi)
+                handleEvnet(context,"DISCONNECTED", it, rssi)
             }
         }
 
@@ -57,7 +62,11 @@ class BluetoothBroadcastReceiver: BroadcastReceiver() {
 //        }
     }
 
-    private fun handleEvnet(state: String, device: BluetoothDevice, rssi: Int) {
+    private fun handleEvnet(context: Context, state: String, device: BluetoothDevice, rssi: Int) {
+        val permissionCheck = ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT)
+        val isGranted = permissionCheck == PackageManager.PERMISSION_GRANTED
+        if (!isGranted) { return }
+
         val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         val currentTime = formatter.format(Date())
 

@@ -70,11 +70,15 @@ class NotificationEventHandler(): EventChannel.StreamHandler, MethodChannel.Meth
     private fun isPermissionGranted(context: Context): Boolean {
         val packageName = context.packageName
         val flat = Settings.Secure.getString(context.contentResolver, "enabled_notification_listeners")
+        Log.d("NotificationEventHandler","flat: $flat")
 
         if (!flat.isNullOrEmpty()) {
             val names = flat.split(":")
             for (name in names) {
                 val componentName = ComponentName.unflattenFromString(name)
+                Log.d("NotificationEventHandler","componentName: $componentName")
+                Log.d("NotificationEventHandler","packageName: $packageName")
+
                 val nameMatch = componentName?.packageName == packageName
                 if (nameMatch) {
                     return true
