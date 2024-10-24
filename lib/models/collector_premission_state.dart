@@ -7,6 +7,10 @@ enum CollectorPermissionState {
 }
 
 extension CollectorPermissionStateGetters on CollectorPermissionState {
+  bool get isValid {
+    return (this != CollectorPermissionState.required);
+  }
+
   String get title {
     switch (this) {
       case CollectorPermissionState.required:

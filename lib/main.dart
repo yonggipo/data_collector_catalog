@@ -7,6 +7,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'catalog_app.dart';
 import 'common/firebase_service.dart';
@@ -25,6 +28,7 @@ const _initialCollectionLog = 'initialCollection';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final _ = Device().checkAndroidVersion();
+  await Hive.initFlutter();
   await _setupFirebase();
   await _setupBackgroundService();
   runApp(const CatalogApp());

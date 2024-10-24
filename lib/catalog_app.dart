@@ -1,6 +1,5 @@
+import 'package:data_collector_catalog/screens/user_inlet_screen.dart';
 import 'package:flutter/cupertino.dart';
-
-import 'collect_state_screen.dart';
 
 class CatalogApp extends StatelessWidget {
   const CatalogApp({super.key});
@@ -9,7 +8,7 @@ class CatalogApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoApp(
       theme: CupertinoThemeData(brightness: Brightness.light),
-      home: CollectStateScreen(),
+      home: UserInletScreen(),
     );
   }
 }

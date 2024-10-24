@@ -6,10 +6,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
-import 'common/svg_image.dart';
-import 'models/collection_item.dart';
-import 'models/collector_premission_state.dart';
-import 'common/constants.dart';
+import '../common/svg_image.dart';
+import '../models/collection_item.dart';
+import '../models/collector_premission_state.dart';
+import '../common/constants.dart';
 
 class CollectStateScreen extends StatefulWidget {
   const CollectStateScreen({super.key});
