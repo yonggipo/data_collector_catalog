@@ -128,7 +128,7 @@ extension CollectionItemGetters on CollectionItem {
   Stream<Map<String, dynamic>?> get dataStream {
     switch (this) {
       case CollectionItem.microphone:
-        return FlutterBackgroundService().on(Constants.stream.audio);
+      // return FlutterBackgroundService().on(Constants.stream.audio);
       default:
         return Stream.empty();
     }

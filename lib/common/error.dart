@@ -1,0 +1,4 @@
+enum Error {
+  fileSave,
+  fileLoad;
+}

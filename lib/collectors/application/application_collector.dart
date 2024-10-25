@@ -1,9 +1,13 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
+import 'package:data_collector_catalog/common/file_manager.dart';
 import 'package:data_collector_catalog/common/firebase_service.dart';
 import 'package:data_collector_catalog/models/collector.dart';
+import 'package:hive/hive.dart';
 
+import '../../common/constants.dart';
+import '../../common/local_db_service.dart';
 import 'application_adaptor.dart';
 
 class ApplicationCollector extends Collector {
@@ -36,9 +40,12 @@ class ApplicationCollector extends Collector {
   }
 
   @override
-  void onData(data) {
+  Future<void> onData(data) async {
     super.onData(data);
-    FirebaseService.shared.upload(path: 'application', map: data);
+    if (!data is Map) return;
+    LocalDbService.save(data, Constants.application);
+    // FileManager.shared.save(data, Constants.applicationPath);
+    // FirebaseService.shared.upload(path: 'application', map: data);
   }
 
   @override

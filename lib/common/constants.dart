@@ -1,6 +1,7 @@
 class Constants {
-  static final file = _File();
-  static final stream = _Stream();
+  Constants._();
+
+  static final application = 'application';
 
   static const String pretendard = 'Pretendard';
 
@@ -15,13 +16,4 @@ class Constants {
 
   static const applicationEvnet = 'com.kane.application.event';
   static const applicationMethod = 'com.kane.application.method';
-}
-
-class _Stream {
-  final String audio = 'audio';
-}
-
-class _File {
-  final String lux = 'lux_events.json';
-  final String audioPath = 'audio';
 }

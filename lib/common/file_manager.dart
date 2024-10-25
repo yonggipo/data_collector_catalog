@@ -49,23 +49,14 @@ class FileManager {
 
   // static Future<String> getPath()
 
-  Future<void> toJsonFile(dynamic data) async {
-    final jsonContent = json.encode(data);
-    try {
-      directory = await getExternalStorageDirectory();
-    } catch (e) {
-      dev.log('[✗ Noti] file: $e');
-    }
+  Future<void> save(Map map, String path) async {
+    final jsonData = json.encode(map);
+    final directory = await getExternalStorageDirectory();
+    if (directory == null) return;
 
-    if (directory == null) {
-      dev.log('[✗ Noti] path is null');
-      return;
-    }
-
-    final filePath = '${directory?.path}/${Constants.file.lux}';
+    final filePath = '${directory.path}/$path';
     final file = File(filePath);
-    file.writeAsStringSync(jsonContent);
-    // uploadJsonFile(filePath, file);
+    file.writeAsStringSync(jsonData);
   }
 
   static Future<List<String>> findFileNames(String filePath) async {
