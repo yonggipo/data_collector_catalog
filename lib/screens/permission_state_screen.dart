@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 
 import 'package:data_collector_catalog/models/collector_premission_state.dart';
 import 'package:data_collector_catalog/screens/collect_state_screen.dart';
+import 'package:data_collector_catalog/screens/data_collection_screen.dart';
 import 'package:data_collector_catalog/views/animation_check.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +28,7 @@ class _PermissionStateScreenState extends State<PermissionStateScreen> {
   void _moveToCollectStateScreen(BuildContext context) {
     Navigator.of(context).push(
       CupertinoPageRoute(
-        builder: (context) => CollectStateScreen(),
+        builder: (context) => DataCollectionScreen(),
       ),
     );
   }
