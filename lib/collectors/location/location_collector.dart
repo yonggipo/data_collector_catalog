@@ -45,6 +45,8 @@ class LocationCollector extends Collector {
       'latitude': position.latitude,
       'longitude': position.longitude,
       'altitude': position.altitude,
+      'accuracy': position.accuracy,
+      'speed': position.speed
     }).onError(onError);
 
     // Call to calculate the remaining time

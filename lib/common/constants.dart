@@ -2,7 +2,7 @@ class Constants {
   static final file = _File();
   static final stream = _Stream();
 
-  static final String pretendard = 'Pretendard';
+  static const String pretendard = 'Pretendard';
 
   static const lightEvent = 'com.kane.light.event';
   static const lightMethod = 'com.kane.light.method';

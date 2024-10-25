@@ -194,9 +194,9 @@ extension CollectionItemGetters on CollectionItem {
   List<Permission> get permissions {
     switch (this) {
       case CollectionItem.location:
-        return [Permission.locationWhenInUse, Permission.locationAlways];
+        return [Permission.locationWhenInUse];
       case CollectionItem.network:
-        return [Permission.locationWhenInUse, Permission.locationAlways];
+        return [Permission.locationWhenInUse];
       case CollectionItem.microphone:
         return Device.shared.isAboveAndroid9
             ? [Permission.microphone]
@@ -249,7 +249,8 @@ extension CollectionItemGetters on CollectionItem {
   }
 
   Future<bool> requestRequired() async {
-    if (isNeedCustomPermission) {
+    final isCustomPermissionGranted = await collector?.onCheck() ?? false;
+    if (isNeedCustomPermission && !isCustomPermissionGranted) {
       final customPermission = await collector?.onRequest() ?? false;
 
       if (!customPermission) {

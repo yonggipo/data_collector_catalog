@@ -64,8 +64,7 @@ class _UserInletScreenState extends State<UserInletScreen> {
     );
 
     // firebase path setting
-    await Future.delayed(Duration(seconds: 2));
-    FirebaseService.shared.setRoot(username);
+    await FirebaseService.shared.setRoot(username);
     Navigator.of(context).pop();
     Navigator.of(context).push(
       CupertinoPageRoute(

@@ -18,6 +18,7 @@ import 'models/collector.dart';
 import 'common/device.dart';
 import 'firebase_options.dart';
 
+
 const _notificationChannelId = 'catalog_notification_channel_id';
 const _foregroundServiceNotificationId = 888;
 
@@ -32,6 +33,7 @@ Future<void> main() async {
   await _setupFirebase();
   await _setupBackgroundService();
   runApp(const CatalogApp());
+
 }
 
 Future<void> _setupFirebase() async {
