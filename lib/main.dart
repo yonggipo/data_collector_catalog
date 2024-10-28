@@ -84,7 +84,7 @@ Future<void> _setupBackgroundService() async {
   await service.configure(
     androidConfiguration: AndroidConfiguration(
       autoStart: false,
-      onStart: onStart,
+      onStart: onBackgroundServiceStart,
       isForegroundMode: true,
       notificationChannelId: _notificationChannelId,
       initialNotificationTitle: 'title',
@@ -93,16 +93,16 @@ Future<void> _setupBackgroundService() async {
     ),
     iosConfiguration: IosConfiguration(),
   );
+
+  final isRunning = await service.isRunning();
+  dev.log('isRunning: $isRunning)', name: 'kane');
 }
 
 @pragma('vm:entry-point')
-void onStart(ServiceInstance service) async {
+void onBackgroundServiceStart(ServiceInstance service) async {
+  dev.log('onBackgroundServiceStart', name: _backgroundServiceLog);
   // WidgetsFlutterBinding.ensureInitialized();
   // DartPluginRegistrant.ensureInitialized();
-
-  // CalendarCollector().onStart();
-
-  dev.log('onStart', name: _backgroundServiceLog);
 
   service.on('stopService').listen((event) {
     service.stopSelf();
@@ -123,6 +123,11 @@ void onStart(ServiceInstance service) async {
 
   service.on('stopService').listen((event) {
     service.stopSelf();
+  });
+
+  service.on('startCollecting').listen((event) async {
+    dev.log('Start collecting has been called', name: _backgroundServiceLog);
+    await startCollectors();
   });
 
   if (service is AndroidServiceInstance) {
@@ -149,8 +154,6 @@ void onStart(ServiceInstance service) async {
       );
     }
   }
-
-  await startCollectors();
 }
 
 Future<void> startCollectors() async {
@@ -159,8 +162,8 @@ Future<void> startCollectors() async {
     CollectionItem.sensorEvnets
   ]; // CollectionItem.values;
 
-  dev.log('''Start collecting: [${items.map((item) => item.name)}]
-  ''', name: _backgroundServiceLog);
+  dev.log('Collectors: ${items.map((item) => item.name)}',
+      name: _backgroundServiceLog);
 
   final collectors = [];
   for (var item in items) {

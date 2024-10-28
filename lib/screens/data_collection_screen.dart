@@ -70,11 +70,14 @@ class _DataCollectionScreenState extends State<DataCollectionScreen>
   @override
   void initState() {
     super.initState();
-    final subscription = LocalDbService.registerBackgroundMessagePort();
-    
+    dev.log('Register background message port', name: _log);
+    LocalDbService.registerBackgroundMessagePort();
+
     WidgetsBinding.instance.addObserver(this);
+
+    dev.log('flutter background service start', name: _log);
     final service = FlutterBackgroundService();
-    service.startService();
+    service.invoke('startCollecting');
   }
 
   @override
@@ -84,9 +87,9 @@ class _DataCollectionScreenState extends State<DataCollectionScreen>
   }
 
   void _uploadData() async {
-    final names = CollectionItem.values.map((item) => item.name);
-    for (var name in names) {
-      await LocalDbService.upload(name);
+    final names = ['user_accelerometer', 'accelerometer', 'gyroscope', 'magnetometer']; // CollectionItem.values.map((item) => item.name);
+    for (var path in names) {
+      LocalDbService.sendMessageToUploadPort(path);
     }
   }
 
@@ -226,7 +229,7 @@ class _DataCollectionScreenState extends State<DataCollectionScreen>
                         onPressed: () async {
                           if (state == CollectorPermissionState.required) {
                             final isGranted = await item.requestRequired();
-                            if (isGranted) item.collector?.onStart();
+                            if (isGranted) item.collector?.onCollectStart();
                             setState(() {});
                           }
                         },

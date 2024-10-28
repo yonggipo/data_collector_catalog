@@ -26,7 +26,7 @@ final class KeystrokeLogger extends Collector {
   }
 
   @override
-  void onStart() {
+  void onCollectStart() {
     _subscription = KeyEventListener.keyEvnetStream.listen(onData);
   }
 }

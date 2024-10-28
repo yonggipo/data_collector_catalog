@@ -43,8 +43,8 @@ final class NotificationCollector extends Collector {
   }
 
   @override
-  void onStart() async {
-    super.onStart();
+  void onCollectStart() async {
+    super.onCollectStart();
     dev.log('Start collection', name: _log);
     _subscription = NotificationAdaptor.stream.listen(onData, onError: onError);
   }

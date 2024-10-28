@@ -52,8 +52,8 @@ final class AudioCollector extends Collector {
   }
 
   @override
-  void onStart() async {
-    super.onStart();
+  void onCollectStart() async {
+    super.onCollectStart();
     dev.log('onStart', name: _log);
     final filePath = await getAudioFilePath();
     const recordConfig = RecordConfig(encoder: AudioEncoder.aacLc);
@@ -68,7 +68,7 @@ final class AudioCollector extends Collector {
   void onData(data) {
     super.onData(data);
     if (data is! Map) return;
-    LocalDbService.save(data, Constants.audio);
+    // LocalDbService._save(data, Constants.audio);
   }
 
   @override

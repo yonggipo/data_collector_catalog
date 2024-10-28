@@ -23,8 +23,8 @@ class SensorEventCollector extends Collector {
   /// [SensorEventCollector] onData: {x: 0.0026906877756118774, z: 0.01701068878173828, y: 0.0010791867971420288}
   /// [SensorEventCollector] onData: {x: 0.0018122680485248566, z: 0.015103340148925781, y: 0.0007445067167282104}
   @override
-  void onStart() async {
-    super.onStart();
+  void onCollectStart() async {
+    super.onCollectStart();
     dev.log('onStart', name: _log);
 
     try {
@@ -32,10 +32,13 @@ class SensorEventCollector extends Collector {
       // _subscription = userAccelerometerEventStream().listen(onData, onError: onError);
 
       // 장치의 가속도 (m/s²?)
-      final userAcc = await userAccelerometerEventStream()
-          .firstWhere((acc) => (acc.x != 0) || (acc.y != 0) || (acc.z != 0));
-      LocalDbService.backgroundMessageHandler(
-          'sensors/user_accelerometer', <String, dynamic>{
+      final userAcc = await userAccelerometerEventStream().firstWhere(
+          (userAcc) =>
+              (userAcc.x != 0) || (userAcc.y != 0) || (userAcc.z != 0));
+      dev.log('accelerometer: ${userAcc.x}, ${userAcc.y}, ${userAcc.z}',
+          name: _log);
+      LocalDbService.sendMessageToSavePort(
+          'user_accelerometer', <String, dynamic>{
         'x': userAcc.x,
         'z': userAcc.z,
         'y': userAcc.y,
@@ -44,20 +47,18 @@ class SensorEventCollector extends Collector {
       // 중력의 영향을 포함한 장치의 가속도 (m/s²)
       final acc = await accelerometerEventStream()
           .firstWhere((acc) => (acc.x != 0) || (acc.y != 0) || (acc.z != 0));
-      LocalDbService.backgroundMessageHandler(
-        'sensors/accelerometer',
-        <String, dynamic>{
-          'x': acc.x,
-          'z': acc.z,
-          'y': acc.y,
-        },
-      );
+      dev.log('accelerometer: ${acc.x}, ${acc.y}, ${acc.z}', name: _log);
+      LocalDbService.sendMessageToSavePort('accelerometer', <String, dynamic>{
+        'x': acc.x,
+        'z': acc.z,
+        'y': acc.y,
+      });
 
       // 장치의 회전
       final gyr = await gyroscopeEventStream()
-          .firstWhere((acc) => (acc.x != 0) || (acc.y != 0) || (acc.z != 0));
-      LocalDbService.backgroundMessageHandler(
-          'sensors/accelerometer', <String, dynamic>{
+          .firstWhere((gyr) => (gyr.x != 0) || (gyr.y != 0) || (gyr.z != 0));
+      dev.log('gyroscope: ${gyr.x}, ${gyr.y}, ${gyr.z}', name: _log);
+      LocalDbService.sendMessageToSavePort('gyroscope', <String, dynamic>{
         'x': gyr.x,
         'y': gyr.y,
         'z': gyr.z,
@@ -65,9 +66,9 @@ class SensorEventCollector extends Collector {
 
       // 장치를 둘러싼 자기장
       final mag = await magnetometerEventStream()
-          .firstWhere((acc) => (acc.x != 0) || (acc.y != 0) || (acc.z != 0));
-      LocalDbService.backgroundMessageHandler(
-          'sensors/magnetometer', <String, dynamic>{
+          .firstWhere((mag) => (mag.x != 0) || (mag.y != 0) || (mag.z != 0));
+      dev.log('magnetometer: ${mag.x}, ${mag.y}, ${mag.z}', name: _log);
+      LocalDbService.sendMessageToSavePort('magnetometer', <String, dynamic>{
         'x': mag.x,
         'y': mag.y,
         'z': mag.z,

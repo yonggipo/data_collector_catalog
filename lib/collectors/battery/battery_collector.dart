@@ -16,8 +16,8 @@ class BatteryCollector extends Collector {
   final _battery = Battery();
 
   @override
-  Future<void> onStart() async {
-    super.onStart();
+  Future<void> onCollectStart() async {
+    super.onCollectStart();
     dev.log('onStart', name: _log);
     final remaining = await _battery.batteryLevel;
     final state = await _battery.batteryState;
@@ -28,6 +28,6 @@ class BatteryCollector extends Collector {
   void onData(data) {
     super.onData(data);
     if (data is! Map) return;
-    LocalDbService.save(data, Constants.battery);
+    // LocalDbService._save(data, Constants.battery);
   }
 }

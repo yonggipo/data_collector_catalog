@@ -13,8 +13,8 @@ class NetworkCollector extends Collector {
   static const _log = 'NetworkCollector';
 
   @override
-  void onStart() async {
-    super.onStart();
+  void onCollectStart() async {
+    super.onCollectStart();
     dev.log('Start collection', name: _log);
 
     final String? ssid = await WiFiForIoTPlugin.getSSID();

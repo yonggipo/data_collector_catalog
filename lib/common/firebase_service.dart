@@ -39,8 +39,9 @@ class FirebaseService {
   Future<void> clear() async {
     final root = await _loadRoot();
     dev.log("Clear $root data", name: _log);
-    return await _ref.child(root).remove().catchError((e) {
-      dev.log("error: $e", name: _log);
-    });
+    // await _ref.remove();
+    // return await _ref.child(root).remove().catchError((e) {
+    //   dev.log("error: $e", name: _log);
+    // });
   }
 }

@@ -16,8 +16,8 @@ class ScreenStateCollector extends Collector {
   StreamSubscription? _subscription;
 
   @override
-  void onStart() {
-    super.onStart();
+  void onCollectStart() {
+    super.onCollectStart();
     dev.log('Start collection', name: _log);
     _subscription = ScreenAdaptor.stream.listen(onData, onError: onError);
   }

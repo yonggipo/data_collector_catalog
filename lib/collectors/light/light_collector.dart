@@ -14,8 +14,8 @@ final class LightCollector extends Collector {
   StreamSubscription? _subscription;
 
   @override
-  void onStart() async {
-    super.onStart();
+  void onCollectStart() async {
+    super.onCollectStart();
     dev.log('Start collection', name: _log);
     final hasSensor = await LightAdaptor.hasSensor();
     if (hasSensor) {

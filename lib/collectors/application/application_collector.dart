@@ -31,8 +31,8 @@ class ApplicationCollector extends Collector {
   }
 
   @override
-  void onStart() {
-    super.onStart();
+  void onCollectStart() {
+    super.onCollectStart();
     dev.log('onStart', name: _log);
     _subscription =
         ApplicationAdaptor.stream.distinct().listen(onData, onError: onError);
@@ -42,7 +42,7 @@ class ApplicationCollector extends Collector {
   void onData(data) {
     super.onData(data);
     if (data is! Map) return;
-    LocalDbService.save(data, Constants.application);
+    // LocalDbService._save(data, Constants.application);
   }
 
   @override

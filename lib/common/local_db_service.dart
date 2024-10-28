@@ -4,8 +4,7 @@ import 'dart:developer' as dev;
 import 'dart:isolate';
 import 'dart:ui';
 
-import 'package:data_collector_catalog/main.dart';
-import 'package:hive/hive.dart';
+import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -14,24 +13,41 @@ import 'firebase_service.dart';
 class LocalDbService {
   LocalDbService._();
   static const _log = 'LocalDbService';
+  static List<StreamSubscription>? _subscriptions;
+
+  static void clear() {
+    _subscriptions?.forEach((e) => e.cancel());
+    _subscriptions = null;
+  }
 
   // Register background message stream listener
-  static StreamSubscription registerBackgroundMessagePort() {
-    final receivePort = ReceivePort();
-    IsolateNameServer.registerPortWithName(receivePort.sendPort, 'main_port');
+  static void registerBackgroundMessagePort() {
+    dev.log('Registered save port and upload port', name: _log);
+    final savePort = ReceivePort();
+    IsolateNameServer.registerPortWithName(savePort.sendPort, 'main_port');
+    final uploadPort = ReceivePort();
+    IsolateNameServer.registerPortWithName(uploadPort.sendPort, 'upload');
 
-    return receivePort.listen((message) async {
-      if (message is Map<String, dynamic>) {
+    _subscriptions ??= [
+      savePort.listen((message) async {
+        dev.log('Receive meesage in save port message: $message', name: _log);
         final path = message['path'];
         final data = message['data'];
-        await save(data, path);
-      }
-    });
+        await _save(path, data);
+      }, onError: (e) {
+        dev.log('Error occurred: $e', name: _log);
+      }),
+      uploadPort.listen((message) async {
+        dev.log('Receive meesage in upload port message: $message', name: _log);
+        final path = message['path'];
+        await _upload(path);
+      }),
+    ];
   }
 
   // Send message to main isolate
-  static void backgroundMessageHandler(String path, Map<String, dynamic> data) {
-    dev.log(' path: $path, onData: $data', name: _log);
+  static void sendMessageToSavePort(String path, Map<String, dynamic> data) {
+    dev.log('Send meesage to save port path: $path, onData: $data', name: _log);
     final message = <String, dynamic>{
       'path': path,
       'data': data,
@@ -39,29 +55,45 @@ class LocalDbService {
     IsolateNameServer.lookupPortByName('main_port')?.send(message);
   }
 
-  static Future<Box> loadBox(String path) async {
+  // Send message to main isolate
+  static void sendMessageToUploadPort(String path) {
+    try {
+      dev.log('Send meesage to upload port path: $path', name: _log);
+      final message = <String, dynamic>{'path': path};
+      IsolateNameServer.lookupPortByName('upload')?.send(message);
+    } catch (e) {
+      dev.log('Error occurred: $e', name: _log);
+    }
+  }
+
+  static Future<Box> _loadBox(String path) async {
     await Hive.initFlutter();
     final isOpen = Hive.isBoxOpen(path);
     return isOpen ? Hive.box(path) : await Hive.openBox(path);
   }
 
-  static Future<void> save(Map map, String path) async {
-    final map0 = (map as Map<String, dynamic>);
-    dev.log('save $path', name: _log);
-    map0['timestamp'] = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
-    final box = await loadBox(path);
-    await box.add(map0);
+  static Future<void> _save(String path, dynamic map) async {
+    dev.log('Save $path data to hive box', name: _log);
+    map['timestamp'] = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
+    final box = await _loadBox(path);
+    await box.add(map);
   }
 
-  static Future<void> upload(String path) async {
-    final box = await loadBox(path);
-    box.values.cast<Map>().forEach((data) async {
-      await FirebaseService.shared.upload(path: path, map: data);
-    });
+  static Future<void> _upload(String path) async {
+    try {
+      final box = await _loadBox(path);
+      final maps = box.values.cast<Map>();
+      dev.log('Count $path maps: ${maps.length}', name: _log);
+      box.values.cast<Map>().forEach((data) async {
+        await FirebaseService.shared.upload(path: path, map: data);
+      });
+    } catch (e) {
+      dev.log('Error occurred: $e', name: _log);
+    }
   }
 
   static Future<bool> isUserIn() async {
-    final box = await loadBox("user");
+    final box = await _loadBox("user");
     final username = box.get('root');
     return (username != null);
   }

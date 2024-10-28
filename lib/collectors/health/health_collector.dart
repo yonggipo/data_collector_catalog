@@ -30,8 +30,8 @@ class HealthCollector extends Collector {
   }
 
   @override
-  void onStart() {
-    super.onStart();
+  void onCollectStart() {
+    super.onCollectStart();
     dev.log('Start collection', name: _log);
 
     _subscriptions ??= [

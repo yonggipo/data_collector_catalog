@@ -159,7 +159,7 @@ class _CollectStateScreenState extends State<CollectStateScreen> {
                         onPressed: () async {
                           if (state == CollectorPermissionState.required) {
                             final isGranted = await item.requestRequired();
-                            if (isGranted) item.collector?.onStart();
+                            if (isGranted) item.collector?.onCollectStart();
                             setState(() {});
                           }
                         },

@@ -26,7 +26,7 @@ abstract class Collector {
     return Future(() => false);
   }
 
-  void onStart() {
+  void onCollectStart() {
     _isCollecting = true;
     isCollectingNotifier.value = _isCollecting;
     _timer?.cancel();
@@ -58,15 +58,16 @@ extension CollectorProgress on Collector {
     _duration = item.samplingInterval.duration;
 
     // 초기 시작
-    onStart();
-    dev.log('Start initial ${item.name} collection..', name: _log);
+    onCollectStart();
+    dev.log('Start initial ${item.name} collection', name: _log);
 
     // 이후 주기적으로 시작
     if (item.samplingInterval != SamplingInterval.event) {
       final schedule = Schedule.parse('*/${_duration?.inMinutes} * * * *');
       _cron.schedule(schedule, () {
-        onStart();
-        dev.log('Start ${item.name}\'s schedule: $schedule', name: _log);
+        onCollectStart();
+        dev.log('Start ${item.name}\'s schedule: ${_duration?.inMinutes}',
+            name: _log);
       });
     }
   }

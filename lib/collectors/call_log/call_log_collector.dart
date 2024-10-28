@@ -14,8 +14,8 @@ class CallLogCollector extends Collector {
   StreamSubscription? _subscription;
 
   @override
-  void onStart() {
-    super.onStart();
+  void onCollectStart() {
+    super.onCollectStart();
     dev.log('Start collection', name: _log);
     PhoneState.stream.listen(onData, onError: onError);
   }

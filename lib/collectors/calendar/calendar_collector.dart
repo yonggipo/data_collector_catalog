@@ -20,8 +20,8 @@ class CalendarCollector extends Collector {
   StreamSubscription? _subscription;
 
   @override
-  void onStart() async {
-    super.onStart();
+  void onCollectStart() async {
+    super.onCollectStart();
     dev.log('onStart', name: _log);
     _subscription = CalendarAdaptor.stream().listen(onData, onError: onError);
   }

@@ -16,8 +16,8 @@ class BluetoothCollector extends Collector {
   StreamSubscription? _subscription;
 
   @override
-  void onStart() async {
-    super.onStart();
+  void onCollectStart() async {
+    super.onCollectStart();
     dev.log('onStart', name: _log);
     _subscription = BluetoothAdaptor.stream.listen(onData, onError: onError);
   }
@@ -26,7 +26,7 @@ class BluetoothCollector extends Collector {
   void onData(data) async {
     super.onData(data);
     if (data is! Map) return;
-    LocalDbService.save(data, Constants.bluetooth);
+    // LocalDbService._save(data, Constants.bluetooth);
   }
 
   @override

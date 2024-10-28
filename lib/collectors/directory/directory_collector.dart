@@ -19,8 +19,8 @@ class DirectoryCollector extends Collector {
   List<StreamSubscription>? _subscriptions;
 
   @override
-  void onStart() async {
-    super.onStart();
+  void onCollectStart() async {
+    super.onCollectStart();
     dev.log('Start collection', name: _log);
     final directories = [
       Directory('/storage/emulated/0/Download'),
