@@ -1,11 +1,12 @@
-import 'package:data_collector_catalog/collectors/calendar/calendar_collector.dart';
-import 'package:data_collector_catalog/common/local_db_service.dart';
+import 'dart:developer' as dev;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:gap/gap.dart';
-import 'dart:developer' as dev;
+
 import '../common/constants.dart';
+import '../common/local_db_service.dart';
 import '../common/svg_image.dart';
 import '../models/collection_item.dart';
 import '../models/collector_premission_state.dart';
@@ -77,7 +78,19 @@ class _DataCollectionScreenState extends State<DataCollectionScreen>
 
     dev.log('flutter background service start', name: _log);
     final service = FlutterBackgroundService();
-    service.invoke('startCollecting');
+    service.isRunning().then((isRunning) {
+      dev.log('Is service running: $isRunning', name: _log);
+      if (!isRunning) {
+        service.startService().then((isStart) {
+          dev.log('Is service start: $isStart', name: _log);
+          if (isStart) {
+            service.invoke('startCollect');
+          }
+        });
+      } else {
+        service.invoke('startCollect');
+      }
+    });
   }
 
   @override
@@ -87,7 +100,12 @@ class _DataCollectionScreenState extends State<DataCollectionScreen>
   }
 
   void _uploadData() async {
-    final names = ['user_accelerometer', 'accelerometer', 'gyroscope', 'magnetometer']; // CollectionItem.values.map((item) => item.name);
+    final names = [
+      'user_accelerometer',
+      'accelerometer',
+      'gyroscope',
+      'magnetometer'
+    ]; // CollectionItem.values.map((item) => item.name);
     for (var path in names) {
       LocalDbService.sendMessageToUploadPort(path);
     }

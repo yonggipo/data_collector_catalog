@@ -3,9 +3,6 @@ import 'dart:developer' as dev;
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:data_collector_catalog/collectors/calendar/calendar_collector.dart';
-import 'package:data_collector_catalog/models/collection_item.dart';
-import 'package:data_collector_catalog/models/collector.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -16,22 +13,26 @@ import 'common/device.dart';
 import 'common/firebase_service.dart';
 import 'common/local_db_service.dart';
 import 'firebase_options.dart';
+import 'models/collection_item.dart';
+import 'models/collector.dart';
 import 'models/collector_premission_state.dart';
 import 'screens/permission_state_screen.dart';
 import 'screens/user_inlet_screen.dart';
 
-const _notificationChannelId = 'catalog_notification_channel_id';
-const _foregroundServiceNotificationId = 888;
+const _notificationChannelId = 'catalog_channel_id';
+const _notificationChannelName = 'catalog_channel_name';
+const _notificationId = 1312;
 
 const _firebaseLog = 'firebase';
+const _localNotiPluginLog = 'localNotiPlugin';
 const _backgroundServiceLog = 'backgroundService';
-const _initialCollectionLog = 'initialCollection';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final _ = Device().checkAndroidVersion();
   await Hive.initFlutter();
   await _setupFirebase();
+  await _setupLocalNotificationPlugin();
   await _setupBackgroundService();
 
   final isUserIn = await LocalDbService.isUserIn();
@@ -46,6 +47,7 @@ Future<void> main() async {
   }
 }
 
+// Setup firebase
 Future<void> _setupFirebase() async {
   try {
     await Firebase.initializeApp(
@@ -56,112 +58,93 @@ Future<void> _setupFirebase() async {
   }
 }
 
-Future<void> _setupBackgroundService() async {
-  final service = FlutterBackgroundService();
-
-  const channel = AndroidNotificationChannel(
-    _notificationChannelId,
-    'data_collector_catalog',
-    description: 'This channel is used for android foreground service',
-    importance: Importance.max,
-  );
-
-  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  if (Platform.isIOS || Platform.isAndroid) {
-    await flutterLocalNotificationsPlugin.initialize(
-      const InitializationSettings(
-        iOS: DarwinInitializationSettings(),
-        android: AndroidInitializationSettings('ic_bg_service_small'),
-      ),
+// Setup local notification plugin
+Future<void> _setupLocalNotificationPlugin() async {
+  try {
+    const channel = AndroidNotificationChannel(
+      _notificationChannelId,
+      _notificationChannelName,
+      description: 'This channel is used for android foreground service',
+      importance: Importance.max,
     );
-  }
 
-  await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(channel);
-
-  await service.configure(
-    androidConfiguration: AndroidConfiguration(
-      autoStart: false,
-      onStart: onBackgroundServiceStart,
-      isForegroundMode: true,
-      notificationChannelId: _notificationChannelId,
-      initialNotificationTitle: 'title',
-      initialNotificationContent: 'content',
-      foregroundServiceNotificationId: _foregroundServiceNotificationId,
-    ),
-    iosConfiguration: IosConfiguration(),
-  );
-
-  final isRunning = await service.isRunning();
-  dev.log('isRunning: $isRunning)', name: 'kane');
-}
-
-@pragma('vm:entry-point')
-void onBackgroundServiceStart(ServiceInstance service) async {
-  dev.log('onBackgroundServiceStart', name: _backgroundServiceLog);
-  // WidgetsFlutterBinding.ensureInitialized();
-  // DartPluginRegistrant.ensureInitialized();
-
-  service.on('stopService').listen((event) {
-    service.stopSelf();
-  });
-
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-
-  if (service is AndroidServiceInstance) {
-    service.on('setAsForeground').listen((event) {
-      service.setAsForegroundService();
-    });
-
-    service.on('setAsBackground').listen((event) {
-      service.setAsBackgroundService();
-    });
-  }
-
-  service.on('stopService').listen((event) {
-    service.stopSelf();
-  });
-
-  service.on('startCollecting').listen((event) async {
-    dev.log('Start collecting has been called', name: _backgroundServiceLog);
-    await startCollectors();
-  });
-
-  if (service is AndroidServiceInstance) {
-    if (await service.isForegroundService()) {
-      // OPTIONAL for use custom notification
-      flutterLocalNotificationsPlugin.show(
-        _foregroundServiceNotificationId,
-        'title',
-        'body',
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            _notificationChannelId,
-            'data_collector_catalog',
-            icon: 'ic_bg_service_small',
-            ongoing: true,
-          ),
+    final plugin = FlutterLocalNotificationsPlugin();
+    if (Platform.isIOS || Platform.isAndroid) {
+      await plugin.initialize(
+        const InitializationSettings(
+          iOS: DarwinInitializationSettings(),
+          android: AndroidInitializationSettings('ic_bg_service_small'),
         ),
       );
-
-      // if you don't using custom notification, uncomment this
-      service.setForegroundNotificationInfo(
-        title: "title",
-        content: "content",
-      );
     }
+
+    await plugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+  } catch (e) {
+    dev.log('Error occurred: $e', name: _localNotiPluginLog);
   }
 }
 
-Future<void> startCollectors() async {
+// Setup background service
+Future<void> _setupBackgroundService() async {
+  try {
+    final service = FlutterBackgroundService();
+    await service.configure(
+      androidConfiguration: AndroidConfiguration(
+          autoStart: false,
+          onStart: _onBackgroundServiceStart,
+          isForegroundMode: true,
+          initialNotificationTitle: 'title',
+          initialNotificationContent: 'content',
+          notificationChannelId: _notificationChannelId,
+          foregroundServiceNotificationId: _notificationId,
+          foregroundServiceTypes: [AndroidForegroundType.dataSync]),
+      iosConfiguration: IosConfiguration(),
+    );
+    service.isRunning().then((isRunning) {
+      dev.log('Is service running: $isRunning', name: _backgroundServiceLog);
+    });
+  } catch (e) {
+    dev.log('Error occurred: $e', name: _backgroundServiceLog);
+  }
+}
+
+// When the background service is ready and invoked, it runs
+@pragma('vm:entry-point')
+void _onBackgroundServiceStart(ServiceInstance service) async {
+  dev.log('Start background service', name: _backgroundServiceLog);
+  DartPluginRegistrant.ensureInitialized();
+  service.on('stopService').listen((event) => service.stopSelf());
+  service.on('stopService').listen((event) => service.stopSelf());
+
+  if (service is AndroidServiceInstance) {
+    service
+        .on('setAsForeground')
+        .listen((event) => service.setAsForegroundService());
+    service
+        .on('setAsBackground')
+        .listen((event) => service.setAsBackgroundService());
+
+    service.on('startCollect').listen((event) async {
+      dev.log('Did \'startollecting\' has been called',
+          name: _backgroundServiceLog);
+      await _onCollect();
+    });
+  } else {
+    dev.log('Is not android service instance', name: _backgroundServiceLog);
+  }
+}
+
+// Collect collectible items
+Future<void> _onCollect() async {
+  dev.log('Start collecting', name: _backgroundServiceLog);
+
   final items = [
     // CollectionItem.calendar,
     CollectionItem.sensorEvnets
   ]; // CollectionItem.values;
-
   dev.log('Collectors: ${items.map((item) => item.name)}',
       name: _backgroundServiceLog);
 
