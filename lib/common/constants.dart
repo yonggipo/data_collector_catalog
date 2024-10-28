@@ -2,6 +2,9 @@ class Constants {
   Constants._();
 
   static final application = 'application';
+  static final audio = 'audio';
+  static final battery = 'battery';
+  static final bluetooth = 'bluetooth';
 
   static const String pretendard = 'Pretendard';
 

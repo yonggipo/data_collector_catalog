@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer' as dev;
+import 'dart:ui';
 
 import 'package:device_calendar/device_calendar.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -14,30 +15,22 @@ class CalendarCollector extends Collector {
   static final shared = CalendarCollector._();
   factory CalendarCollector() => shared;
 
-  static const _log = 'calender';
+  static const _log = 'CalendarCollector';
   final _plugin = DeviceCalendarPlugin();
   StreamSubscription? _subscription;
 
   @override
-  Future<bool> onRequest() async {
-    var isGranted = await _plugin.requestPermissions();
-    return isGranted.data ?? false;
-  }
-
-  Future<bool> isGranted() async {
-    var isGranted = await _plugin.hasPermissions();
-    return isGranted.data ?? false;
+  void onStart() async {
+    super.onStart();
+    dev.log('onStart', name: _log);
+    _subscription = CalendarAdaptor.stream().listen(onData, onError: onError);
   }
 
   @override
-  void onStart() async {
-    super.onStart();
-    dev.log('Start collection', name: _log);
-
-    // 앱시작시, 그리고 일정 변경을 감지시 3달(-30 +60)에 해당하는 일정을 읽어와 전송
-    await _uploadEvents();
-    _subscription = CalendarAdaptor.signalStream().listen(onData);
-    _subscription?.onError(onError);
+  void onData(data) {
+    super.onData(data);
+    dev.log('Calendar has been changed', name: _log);
+    // await _uploadEvents();
   }
 
   Future<void> _uploadEvents() async {
@@ -85,6 +78,7 @@ class CalendarCollector extends Collector {
   }
 
   Future<List<Event>> _fetchCalendarEvents(Calendar calendar) async {
+    dev.log('calender id ${calendar.id.toString()}', name: _log);
     final startDate = DateTime.now().add(const Duration(days: -30));
     final endDate = DateTime.now().add(const Duration(days: 30 * 2));
     final params = RetrieveEventsParams(startDate: startDate, endDate: endDate);
@@ -95,13 +89,6 @@ class CalendarCollector extends Collector {
   bool _validateCalendarName(String name) {
     final emailRegex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$';
     return RegExp(emailRegex).hasMatch(name);
-  }
-
-  @override
-  void onData(object) async {
-    super.onData(object);
-    dev.log('Calendar has been changed', name: _log);
-    await _uploadEvents();
   }
 
   @override

@@ -21,7 +21,7 @@ class _UserInletScreenState extends State<UserInletScreen> {
   static const _log = '_UserInletScreenState';
 
   final _controller = TextEditingController();
-  bool _isButtonDisabled = false;
+  bool _isButtonDisabled = true;
 
   @override
   void initState() {

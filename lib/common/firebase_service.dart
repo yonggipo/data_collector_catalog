@@ -28,9 +28,9 @@ class FirebaseService {
 
   // upload map data to firebase with path
   Future<void> upload({required String path, required Map map}) async {
-    final path = await _loadRoot();
-    map['timestamp'] = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
-    return await _ref.child(path).child(path).push().set(map).catchError((e) {
+    final root = await _loadRoot();
+    // map['timestamp'] = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
+    return await _ref.child(root).child(path).push().set(map).catchError((e) {
       dev.log("error: $e", name: _log);
     });
   }

@@ -26,6 +26,7 @@ class _PermissionStateScreenState extends State<PermissionStateScreen> {
   static const _log = '_PermissionStateScreenState';
 
   void _moveToCollectStateScreen(BuildContext context) {
+  
     Navigator.of(context).push(
       CupertinoPageRoute(
         builder: (context) => DataCollectionScreen(),
@@ -75,7 +76,7 @@ class _PermissionStateScreenState extends State<PermissionStateScreen> {
                           builder: (context, snapshot) =>
                               (snapshot.data?.isValid ?? false)
                                   ? Text(
-                                      item.name,
+                                      item.korean,
                                       style: TextStyle(
                                         fontFamily: Constants.pretendard,
                                         fontSize: 16,
@@ -86,7 +87,7 @@ class _PermissionStateScreenState extends State<PermissionStateScreen> {
                                       ),
                                     )
                                   : Text(
-                                      item.name,
+                                      item.korean,
                                       style: TextStyle(
                                         fontFamily: Constants.pretendard,
                                         fontSize: 16,

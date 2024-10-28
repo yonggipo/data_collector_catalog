@@ -86,7 +86,7 @@ class _CollectStateScreenState extends State<CollectStateScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item.name,
+                      item.korean,
                       style: TextStyle(
                         fontFamily: Constants.pretendard,
                         fontSize: 15,

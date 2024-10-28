@@ -51,7 +51,7 @@ extension CollectionItemGetters on CollectionItem {
   // ignore: unused_field
   static const _log = 'CollectionItemGetters';
 
-  String get name {
+  String get korean {
     switch (this) {
       case CollectionItem.sensorEvnets:
         return '가속도, 각속도, 자기장';

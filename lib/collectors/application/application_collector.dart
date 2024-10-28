@@ -33,19 +33,16 @@ class ApplicationCollector extends Collector {
   @override
   void onStart() {
     super.onStart();
-
     dev.log('onStart', name: _log);
     _subscription =
         ApplicationAdaptor.stream.distinct().listen(onData, onError: onError);
   }
 
   @override
-  Future<void> onData(data) async {
+  void onData(data) {
     super.onData(data);
-    if (!data is Map) return;
+    if (data is! Map) return;
     LocalDbService.save(data, Constants.application);
-    // FileManager.shared.save(data, Constants.applicationPath);
-    // FirebaseService.shared.upload(path: 'application', map: data);
   }
 
   @override

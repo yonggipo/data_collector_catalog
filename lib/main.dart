@@ -1,23 +1,24 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 import 'dart:io';
+import 'dart:ui';
 
-import 'package:data_collector_catalog/models/collector_premission_state.dart';
+import 'package:data_collector_catalog/collectors/calendar/calendar_collector.dart';
+import 'package:data_collector_catalog/models/collection_item.dart';
+import 'package:data_collector_catalog/models/collector.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart';
 
-import 'catalog_app.dart';
-import 'common/firebase_service.dart';
-import 'models/collection_item.dart';
-import 'models/collector.dart';
 import 'common/device.dart';
+import 'common/firebase_service.dart';
+import 'common/local_db_service.dart';
 import 'firebase_options.dart';
-
+import 'models/collector_premission_state.dart';
+import 'screens/permission_state_screen.dart';
+import 'screens/user_inlet_screen.dart';
 
 const _notificationChannelId = 'catalog_notification_channel_id';
 const _foregroundServiceNotificationId = 888;
@@ -32,8 +33,17 @@ Future<void> main() async {
   await Hive.initFlutter();
   await _setupFirebase();
   await _setupBackgroundService();
-  runApp(const CatalogApp());
 
+  final isUserIn = await LocalDbService.isUserIn();
+  if (isUserIn) {
+    runApp(const MaterialApp(
+      home: PermissionStateScreen(),
+    ));
+  } else {
+    runApp(const MaterialApp(
+      home: UserInletScreen(),
+    ));
+  }
 }
 
 Future<void> _setupFirebase() async {
@@ -73,6 +83,7 @@ Future<void> _setupBackgroundService() async {
 
   await service.configure(
     androidConfiguration: AndroidConfiguration(
+      autoStart: false,
       onStart: onStart,
       isForegroundMode: true,
       notificationChannelId: _notificationChannelId,
@@ -82,23 +93,21 @@ Future<void> _setupBackgroundService() async {
     ),
     iosConfiguration: IosConfiguration(),
   );
-
-  startCollectors();
-  // service.startService();
 }
 
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
+  // WidgetsFlutterBinding.ensureInitialized();
   // DartPluginRegistrant.ensureInitialized();
+
+  // CalendarCollector().onStart();
+
   dev.log('onStart', name: _backgroundServiceLog);
-  // await Hive.initFlutter();
-  // var box = await Hive.openBox("user");
 
   service.on('stopService').listen((event) {
     service.stopSelf();
   });
 
-  // OPTIONAL when use custom notification
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
@@ -140,26 +149,29 @@ void onStart(ServiceInstance service) async {
       );
     }
   }
+
+  await startCollectors();
 }
 
 Future<void> startCollectors() async {
-  var items = CollectionItem.values;
+  final items = [
+    // CollectionItem.calendar,
+    CollectionItem.sensorEvnets
+  ]; // CollectionItem.values;
 
-  List<(CollectionItem, Collector)> collectors = [];
+  dev.log('''Start collecting: [${items.map((item) => item.name)}]
+  ''', name: _backgroundServiceLog);
+
+  final collectors = [];
   for (var item in items) {
     final status = await item.permissionStatus;
-    if (status != CollectorPermissionState.required) {
-      final collector = item.collector;
-      if (collector != null) {
-        collectors.add((item, collector));
-      }
-    }
+    if (status.isValid) collectors.add((item, item.collector));
   }
 
-  dev.log('Granted controller count: ${collectors.length}',
-      name: _initialCollectionLog);
-
   for (var (item, collector) in collectors) {
-    collector.start(item);
+    if (collector is Collector) {
+      final casted = collector;
+      casted.start(item);
+    }
   }
 }

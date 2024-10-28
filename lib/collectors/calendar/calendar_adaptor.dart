@@ -7,7 +7,7 @@ class CalendarAdaptor {
 
   static const eventChannel = EventChannel(Constants.calendarEvent);
 
-  static Stream<void> signalStream() {
+  static Stream<void> stream() {
     return eventChannel.receiveBroadcastStream();
   }
 }

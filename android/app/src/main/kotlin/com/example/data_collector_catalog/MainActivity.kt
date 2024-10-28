@@ -3,6 +3,7 @@ package com.example.data_collector_catalog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import id.flutter.flutter_background_service.FlutterBackgroundServicePlugin
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel

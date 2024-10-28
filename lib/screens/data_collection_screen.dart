@@ -1,7 +1,10 @@
+import 'package:data_collector_catalog/collectors/calendar/calendar_collector.dart';
+import 'package:data_collector_catalog/common/local_db_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:gap/gap.dart';
-
+import 'dart:developer' as dev;
 import '../common/constants.dart';
 import '../common/svg_image.dart';
 import '../models/collection_item.dart';
@@ -17,8 +20,75 @@ class DataCollectionScreen extends StatefulWidget {
   }
 }
 
-class _DataCollectionScreenState extends State<DataCollectionScreen> {
-  void _uploadData() {}
+class _DataCollectionScreenState extends State<DataCollectionScreen>
+    with WidgetsBindingObserver {
+  static const _log = 'DataCollectionScreen';
+  // final service = FlutterBackgroundService();
+  // var items = CollectionItem.values;
+
+  // List<(CollectionItem, Collector)> collectors = [];
+  // for (var item in items) {
+  //   final status = await item.permissionStatus;
+  //   if (status != CollectorPermissionState.required) {
+  //     final collector = item.collector;
+  //     if (collector != null) {
+  //       collectors.add((item, collector));
+  //     }
+  //   }
+  // }
+
+  // dev.log('Granted controller count: ${collectors.length}',
+  //     name: _initialCollectionLog);
+
+  // for (var (item, collector) in collectors) {
+  //   collector.start(item);
+  // }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    switch (state) {
+      case AppLifecycleState.inactive:
+        dev.log('inactive - 비활성 상태', name: _log);
+        break;
+      case AppLifecycleState.paused:
+        dev.log('paused - 백그라운드로 전환', name: _log);
+        break;
+      case AppLifecycleState.resumed:
+        dev.log('resumed - 포그라운드로 전환', name: _log);
+        break;
+      case AppLifecycleState.detached:
+        dev.log('detached - 앱이 완전히 종료되기 직전', name: _log);
+        break;
+      case AppLifecycleState.hidden:
+        dev.log('hidden - 앱이 보이지 않는 상태', name: _log);
+        break;
+      // inactive hidden paused
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final subscription = LocalDbService.registerBackgroundMessagePort();
+    
+    WidgetsBinding.instance.addObserver(this);
+    final service = FlutterBackgroundService();
+    service.startService();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  void _uploadData() async {
+    final names = CollectionItem.values.map((item) => item.name);
+    for (var name in names) {
+      await LocalDbService.upload(name);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +153,7 @@ class _DataCollectionScreenState extends State<DataCollectionScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item.name,
+                      item.korean,
                       style: TextStyle(
                         fontFamily: Constants.pretendard,
                         fontSize: 15,

@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
-import 'package:data_collector_catalog/collectors/bluetooth/bluetooth_adaptor.dart';
-
-import '../../common/firebase_service.dart';
+import '../../common/constants.dart';
+import '../../common/local_db_service.dart';
 import '../../models/collector.dart';
+import 'bluetooth_adaptor.dart';
 
 class BluetoothCollector extends Collector {
   BluetoothCollector._() : super();
@@ -18,15 +18,15 @@ class BluetoothCollector extends Collector {
   @override
   void onStart() async {
     super.onStart();
-    dev.log('Start collection', name: _log);
+    dev.log('onStart', name: _log);
     _subscription = BluetoothAdaptor.stream.listen(onData, onError: onError);
   }
 
   @override
   void onData(data) async {
     super.onData(data);
-    dev.log('onData: $data', name: _log);
-    FirebaseService.shared.upload(path: 'bluetooth', map: data);
+    if (data is! Map) return;
+    LocalDbService.save(data, Constants.bluetooth);
   }
 
   @override
