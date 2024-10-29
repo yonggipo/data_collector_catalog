@@ -85,10 +85,12 @@ class _DataCollectionScreenState extends State<DataCollectionScreen>
           dev.log('Is service start: $isStart', name: _log);
           if (isStart) {
             service.invoke('startCollect');
+            service.invoke('setAsForeground');
           }
         });
       } else {
         service.invoke('startCollect');
+        service.invoke('setAsForeground');
       }
     });
   }
