@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:developer' as dev;
+import 'dart:isolate';
 
 import 'package:data_collector_catalog/background_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'collectors/sensor/Inertial_collector.dart';
 import 'common/device.dart';
 import 'common/firebase_service.dart';
 import 'common/local_db_service.dart';
@@ -39,26 +41,11 @@ Future<void> main() async {
   runApp(MaterialApp(home: home));
 }
 
+final List<Collector2> collectors = [InertialCollector()];
 Future<void> onCollect() async {
-  dev.log('Did \'startollecting\' has been called', name: _log);
-  dev.log('Start collecting', name: _log);
-
-  final items = [
-    // CollectionItem.calendar,
-    CollectionItem.sensorEvnets
-  ]; // CollectionItem.values;
-  dev.log('Collectors: ${items.map((item) => item.name)}', name: _log);
-
-  final collectors = [];
-  for (var item in items) {
-    final status = await item.permissionStatus;
-    if (status.isValid) collectors.add((item, item.collector));
-  }
-
-  for (var (item, collector) in collectors) {
-    if (collector is Collector) {
-      final casted = collector;
-      casted.start(item);
-    }
+  dev.log('${Isolate.current.hashCode} Start collecting in background service',
+      name: _log);
+  for (var e in collectors) {
+    e.startCollecting();
   }
 }

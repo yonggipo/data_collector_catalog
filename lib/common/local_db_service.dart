@@ -30,17 +30,21 @@ class LocalDbService {
 
     _subscriptions ??= [
       savePort.listen((message) async {
-        dev.log('Receive meesage in save port message: $message', name: _log);
+        dev.log(
+            '[${Isolate.current.debugName}] Receive meesage in save port message: $message',
+            name: _log);
         final path = message['path'];
         final data = message['data'];
-        await _save(path, data);
+        await save(path, data);
       }, onError: (e) {
         dev.log('Error occurred: $e', name: _log);
       }),
       uploadPort.listen((message) async {
-        dev.log('Receive meesage in upload port message: $message', name: _log);
+        dev.log(
+            '[${Isolate.current.debugName}] Receive meesage in upload port message: $message',
+            name: _log);
         final path = message['path'];
-        await _upload(path);
+        await upload(path);
       }),
     ];
   }
@@ -58,7 +62,9 @@ class LocalDbService {
   // Send message to main isolate
   static void sendMessageToUploadPort(String path) {
     try {
-      dev.log('Send meesage to upload port path: $path', name: _log);
+      dev.log(
+          '[${Isolate.current.debugName}] Send meesage to upload port path: $path',
+          name: _log);
       final message = <String, dynamic>{'path': path};
       IsolateNameServer.lookupPortByName('upload')?.send(message);
     } catch (e) {
@@ -72,14 +78,19 @@ class LocalDbService {
     return isOpen ? Hive.box(path) : await Hive.openBox(path);
   }
 
-  static Future<void> _save(String path, dynamic map) async {
-    dev.log('Save $path data to hive box', name: _log);
+  static Future<void> save(String path, dynamic map) async {
+    dev.log('Save $path data', name: _log);
     map['timestamp'] = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
     final box = await _loadBox(path);
     await box.add(map);
   }
 
-  static Future<void> _upload(String path) async {
+  static Future<int> count(String path) async {
+    final box = await _loadBox(path);
+    return box.values.length;
+  }
+
+  static Future<void> upload(String path) async {
     try {
       final box = await _loadBox(path);
       final maps = box.values.cast<Map>();

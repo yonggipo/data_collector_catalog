@@ -1,4 +1,5 @@
 import 'dart:developer' as dev;
+import 'dart:isolate';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import '../common/constants.dart';
 import '../common/local_db_service.dart';
 import '../common/svg_image.dart';
 import '../models/collection_item.dart';
+import '../models/collector.dart';
 import '../models/collector_premission_state.dart';
 import '../models/sampling_interval.dart';
 
@@ -71,26 +73,26 @@ class _DataCollectionScreenState extends State<DataCollectionScreen>
   @override
   void initState() {
     super.initState();
-    dev.log('Register background message port', name: _log);
+
+    _initializeAsyncTasks();
+  }
+
+  void _initializeAsyncTasks() async {
+    dev.log('[${Isolate.current.hashCode}] Register message isCollecting port',
+        name: _log);
     LocalDbService.registerBackgroundMessagePort();
-
-    WidgetsBinding.instance.addObserver(this);
-
-    dev.log('flutter background service start', name: _log);
+    for (var e in CollectionItem.values.map((e) => e.collector)) {
+      if (e != null) await e.registerMessagePort();
+    }
+    dev.log('[${Isolate.current.hashCode}] flutter background service start',
+        name: _log);
     final service = FlutterBackgroundService();
     service.isRunning().then((isRunning) {
       dev.log('Is service running: $isRunning', name: _log);
       if (!isRunning) {
         service.startService().then((isStart) {
           dev.log('Is service start: $isStart', name: _log);
-          if (isStart) {
-            service.invoke('startCollect');
-            service.invoke('setAsForeground');
-          }
         });
-      } else {
-        service.invoke('startCollect');
-        service.invoke('setAsForeground');
       }
     });
   }
@@ -124,6 +126,8 @@ class _DataCollectionScreenState extends State<DataCollectionScreen>
               child: ListView.builder(
                 itemCount: CollectionItem.values.length,
                 itemBuilder: (context, index) {
+                  dev.log('[${Isolate.current.debugName}] ListView.builder',
+                      name: _log);
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child:
@@ -144,6 +148,8 @@ class _DataCollectionScreenState extends State<DataCollectionScreen>
   }
 
   Widget _createCollectStateView(CollectionItem item) {
+    dev.log('[${Isolate.current.debugName}] _createCollectStateView: $item',
+        name: _log);
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
@@ -159,10 +165,11 @@ class _DataCollectionScreenState extends State<DataCollectionScreen>
             Row(
               children: [
                 ValueListenableBuilder(
-                  valueListenable: item.collector?.isCollectingNotifier ??
-                      ValueNotifier(false),
+                  valueListenable: item.collector!.isCollectingNotifier,
                   builder:
                       (BuildContext context, dynamic value, Widget? child) {
+                    dev.log('[${Isolate.current.debugName}] value: $value',
+                        name: _log);
                     return Padding(
                         padding: const EdgeInsets.all(6.0),
                         child: value
@@ -204,15 +211,20 @@ class _DataCollectionScreenState extends State<DataCollectionScreen>
                     FutureBuilder<CollectorPermissionState>(
                       future: item.permissionStatus,
                       builder: (context, snapshot) {
+                        dev.log(
+                            '[${Isolate.current.debugName}] FutureBuilder<CollectorPermissionState',
+                            name: _log);
                         final status =
                             snapshot.data ?? CollectorPermissionState.required;
                         return SizedBox(
                           width: 160,
                           child: ValueListenableBuilder<double>(
-                            valueListenable: item.collector?.progressNotifier ??
-                                ValueNotifier(0),
+                            valueListenable: item.collector!.progressNotifier,
                             builder: (BuildContext context, dynamic value,
                                 Widget? child) {
+                              dev.log(
+                                  '[${Isolate.current.debugName}] progress: $value',
+                                  name: _log);
                               return Visibility(
                                 visible: ((status !=
                                         CollectorPermissionState.required) &&

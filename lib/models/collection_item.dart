@@ -220,12 +220,12 @@ extension CollectionItemGetters on CollectionItem {
 
   bool get isNeedCustomPermission {
     return [
-      CollectionItem.location,
+      // CollectionItem.location,
       CollectionItem.health,
       CollectionItem.notification,
       // CollectionItem.callLog,
       CollectionItem.application,
-    ].contains(this);
+    ].contains(this);                                             
   }
 
   // Status of the required permissions in the collector

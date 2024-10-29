@@ -2,7 +2,6 @@
 import 'dart:developer' as dev;
 
 import 'package:data_collector_catalog/models/collector_premission_state.dart';
-import 'package:data_collector_catalog/screens/collect_state_screen.dart';
 import 'package:data_collector_catalog/screens/data_collection_screen.dart';
 import 'package:data_collector_catalog/views/animation_check.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,6 +10,7 @@ import 'package:gap/gap.dart';
 
 import '../common/constants.dart';
 import '../models/collection_item.dart';
+import 'collecting_state_screen.dart';
 
 class PermissionStateScreen extends StatefulWidget {
   const PermissionStateScreen({super.key});
@@ -26,10 +26,9 @@ class _PermissionStateScreenState extends State<PermissionStateScreen> {
   static const _log = '_PermissionStateScreenState';
 
   void _moveToCollectStateScreen(BuildContext context) {
-  
     Navigator.of(context).push(
       CupertinoPageRoute(
-        builder: (context) => DataCollectionScreen(),
+        builder: (context) => CollectingStateScreen(),
       ),
     );
   }

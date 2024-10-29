@@ -1,6 +1,7 @@
 // Setup local notification plugin
 import 'dart:developer' as dev;
 import 'dart:io';
+import 'dart:isolate';
 import 'dart:ui';
 
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -58,10 +59,12 @@ Future<void> initializeBackgroundService() async {
           foregroundServiceTypes: [AndroidForegroundType.dataSync]),
       iosConfiguration: IosConfiguration(),
     );
-    dev.log('Is service configured: $isConfigured',
+    dev.log(
+        '[${Isolate.current.debugName}] Is service configured: $isConfigured',
         name: _backgroundServiceLog);
     service.isRunning().then((isRunning) {
-      dev.log('Is service running: $isRunning', name: _backgroundServiceLog);
+      dev.log('[${Isolate.current.debugName}] Is service running: $isRunning',
+          name: _backgroundServiceLog);
     });
   } catch (e) {
     dev.log('Error occurred: $e', name: _backgroundServiceLog);
@@ -71,10 +74,10 @@ Future<void> initializeBackgroundService() async {
 // When the background service is ready and invoked, it runs
 @pragma('vm:entry-point')
 void _onBackgroundServiceStart(ServiceInstance service) async {
-  dev.log('Start background service', name: _backgroundServiceLog);
-  DartPluginRegistrant.ensureInitialized();
+  dev.log('${Isolate.current.hashCode} Start background service',
+      name: _backgroundServiceLog);
+  // DartPluginRegistrant.ensureInitialized();
   service.on('stopService').listen((event) => service.stopSelf());
-  service.on('startCollect').listen((event) => onCollect());
 
   if (service is AndroidServiceInstance) {
     service
@@ -86,11 +89,14 @@ void _onBackgroundServiceStart(ServiceInstance service) async {
 
     final isForeground = await service.isForegroundService();
     if (isForeground) {
-      dev.log('Service is foreground mode', name: _backgroundServiceLog);
-      // service.setForegroundNotificationInfo(
-      //   title: "My App Service",
-      //   content: "Updated at ${DateTime.now()}",
-      // );
+      dev.log('[$Isolate.current.hashCode} Service is foreground mode',
+          name: _backgroundServiceLog);
+      service.setForegroundNotificationInfo(
+        title: "My App Service",
+        content: "Updated at ${DateTime.now()}",
+      );
     }
   }
+
+  onCollect();
 }
