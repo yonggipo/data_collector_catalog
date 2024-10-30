@@ -41,7 +41,7 @@ class LocalDbService {
       }),
       uploadPort.listen((message) async {
         dev.log(
-            '[${Isolate.current.debugName}] Receive meesage in upload port message: $message',
+            '${Isolate.current.hashCode} Receive meesage in upload port message: $message',
             name: _log);
         final path = message['path'];
         await upload(path);
@@ -94,10 +94,11 @@ class LocalDbService {
     try {
       final box = await _loadBox(path);
       final maps = box.values.cast<Map>();
-      dev.log('Count $path maps: ${maps.length}', name: _log);
+      dev.log('$path data count: ${maps.length}', name: _log);
       box.values.cast<Map>().forEach((data) async {
         await FirebaseService.shared.upload(path: path, map: data);
       });
+      box.clear();
     } catch (e) {
       dev.log('Error occurred: $e', name: _log);
     }

@@ -59,11 +59,10 @@ Future<void> initializeBackgroundService() async {
           foregroundServiceTypes: [AndroidForegroundType.dataSync]),
       iosConfiguration: IosConfiguration(),
     );
-    dev.log(
-        '[${Isolate.current.debugName}] Is service configured: $isConfigured',
+    dev.log('${Isolate.current.hashCode} Is service configured: $isConfigured',
         name: _backgroundServiceLog);
     service.isRunning().then((isRunning) {
-      dev.log('[${Isolate.current.debugName}] Is service running: $isRunning',
+      dev.log('${Isolate.current.hashCode} Is service running: $isRunning',
           name: _backgroundServiceLog);
     });
   } catch (e) {

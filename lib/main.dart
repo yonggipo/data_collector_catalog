@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer' as dev;
 import 'dart:isolate';
 
+import 'package:cron/cron.dart';
 import 'package:data_collector_catalog/background_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import 'firebase_options.dart';
 import 'models/collection_item.dart';
 import 'models/collector.dart';
 import 'models/collector_premission_state.dart';
+import 'models/sampling_interval.dart';
 import 'screens/permission_state_screen.dart';
 import 'screens/user_inlet_screen.dart';
 
@@ -46,6 +48,6 @@ Future<void> onCollect() async {
   dev.log('${Isolate.current.hashCode} Start collecting in background service',
       name: _log);
   for (var e in collectors) {
-    e.startCollecting();
+    e.start();
   }
 }

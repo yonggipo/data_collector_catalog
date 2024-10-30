@@ -51,6 +51,7 @@ extension CollectionItemGetters on CollectionItem {
   // ignore: unused_field
   static const _log = 'CollectionItemGetters';
 
+
   String get korean {
     switch (this) {
       case CollectionItem.sensorEvnets:

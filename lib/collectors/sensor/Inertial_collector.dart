@@ -11,10 +11,10 @@ class InertialCollector extends Collector2 {
   String get messagePortName => 'InertialCollector';
 
   @override
-  Duration get duration => SamplingInterval.min15.duration;
+  SamplingInterval get samplingInterval => SamplingInterval.min15;
 
   @override
-  Future<void> startCollecting() async {
+  Future<void> collect() async {
     sendMessageToPort(true);
     final collection = <String, dynamic>{};
     // 중력의 영향을 포함한 장치의 가속도 (m/s²)

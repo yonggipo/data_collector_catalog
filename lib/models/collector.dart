@@ -14,14 +14,16 @@ import 'item.dart';
 abstract class Collector2 {
   Item get item;
   String get messagePortName;
-  Duration get duration;
-  void startCollecting();
+  SamplingInterval get samplingInterval;
+  void collect();
 
   final _messagePort = ReceivePort();
+  // ignore: unused_field
   StreamSubscription? _messageSubscription;
-  final progressNotifier = ValueNotifier<double>(0);
-  final valueNotifier = ValueNotifier<dynamic>(null);
+  final progressNotifier = ValueNotifier<double>(1.0);
+  final valueNotifier = ValueNotifier<dynamic>('loading..');
   final collectingNotifier = ValueNotifier<bool>(false);
+  final _cron = Cron();
   Timer? _timer;
   double _progressValue = 0;
 
@@ -60,7 +62,7 @@ abstract class Collector2 {
   void _trackReminderTime() {
     collectingNotifier.value = false;
     _progressValue = 0;
-    _tracking(duration);
+    _tracking(samplingInterval.duration);
   }
 
   void _tracking(Duration duration) {
@@ -71,6 +73,16 @@ abstract class Collector2 {
       _progressValue = (progress >= 1.0) ? 1.0 : progress;
       progressNotifier.value = _progressValue;
     });
+  }
+
+  void start() {
+    collect();
+    // 이후 주기적으로 시작
+    if (samplingInterval != SamplingInterval.event) {
+      final min = samplingInterval.duration.inMinutes;
+      final schedule = Schedule.parse('*/$min * * * *');
+      _cron.schedule(schedule, () => collect());
+    }
   }
 }
 
@@ -163,8 +175,6 @@ extension CollectorProgress on Collector {
 
     // 초기 시작
     onCollectStart();
-    dev.log('Start collecting ${item.name} data', name: _log);
-
     // 이후 주기적으로 시작
     if (item.samplingInterval != SamplingInterval.event) {
       final schedule = Schedule.parse('*/${_duration?.inMinutes} * * * *');

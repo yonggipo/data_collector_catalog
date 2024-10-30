@@ -7,9 +7,7 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:gap/gap.dart';
 
 import '../common/local_db_service.dart';
-import '../common/svg_image.dart';
 import '../main.dart';
-import '../models/collection_item.dart';
 import '../models/collector.dart';
 import '../common/constants.dart';
 
@@ -33,12 +31,12 @@ class _CollectingStateScreenState extends State<CollectingStateScreen> {
   }
 
   void _initializeAsyncTasks() async {
-    dev.log('[${Isolate.current.hashCode}] Register message port', name: _log);
+    dev.log('${Isolate.current.hashCode} Register message port', name: _log);
     LocalDbService.registerBackgroundMessagePort();
     for (var e in collectors) {
       await e.registerMessagePort();
     }
-    dev.log('[${Isolate.current.hashCode}] Run flutter background service',
+    dev.log('${Isolate.current.hashCode} Run flutter background service',
         name: _log);
     final service = FlutterBackgroundService();
     service.isRunning().then((isRunning) {
@@ -52,14 +50,14 @@ class _CollectingStateScreenState extends State<CollectingStateScreen> {
   }
 
   void _uploadData() async {
-    final names = [
-      'user_accelerometer',
-      'accelerometer',
-      'gyroscope',
-      'magnetometer'
-    ]; // CollectionItem.values.map((item) => item.name);
-    for (var path in names) {
-      LocalDbService.sendMessageToUploadPort(path);
+    dev.log('${Isolate.current.hashCode} upload button taps', name: _log);
+    for (var e in collectors) {
+      for (var p in e.item.paths) {
+        await LocalDbService.upload(p);
+      }
+      setState(() {
+        e.valueNotifier.value = 'All data sent waiting collect..';
+      });
     }
   }
 
@@ -111,12 +109,16 @@ class _CollectingStateScreenState extends State<CollectingStateScreen> {
                   valueListenable: collector.progressNotifier,
                   builder:
                       (BuildContext context, dynamic value, Widget? child) =>
-                          CircularProgressIndicator(
-                    value: value,
-                    semanticsLabel: 'Circular progress indicator',
+                          SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      value: value,
+                      semanticsLabel: 'Circular progress indicator',
+                    ),
                   ),
                 ),
-                Gap(8.0),
+                Gap(16),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,7 +135,7 @@ class _CollectingStateScreenState extends State<CollectingStateScreen> {
                         ),
                         Gap(4.0),
                         Text(
-                          '(${collector.item.description})',
+                          '(${collector.item.description} · ${collector.samplingInterval.name})',
                           style: TextStyle(
                             fontFamily: Constants.pretendard,
                             fontSize: 13,
@@ -146,80 +148,9 @@ class _CollectingStateScreenState extends State<CollectingStateScreen> {
                       valueListenable: collector.valueNotifier,
                       builder: (context, value, child) => Text(value ?? ''),
                     ),
-                    // Text(
-                    //   ' · 주기: ${item.samplingInterval.toString()}',
-                    //   style: TextStyle(
-                    //     fontFamily: Constants.pretendard,
-                    //     fontSize: 13,
-                    //     fontWeight: FontWeight.w400,
-                    //   ),
-                    // ),
-                    // Gap(8.0),
-                    // FutureBuilder<CollectorPermissionState>(
-                    //   future: item.permissionStatus,
-                    //   builder: (context, snapshot) {
-                    //     final status =
-                    //         snapshot.data ?? CollectorPermissionState.required;
-                    //     return SizedBox(
-                    //       width: 160,
-                    //       child: ValueListenableBuilder<double>(
-                    //         valueListenable: item.collector?.progressNotifier ??
-                    //             ValueNotifier(0),
-                    //         builder: (BuildContext context, dynamic value,
-                    //             Widget? child) {
-                    //           return Visibility(
-                    //             visible: ((status !=
-                    //                     CollectorPermissionState.required) &&
-                    //                 item.samplingInterval !=
-                    //                     SamplingInterval.event),
-                    //             child: LinearProgressIndicator(
-                    //               value: value,
-                    //               backgroundColor: Colors.white,
-                    //               color: Color(0xFF4C71F5),
-                    //               borderRadius: BorderRadius.circular(2.0),
-                    //             ),
-                    //           );
-                    //         },
-                    //       ),
-                    //     );
-                    //   },
-                    // )
                   ],
                 ),
                 Spacer(),
-                // FutureBuilder<CollectorPermissionState>(
-                //   future: item.permissionStatus,
-                //   builder: (context, snapshot) {
-                //     if (snapshot.connectionState == ConnectionState.waiting) {
-                //       return const CircularProgressIndicator();
-                //     } else {
-                //       final state =
-                //           snapshot.data ?? CollectorPermissionState.none;
-                //       return CupertinoButton(
-                //         color: state.indicatorColor,
-                //         padding:
-                //             EdgeInsets.symmetric(horizontal: 12, vertical: 8.0),
-                //         minSize: 0,
-                //         onPressed: () async {
-                //           if (state == CollectorPermissionState.required) {
-                //             final isGranted = await item.requestRequired();
-                //             if (isGranted) item.collector?.onCollectStart();
-                //             setState(() {});
-                //           }
-                //         },
-                //         child: Text(
-                //           state.title,
-                //           style: TextStyle(
-                //             fontFamily: Constants.pretendard,
-                //             fontSize: 14,
-                //             fontWeight: FontWeight.w500,
-                //             color: Colors.white,
-                //           ),
-                //         ),
-                //       );
-                //     }
-                //   },
-                // ),
               ],
             ),
           ],
