@@ -42,18 +42,20 @@ class HealthCollector extends Collector2 {
       final activity = data;
       sendMessageToPort(
           <String, dynamic>{'physical_activity': activity.toJson()});
+      sendMessageToPort(true);
     } else if (data is StepCount) {
       final stepCount = data;
       sendMessageToPort(<String, dynamic>{
         'step_count': <String, dynamic>{'step': stepCount.steps}
       });
+      sendMessageToPort(true);
     } else if (data is PedestrianStatus) {
       final status = data;
       sendMessageToPort(<String, dynamic>{
         'pedestrian_status': <String, dynamic>{'status': status.status}
       });
+      sendMessageToPort(true);
     }
-    sendMessageToPort(true);
   }
 
   FutureOr<void> onError(Object error, StackTrace stackTrace) async {

@@ -158,7 +158,7 @@ extension CollectionItemGetters on CollectionItem {
       case CollectionItem.callLog:
         return SensorEventCollector();
       case CollectionItem.bluetooth:
-        return BluetoothCollector();
+        return SensorEventCollector();
       default:
         return null;
     }

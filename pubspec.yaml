@@ -50,6 +50,8 @@ dependencies:
       url: https://github.com/yonggipo/notification_listener_service
   app_usage:
     path: ../app_usage
+  blue_info:
+    path: ../blue_info
 
 dev_dependencies:
   flutter_test:

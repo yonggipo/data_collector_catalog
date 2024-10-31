@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
-import '../../common/constants.dart';
-import '../../common/local_db_service.dart';
-import '../../models/collector.dart';
-import 'bluetooth_adaptor.dart';
+import 'package:blue_info/blue_info.dart';
 
-class BluetoothCollector extends Collector {
+import '../../models/collector.dart';
+import '../../models/item.dart';
+import '../../models/sampling_interval.dart';
+
+class BluetoothCollector extends Collector2 {
   BluetoothCollector._() : super();
   static final shared = BluetoothCollector._();
   factory BluetoothCollector() => shared;
@@ -16,22 +17,33 @@ class BluetoothCollector extends Collector {
   StreamSubscription? _subscription;
 
   @override
-  void onCollectStart() async {
-    super.onCollectStart();
-    dev.log('onStart', name: _log);
-    _subscription = BluetoothAdaptor.stream.listen(onData, onError: onError);
-  }
+  Item get item => Item.bluetooth;
 
   @override
-  void onData(data) async {
-    super.onData(data);
-    if (data is! Map) return;
-    // LocalDbService._save(data, Constants.bluetooth);
-  }
+  String get messagePortName => _log;
 
   @override
+  SamplingInterval get samplingInterval => SamplingInterval.event;
+
+  @override
+  void collect() {
+    sendMessageToPort(true);
+    _subscription = BlueInfo.stream.listen(onData, onError: onError);
+  }
+
+  void onData(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      final blueInfo = data;
+      sendMessageToPort(<String, dynamic>{'bluetooth': blueInfo});
+      sendMessageToPort(true);
+    }
+  }
+
+  FutureOr<void> onError(Object error, StackTrace stackTrace) async {
+    dev.log('Error occurred: $error', name: _log);
+  }
+
   void onCancel() {
-    super.onCancel();
     _subscription?.cancel();
     _subscription = null;
   }
