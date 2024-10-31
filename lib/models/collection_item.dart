@@ -8,17 +8,8 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:data_collector_catalog/collectors/calendar/calendar_collector.dart';
-import 'package:data_collector_catalog/collectors/call_log/call_log_collector.dart';
-import 'package:data_collector_catalog/collectors/directory/directory_collector.dart';
-import 'package:data_collector_catalog/collectors/enviroment/enviroment_collector.dart';
-import 'package:data_collector_catalog/collectors/health/health_collector.dart';
-import 'package:data_collector_catalog/collectors/light/light_collector.dart';
-import 'package:data_collector_catalog/collectors/location/location_collector.dart';
-import 'package:data_collector_catalog/collectors/network/network_collector.dart';
-import 'package:data_collector_catalog/collectors/notification/notification_collector.dart';
-import 'package:data_collector_catalog/collectors/screen_state/screen_state_collector.dart';
+
 import 'package:data_collector_catalog/collectors/inertial/sensor_event_collector.dart';
-import 'package:data_collector_catalog/collectors/volume/volume_collector.dart';
 import 'package:data_collector_catalog/models/permission_list_ext.dart';
 
 import '../collectors/audio/audio_collector.dart';
@@ -151,7 +142,7 @@ extension CollectionItemGetters on CollectionItem {
       case CollectionItem.calendar:
         return CalendarCollector();
       case CollectionItem.light:
-        return LightCollector();
+        return SensorEventCollector();
       case CollectionItem.notification:
         return SensorEventCollector();
       case CollectionItem.directory:
