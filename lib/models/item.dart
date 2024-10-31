@@ -105,12 +105,12 @@ enum Item {
   }
 
   Future<bool> get hasPermission async {
-    if (this == Item.calendar) {
+    if (this == Item.appUsage) {
       return AppUsage.hasPermission();
     } else if (this == Item.notification) {
       return NotificationListenerService.isPermissionGranted();
     } else if (this == Item.microphone) {
-      return  AudioRecorder().hasPermission();
+      return AudioRecorder().hasPermission();
     } else {
       return permissions.areGranted;
     }
