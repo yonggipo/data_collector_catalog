@@ -1,57 +1,61 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
-import 'package:data_collector_catalog/common/firebase_service.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:data_collector_catalog/models/item.dart';
+import 'package:data_collector_catalog/models/sampling_interval.dart';
+import 'package:notification_listener_service/notification_event.dart';
+import 'package:notification_listener_service/notification_listener_service.dart';
 
 import '../../models/collector.dart';
-import 'notification_event.dart';
-import 'notification_adaptor.dart';
 
-final class NotificationCollector extends Collector {
+final class NotificationCollector extends Collector2 {
   NotificationCollector._() : super();
   static final NotificationCollector shared = NotificationCollector._();
   factory NotificationCollector() => shared;
 
   static const _log = 'NotificationCollector';
-  List<NotificationEvent> envents = [];
   StreamSubscription? _subscription;
-  ServiceInstance? service;
 
   @override
-  Future<bool> onCheck() async {
-    super.onCheck();
-    return NotificationAdaptor.hasPermission();
-  }
+  Item get item => Item.notification;
 
   @override
-  Future<bool> onRequest() async {
-    super.onRequest();
-    return NotificationAdaptor.requestPermission();
-  }
+  String get messagePortName => _log;
 
   @override
-  void onData(data) async {
-    super.onData(data);
-    // dev.log('notification: ${data.toString()}', name: _log);
+  SamplingInterval get samplingInterval => SamplingInterval.event;
 
-    // Upload item to firebase
-    if (data is NotificationEvent) {
-      final event = data;
-      FirebaseService.shared.upload(path: 'notification', map: event.toMap());
+  @override
+  void collect() async {
+    final isGranted = await NotificationListenerService.isPermissionGranted();
+    if (isGranted) {
+      sendMessageToPort(true);
+      _subscription = NotificationListenerService.notificationsStream
+          .listen(onData, onError: onError);
     }
   }
 
-  @override
-  void onCollectStart() async {
-    super.onCollectStart();
-    dev.log('Start collection', name: _log);
-    _subscription = NotificationAdaptor.stream.listen(onData, onError: onError);
+  void onData(data) async {
+    if (data is ServiceNotificationEvent) {
+      final notification = data;
+      sendMessageToPort(<String, dynamic>{
+        'notification': <String, dynamic>{
+          'id': notification.id,
+          'hasRemoved': notification.hasRemoved,
+          'packageName': notification.packageName,
+          'title': notification.title,
+          'content': notification.content,
+        }
+      });
+      sendMessageToPort(true);
+    }
   }
 
-  @override
+  FutureOr<void> onError(Object error, StackTrace stackTrace) async {
+    dev.log('Error occurred: $error', name: _log);
+  }
+
   void onCancel() {
-    super.onCancel();
     _subscription?.cancel();
     _subscription = null;
   }

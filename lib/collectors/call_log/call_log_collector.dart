@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
-import 'package:data_collector_catalog/common/firebase_service.dart';
-import 'package:data_collector_catalog/models/collector.dart';
 import 'package:phone_state/phone_state.dart';
 
-class CallLogCollector extends Collector {
+import '../../models/collector.dart';
+import '../../models/item.dart';
+import '../../models/sampling_interval.dart';
+
+class CallLogCollector extends Collector2 {
   CallLogCollector._() : super();
   static final shared = CallLogCollector._();
   factory CallLogCollector() => shared;
@@ -14,28 +16,41 @@ class CallLogCollector extends Collector {
   StreamSubscription? _subscription;
 
   @override
-  void onCollectStart() {
-    super.onCollectStart();
-    dev.log('Start collection', name: _log);
-    PhoneState.stream.listen(onData, onError: onError);
-  }
+  Item get item => Item.callLog;
 
   @override
-  void onCancel() {
-    super.onCancel();
-    _subscription?.cancel();
-    _subscription = null;
-  }
+  String get messagePortName => _log;
 
   @override
+  SamplingInterval get samplingInterval => SamplingInterval.event;
+
+  @override
+  void collect() {
+    sendMessageToPort(true);
+    _subscription = PhoneState.stream
+        .where((e) => e.number != null)
+        .listen(onData, onError: onError);
+  }
+
   void onData(data) {
-    super.onData(data);
     if (data is PhoneState) {
       final log = data;
-      FirebaseService.shared.upload(path: 'call_log', map: {
-        'state': log.status.name,
-        'phoneNumber': log.number,
-      }).onError(onError);
+      sendMessageToPort(<String, dynamic>{
+        'call_log': <String, dynamic>{
+          'status': log.status.name,
+          'phoneNumber': log.number
+        }
+      });
+      sendMessageToPort(true);
     }
+  }
+
+  FutureOr<void> onError(Object error, StackTrace stackTrace) async {
+    dev.log('Error occurred: $error', name: _log);
+  }
+
+  void onCancel() {
+    _subscription?.cancel();
+    _subscription = null;
   }
 }

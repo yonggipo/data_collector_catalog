@@ -1,14 +1,13 @@
-import 'dart:async';
+// ignore: unused_import
 import 'dart:developer' as dev;
 
-import 'package:data_collector_catalog/common/firebase_service.dart';
-import 'package:data_collector_catalog/common/local_db_service.dart';
+import 'package:data_collector_catalog/models/item.dart';
+import 'package:data_collector_catalog/models/sampling_interval.dart';
 import 'package:geolocator/geolocator.dart' as geo;
-// import 'package:location/location.dart';
 
 import '../../models/collector.dart';
 
-class LocationCollector extends Collector {
+class LocationCollector extends Collector2 {
   LocationCollector._() : super();
   static final shared = LocationCollector._();
   factory LocationCollector() => shared;
@@ -17,23 +16,32 @@ class LocationCollector extends Collector {
   static const _log = 'LocationCollector';
 
   @override
-  void onCollectStart() async {
-    super.onCollectStart();
-    dev.log('Start collection', name: _log);
+  Item get item => Item.location;
+
+  @override
+  String get messagePortName => _log;
+
+  @override
+  SamplingInterval get samplingInterval => SamplingInterval.min15;
+
+  @override
+  void collect() async {
+    sendMessageToPort(true);
 
     final setting = geo.AndroidSettings(accuracy: geo.LocationAccuracy.medium);
-    final position =
-        await geo.Geolocator.getCurrentPosition(locationSettings: setting);
+    final position = await geo.Geolocator.getCurrentPosition(
+      locationSettings: setting,
+    );
 
-    LocalDbService.sendMessageToSavePort('location', {
-      'latitude': position.latitude,
-      'longitude': position.longitude,
-      'altitude': position.altitude,
-      'accuracy': position.accuracy,
-      'speed': position.speed
+    sendMessageToPort(<String, dynamic>{
+      'location': <String, dynamic>{
+        'latitude': position.latitude,
+        'longitude': position.longitude,
+        'altitude': position.altitude,
+        'accuracy': position.accuracy,
+        'speed': position.speed
+      },
     });
-
-    // Call to calculate the remaining time
-    super.onCancel();
+    sendMessageToPort(false);
   }
 }

@@ -19,7 +19,7 @@ abstract class Collector2 {
 
   final _messagePort = ReceivePort();
   // ignore: unused_field
-  StreamSubscription? _messageSubscription;
+  StreamSubscription? messageSubscription;
   final progressNotifier = ValueNotifier<double>(1.0);
   final valueNotifier = ValueNotifier<dynamic>('loading..');
   final collectingNotifier = ValueNotifier<bool>(false);
@@ -30,7 +30,7 @@ abstract class Collector2 {
   Future<void> registerMessagePort() async {
     IsolateNameServer.registerPortWithName(
         _messagePort.sendPort, messagePortName);
-    _messageSubscription = _messagePort.listen(_onMessage);
+    messageSubscription = _messagePort.listen(_onMessage);
   }
 
   void sendMessageToPort(dynamic message) {

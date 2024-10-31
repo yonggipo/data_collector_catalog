@@ -1,13 +1,13 @@
-import 'dart:async';
+// ignore: unused_import
 import 'dart:developer' as dev;
 
 import 'package:battery_plus/battery_plus.dart';
 
-import '../../common/constants.dart';
-import '../../common/local_db_service.dart';
 import '../../models/collector.dart';
+import '../../models/item.dart';
+import '../../models/sampling_interval.dart';
 
-class BatteryCollector extends Collector {
+class BatteryCollector extends Collector2 {
   BatteryCollector._() : super();
   static final shared = BatteryCollector._();
   factory BatteryCollector() => shared;
@@ -16,18 +16,22 @@ class BatteryCollector extends Collector {
   final _battery = Battery();
 
   @override
-  Future<void> onCollectStart() async {
-    super.onCollectStart();
-    dev.log('onStart', name: _log);
-    final remaining = await _battery.batteryLevel;
-    final state = await _battery.batteryState;
-    onData({'remaining': remaining, 'state': state.name});
-  }
+  Item get item => Item.battery;
 
   @override
-  void onData(data) {
-    super.onData(data);
-    if (data is! Map) return;
-    // LocalDbService._save(data, Constants.battery);
+  String get messagePortName => _log;
+
+  @override
+  SamplingInterval get samplingInterval => SamplingInterval.h4;
+
+  @override
+  void collect() async {
+    sendMessageToPort(true);
+    final remaining = await _battery.batteryLevel;
+    final state = await _battery.batteryState;
+    sendMessageToPort(<String, dynamic>{
+      'battery': <String, dynamic>{'remaining': remaining, 'state': state.name}
+    });
+    sendMessageToPort(false);
   }
 }

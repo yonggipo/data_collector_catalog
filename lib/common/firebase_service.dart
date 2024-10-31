@@ -38,8 +38,18 @@ class FirebaseService {
   // clear root path
   Future<void> clear() async {
     final root = await _loadRoot();
-    dev.log("Clear $root data", name: _log);
+    // dev.log("Clear $root data", name: _log);
     // await _ref.remove();
+    var snapshot = await _ref.child("acc").limitToLast(100).get();
+    while (snapshot.exists) {
+      for (var child in snapshot.children) {
+        await _ref.child(child.key!).remove();
+      }
+      dev.log("remove 5 data", name: _log);
+      snapshot = await _ref.child("acc").limitToLast(100).get();
+    }
+    dev.log("Clear All data", name: _log);
+
     // return await _ref.child(root).remove().catchError((e) {
     //   dev.log("error: $e", name: _log);
     // });

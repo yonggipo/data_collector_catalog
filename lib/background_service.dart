@@ -2,7 +2,6 @@
 import 'dart:developer' as dev;
 import 'dart:io';
 import 'dart:isolate';
-import 'dart:ui';
 
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';

@@ -1,12 +1,14 @@
 // ignore: unused_import
 import 'dart:developer' as dev;
 
+import 'package:app_usage/app_usage.dart';
 import 'package:data_collector_catalog/models/collector_premission_state.dart';
 import 'package:data_collector_catalog/screens/data_collection_screen.dart';
 import 'package:data_collector_catalog/views/animation_check.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:notification_listener_service/notification_listener_service.dart';
 
 import '../common/constants.dart';
 import '../models/collection_item.dart';
@@ -38,6 +40,20 @@ class _PermissionStateScreenState extends State<PermissionStateScreen> {
     for (var item in items) {
       await item.requestRequired();
     }
+
+    final hasPermission =
+        await NotificationListenerService.isPermissionGranted();
+    if (!hasPermission) {
+      final isGranted = await NotificationListenerService.requestPermission();
+      dev.log('NotificationListenerService isGranted: $isGranted', name: _log);
+    }
+
+    final hasAppUsagePermission = await AppUsage.hasPermission();
+    if (!hasAppUsagePermission) {
+      final isGranted = await AppUsage.requestPermission();
+      dev.log('AppUsage isGranted: $isGranted', name: _log);
+    }
+
     setState(() {});
   }
 

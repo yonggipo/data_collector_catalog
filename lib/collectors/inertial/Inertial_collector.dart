@@ -1,9 +1,14 @@
-import 'package:data_collector_catalog/models/collector.dart';
-import 'package:data_collector_catalog/models/item.dart';
-import 'package:data_collector_catalog/models/sampling_interval.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
+import '../../models/collector.dart';
+import '../../models/item.dart';
+import '../../models/sampling_interval.dart';
+
 class InertialCollector extends Collector2 {
+  InertialCollector._() : super();
+  static final shared = InertialCollector._();
+  factory InertialCollector() => shared;
+
   @override
   Item get item => Item.sensorEvnets;
 
@@ -16,7 +21,7 @@ class InertialCollector extends Collector2 {
   @override
   Future<void> collect() async {
     sendMessageToPort(true);
-    final collection = <String, dynamic>{};
+
     // 중력의 영향을 포함한 장치의 가속도 (m/s²)
     final userAcc = await userAccelerometerEventStream()
         .firstWhere((e) => (e.x != 0) || (e.y != 0) || (e.z != 0));
@@ -30,7 +35,7 @@ class InertialCollector extends Collector2 {
     final mag = await magnetometerEventStream()
         .firstWhere((e) => (e.x != 0) || (e.y != 0) || (e.z != 0));
 
-    collection.addAll({
+    sendMessageToPort(<String, dynamic>{
       'user_accelerometer': <String, dynamic>{
         'x': userAcc.x,
         'z': userAcc.z,
@@ -41,6 +46,5 @@ class InertialCollector extends Collector2 {
       'magnetometer': <String, dynamic>{'x': mag.x, 'z': mag.z, 'y': mag.y}
     });
     sendMessageToPort(false);
-    sendMessageToPort(collection);
   }
 }

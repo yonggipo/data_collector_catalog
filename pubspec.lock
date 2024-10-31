@@ -9,6 +9,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.43"
+  app_usage:
+    dependency: "direct main"
+    description:
+      path: "../app_usage"
+      relative: true
+    source: path
+    version: "0.0.1"
   args:
     dependency: transitive
     description:
@@ -473,6 +480,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.15.0"
+  notification_listener_service:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "2500e0e72d10f435e07fc658d862a26b0275f64f"
+      url: "https://github.com/yonggipo/notification_listener_service"
+    source: git
+    version: "0.3.3"
   path:
     dependency: "direct main"
     description:
@@ -690,6 +706,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.3"
+  screen_state:
+    dependency: "direct main"
+    description:
+      path: "packages/screen_state"
+      ref: HEAD
+      resolved-ref: "69958041a17f74cbb9633fe0982036f6cb28580d"
+      url: "https://github.com/yonggipo/flutter-plugins"
+    source: git
+    version: "4.0.0"
   sensors_plus:
     dependency: "direct main"
     description:

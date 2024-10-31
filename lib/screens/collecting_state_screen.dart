@@ -34,7 +34,7 @@ class _CollectingStateScreenState extends State<CollectingStateScreen> {
     dev.log('${Isolate.current.hashCode} Register message port', name: _log);
     LocalDbService.registerBackgroundMessagePort();
     for (var e in collectors) {
-      await e.registerMessagePort();
+      if (e.messageSubscription == null) await e.registerMessagePort();
     }
     dev.log('${Isolate.current.hashCode} Run flutter background service',
         name: _log);

@@ -3,25 +3,39 @@ import 'dart:async';
 import 'dart:developer' as dev;
 import 'dart:io';
 
-import 'package:data_collector_catalog/common/firebase_service.dart';
-import 'package:watcher/watcher.dart';
 import 'package:path/path.dart' as p;
+import 'package:watcher/watcher.dart';
 
 import '../../models/collector.dart';
+import '../../models/item.dart';
+import '../../models/sampling_interval.dart';
 
-class DirectoryCollector extends Collector {
+class DirectoryCollector extends Collector2 {
   DirectoryCollector._() : super();
   static final shared = DirectoryCollector._();
   factory DirectoryCollector() => shared;
 
   static const _log = 'DirectoryCollector';
-
   List<StreamSubscription>? _subscriptions;
 
   @override
-  void onCollectStart() async {
-    super.onCollectStart();
-    dev.log('Start collection', name: _log);
+  Item get item => Item.directory;
+
+  @override
+  String get messagePortName => _log;
+
+  @override
+  SamplingInterval get samplingInterval => SamplingInterval.event;
+
+  @override
+  void collect() async {
+    sendMessageToPort(true);
+
+    // https://stackoverflow.com/questions/62974799/how-to-grant-permission-to-access-external-storage-in-flutter
+
+    // Don't use listSync(recursive:) the UI thread might get blocked
+    // https://stackoverflow.com/questions/76497379/pathaccessexception-issue-in-android-11-and-above
+
     final directories = [
       Directory('/storage/emulated/0/Download'),
       Directory('/storage/emulated/0/DCIM'),
@@ -37,49 +51,33 @@ class DirectoryCollector extends Collector {
       if (!guard) continue;
     }
 
-    //
-    // https://stackoverflow.com/questions/62974799/how-to-grant-permission-to-access-external-storage-in-flutter
-
-    // Don't use listSync(recursive:) the UI thread might get blocked
-    // https://stackoverflow.com/questions/76497379/pathaccessexception-issue-in-android-11-and-above
-
-    // final subDirectories = await directory.list().toList();
-    // dev.log('subDirectories: $subDirectories', name: _log);
-
     final watchers =
         directories.map((directory) => DirectoryWatcher(directory.path));
 
-    _subscriptions = watchers
+    _subscriptions ??= watchers
         .map((watcher) => watcher.events.listen(onData, onError: onError))
         .toList();
   }
 
-  @override
   void onData(data) {
-    super.onData(data);
-    switch (data.type) {
-      case ChangeType.ADD:
-        dev.log('File added: ${data.path}', name: _log);
-        break;
-      case ChangeType.REMOVE:
-        dev.log('File removed: ${data.path}', name: _log);
-        break;
-      case ChangeType.MODIFY:
-        dev.log('File modified: ${data.path}', name: _log);
-        break;
+    if (data is WatchEvent) {
+      final evnet = data;
+      sendMessageToPort(<String, dynamic>{
+        'directory(media)': <String, dynamic>{
+          'path': evnet.path,
+          'type': evnet.toString(),
+          'extension': p.extension(evnet.path),
+        }
+      });
     }
-
-    // Upload item to firebase
-    FirebaseService.shared.upload(path: 'media', map: {
-      'path': data.path,
-      'type': data.type.toString(),
-      'extension': p.extension(data.path),
-    });
+    sendMessageToPort(true);
   }
 
-  @override
+  FutureOr<void> onError(Object error, StackTrace stackTrace) async {
+    dev.log('Error occurred: $error', name: _log);
+  }
+
   void onCancel() {
-    super.onCancel();
     _subscriptions?.forEach((e) => e.cancel());
     _subscriptions = null;
   }

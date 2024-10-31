@@ -4,9 +4,7 @@ import 'dart:developer' as dev;
 import 'dart:isolate';
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'firebase_service.dart';
 
@@ -79,10 +77,14 @@ class LocalDbService {
   }
 
   static Future<void> save(String path, dynamic map) async {
-    dev.log('Save $path data', name: _log);
-    map['timestamp'] = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
-    final box = await _loadBox(path);
-    await box.add(map);
+    try {
+      dev.log('Save $path data: $map', name: _log);
+      map['timestamp'] = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
+      final box = await _loadBox(path);
+      await box.add(map);
+    } catch (e) {
+      dev.log('Error occurred: $e', name: _log);
+    }
   }
 
   static Future<int> count(String path) async {

@@ -4,36 +4,32 @@ import 'dart:developer' as dev;
 import 'package:flutter_activity_recognition/flutter_activity_recognition.dart';
 import 'package:pedometer/pedometer.dart';
 
-import '../../common/firebase_service.dart';
 import '../../models/collector.dart';
+import '../../models/item.dart';
+import '../../models/sampling_interval.dart';
 
-class HealthCollector extends Collector {
+class HealthCollector extends Collector2 {
   HealthCollector._() : super();
   static final shared = HealthCollector._();
   factory HealthCollector() => shared;
 
-  static const _log = 'Health';
+  static const _log = 'HealthCollector';
 
   final _recognizer = FlutterActivityRecognition.instance;
   List<StreamSubscription>? _subscriptions;
 
   @override
-  Future<bool> onRequest() async {
-    final permission = await _recognizer.requestPermission();
-    return (permission == ActivityPermission.GRANTED);
-  }
+  Item get item => Item.health;
 
   @override
-  Future<bool> onCheck() async {
-    final permission = await _recognizer.checkPermission();
-    return (permission == ActivityPermission.GRANTED);
-  }
+  String get messagePortName => _log;
 
   @override
-  void onCollectStart() {
-    super.onCollectStart();
-    dev.log('Start collection', name: _log);
+  SamplingInterval get samplingInterval => SamplingInterval.event;
 
+  @override
+  void collect() {
+    sendMessageToPort(true);
     _subscriptions ??= [
       _recognizer.activityStream.listen(onData, onError: onError),
       Pedometer.pedestrianStatusStream.listen(onData, onError: onError),
@@ -41,34 +37,30 @@ class HealthCollector extends Collector {
     ];
   }
 
-  @override
-  void onData(data) async {
-    super.onData(data);
-
-    // Upload item to firebase
+  void onData(dynamic data) {
     if (data is Activity) {
       final activity = data;
-      FirebaseService.shared
-          .upload(path: 'health/activity', map: activity.toJson())
-          .onError(onError);
+      sendMessageToPort(
+          <String, dynamic>{'physical_activity': activity.toJson()});
     } else if (data is StepCount) {
       final stepCount = data;
-      final map = {'stepCount': stepCount.steps};
-      FirebaseService.shared
-          .upload(path: 'health/step_count', map: map)
-          .onError(onError);
+      sendMessageToPort(<String, dynamic>{
+        'step_count': <String, dynamic>{'step': stepCount.steps}
+      });
     } else if (data is PedestrianStatus) {
       final status = data;
-      final map = {'status': status.status};
-      FirebaseService.shared
-          .upload(path: 'health/pedestrian_status', map: map)
-          .onError(onError);
+      sendMessageToPort(<String, dynamic>{
+        'pedestrian_status': <String, dynamic>{'status': status.status}
+      });
     }
+    sendMessageToPort(true);
   }
 
-  @override
+  FutureOr<void> onError(Object error, StackTrace stackTrace) async {
+    dev.log('Error occurred: $error', name: _log);
+  }
+
   void onCancel() {
-    super.onCancel();
     _subscriptions?.forEach((e) => e.cancel());
     _subscriptions = null;
   }

@@ -1,7 +1,7 @@
 // ignore: unused_import
 import 'dart:developer' as dev;
 
-import 'package:data_collector_catalog/collectors/application/application_collector.dart';
+import 'package:data_collector_catalog/collectors/app_usage/app_usage_collector.dart';
 import 'package:data_collector_catalog/collectors/battery/battery_collector.dart';
 import 'package:data_collector_catalog/collectors/bluetooth/bluetooth_collector.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -17,7 +17,7 @@ import 'package:data_collector_catalog/collectors/location/location_collector.da
 import 'package:data_collector_catalog/collectors/network/network_collector.dart';
 import 'package:data_collector_catalog/collectors/notification/notification_collector.dart';
 import 'package:data_collector_catalog/collectors/screen_state/screen_state_collector.dart';
-import 'package:data_collector_catalog/collectors/sensor/sensor_event_collector.dart';
+import 'package:data_collector_catalog/collectors/inertial/sensor_event_collector.dart';
 import 'package:data_collector_catalog/collectors/volume/volume_collector.dart';
 import 'package:data_collector_catalog/models/permission_list_ext.dart';
 
@@ -50,7 +50,6 @@ enum CollectionItem {
 extension CollectionItemGetters on CollectionItem {
   // ignore: unused_field
   static const _log = 'CollectionItemGetters';
-
 
   String get korean {
     switch (this) {
@@ -140,33 +139,33 @@ extension CollectionItemGetters on CollectionItem {
       case CollectionItem.sensorEvnets:
         return SensorEventCollector();
       case CollectionItem.location:
-        return LocationCollector();
+        return SensorEventCollector();
       case CollectionItem.environment:
-        return EnviromentCollector();
+        return SensorEventCollector();
       case CollectionItem.network:
-        return NetworkCollector();
+        return SensorEventCollector();
       case CollectionItem.microphone:
         return AudioCollector();
       case CollectionItem.health:
-        return HealthCollector();
+        return SensorEventCollector();
       case CollectionItem.calendar:
         return CalendarCollector();
       case CollectionItem.light:
         return LightCollector();
       case CollectionItem.notification:
-        return NotificationCollector();
+        return SensorEventCollector();
       case CollectionItem.directory:
-        return DirectoryCollector();
+        return SensorEventCollector();
       case CollectionItem.application:
-        return ApplicationCollector();
+        return SensorEventCollector();
       case CollectionItem.volume:
-        return VolumeCollector();
+        return SensorEventCollector();
       case CollectionItem.screenState:
-        return ScreenStateCollector();
+        return SensorEventCollector();
       case CollectionItem.battery:
-        return BatteryCollector();
+        return SensorEventCollector();
       case CollectionItem.callLog:
-        return CallLogCollector();
+        return SensorEventCollector();
       case CollectionItem.bluetooth:
         return BluetoothCollector();
       default:
@@ -198,6 +197,8 @@ extension CollectionItemGetters on CollectionItem {
         return [Permission.locationWhenInUse];
       case CollectionItem.network:
         return [Permission.locationWhenInUse];
+      case CollectionItem.health:
+        return [Permission.activityRecognition];
       case CollectionItem.microphone:
         return Device.shared.isAboveAndroid9
             ? [Permission.microphone]
@@ -221,12 +222,10 @@ extension CollectionItemGetters on CollectionItem {
 
   bool get isNeedCustomPermission {
     return [
-      // CollectionItem.location,
-      CollectionItem.health,
       CollectionItem.notification,
       // CollectionItem.callLog,
       CollectionItem.application,
-    ].contains(this);                                             
+    ].contains(this);
   }
 
   // Status of the required permissions in the collector

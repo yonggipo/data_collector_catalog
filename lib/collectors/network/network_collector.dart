@@ -1,11 +1,13 @@
+// ignore: unused_import
 import 'dart:developer' as dev;
 
 import 'package:wifi_iot/wifi_iot.dart';
 
-import '../../common/firebase_service.dart';
 import '../../models/collector.dart';
+import '../../models/item.dart';
+import '../../models/sampling_interval.dart';
 
-class NetworkCollector extends Collector {
+class NetworkCollector extends Collector2 {
   NetworkCollector._() : super();
   static final NetworkCollector shared = NetworkCollector._();
   factory NetworkCollector() => shared;
@@ -13,9 +15,17 @@ class NetworkCollector extends Collector {
   static const _log = 'NetworkCollector';
 
   @override
-  void onCollectStart() async {
-    super.onCollectStart();
-    dev.log('Start collection', name: _log);
+  Item get item => Item.network;
+
+  @override
+  String get messagePortName => _log;
+
+  @override
+  SamplingInterval get samplingInterval => SamplingInterval.min5;
+
+  @override
+  Future<void> collect() async {
+    sendMessageToPort(true);
 
     final String? ssid = await WiFiForIoTPlugin.getSSID();
     final String? bssid = await WiFiForIoTPlugin.getBSSID();
@@ -23,15 +33,14 @@ class NetworkCollector extends Collector {
         await WiFiForIoTPlugin.getCurrentSignalStrength();
     final int? frequency = await WiFiForIoTPlugin.getFrequency();
 
-    // Upload item to firebase
-    FirebaseService.shared.upload(path: 'network', map: {
-      'ssid': ssid,
-      'bssid': bssid,
-      'signalStrength': signalStrength,
-      'frequency': frequency,
+    sendMessageToPort(<String, dynamic>{
+      'network': <String, dynamic>{
+        'ssid': ssid,
+        'bssid': bssid,
+        'signalStrength': signalStrength,
+        'frequency': frequency,
+      },
     });
-
-    // Call to calculate the remaining time
-    super.onCancel();
+    sendMessageToPort(false);
   }
 }
