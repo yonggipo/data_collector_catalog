@@ -1,3 +1,11 @@
+import 'package:app_usage/app_usage.dart';
+import 'package:data_collector_catalog/models/permissions_getter.dart';
+import 'package:notification_listener_service/notification_listener_service.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:record/record.dart';
+
+import '../common/device.dart';
+
 enum Item {
   sensorEvnets,
   location,
@@ -12,9 +20,8 @@ enum Item {
   directory,
   appUsage,
   bluetooth,
-
-  microphone,
-  calendar;
+  calendar,
+  microphone;
   
   String get category {
     switch (this) {
@@ -31,9 +38,8 @@ enum Item {
       case Item.directory: return '경로(미디어)';
       case Item.appUsage: return '어플리케이션';
       case Item.bluetooth: return '블루투스';
-
-      case Item.microphone: return '오디오';
       case Item.calendar: return '켈린더';
+      case Item.microphone: return '오디오';
     }
   }
 
@@ -52,9 +58,8 @@ enum Item {
       case Item.directory: return '디렉토리, 확장자';
       case Item.appUsage: return '앱 카테고리, 이름';
       case Item.bluetooth: return 'MAC주소, CoD, 신호 강도';
-
-      case Item.microphone: return 'audio m4a';
       case Item.calendar: return '일정';
+      case Item.microphone: return 'audio m4a';
     }
   }
 
@@ -73,9 +78,41 @@ enum Item {
       case Item.directory: return ['directory(media)'];
       case Item.appUsage: return ['app_usage'];
       case Item.bluetooth: return ['bluetooth'];
+      case Item.calendar: return ['calendar'];
+      case Item.microphone: return ['microphone'];
+    }
+  }
 
-      case Item.microphone: return [];
-      case Item.calendar: return [];
+  List<Permission> get permissions {
+    switch (this) {
+      case Item.location: return [Permission.locationWhenInUse];
+      case Item.network: return [Permission.locationWhenInUse];
+      case Item.health: return [Permission.activityRecognition];
+      case Item.callLog: return [Permission.phone];
+      case Item.directory: return (Device.shared.andSdk! >= 33)
+            ? [Permission.manageExternalStorage]
+            : ((Device.shared.andSdk! >= 23) ? [Permission.storage] : []);
+      case Item.bluetooth: return (Device.shared.andSdk! >= 31)
+            ? [Permission.bluetoothScan, Permission.bluetoothConnect]
+            : ((Device.shared.andSdk! <= 28) ? [] : []);
+      case Item.calendar: return [Permission.calendarFullAccess];
+      case Item.microphone: return Device.shared.isAboveAndroid9
+            ? [Permission.microphone]
+            : [Permission.microphone, Permission.storage];
+      default:
+        return [];
+    }
+  }
+
+  Future<bool> get hasPermission async {
+    if (this == Item.calendar) {
+      return AppUsage.hasPermission();
+    } else if (this == Item.notification) {
+      return NotificationListenerService.isPermissionGranted();
+    } else if (this == Item.microphone) {
+      return  AudioRecorder().hasPermission();
+    } else {
+      return permissions.areGranted;
     }
   }
 }

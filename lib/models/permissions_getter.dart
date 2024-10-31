@@ -1,7 +1,8 @@
 import 'dart:developer' as dev;
+
 import 'package:permission_handler/permission_handler.dart';
 
-extension PermissionListExt on List<Permission> {
+extension PermissionsGetter on List<Permission> {
   static const _log = 'PermissionListExt';
 
   Future<bool> get areGranted async {

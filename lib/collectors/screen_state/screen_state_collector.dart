@@ -7,7 +7,7 @@ import '../../models/item.dart';
 import '../../models/collector.dart';
 import '../../models/sampling_interval.dart';
 
-class ScreenStateCollector extends Collector2 {
+class ScreenStateCollector extends Collector {
   ScreenStateCollector._() : super();
   static final ScreenStateCollector shared = ScreenStateCollector._();
   factory ScreenStateCollector() => shared;

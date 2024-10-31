@@ -8,7 +8,7 @@ import 'package:notification_listener_service/notification_listener_service.dart
 
 import '../../models/collector.dart';
 
-final class NotificationCollector extends Collector2 {
+final class NotificationCollector extends Collector {
   NotificationCollector._() : super();
   static final NotificationCollector shared = NotificationCollector._();
   factory NotificationCollector() => shared;

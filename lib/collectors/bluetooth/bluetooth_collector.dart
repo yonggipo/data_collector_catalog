@@ -7,7 +7,7 @@ import '../../models/collector.dart';
 import '../../models/item.dart';
 import '../../models/sampling_interval.dart';
 
-class BluetoothCollector extends Collector2 {
+class BluetoothCollector extends Collector {
   BluetoothCollector._() : super();
   static final shared = BluetoothCollector._();
   factory BluetoothCollector() => shared;

@@ -5,8 +5,6 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
-import 'constants.dart';
-
 @override
 Future<void> upload(String filePath, dynamic file) async {
   // var formData = FormData.fromMap({

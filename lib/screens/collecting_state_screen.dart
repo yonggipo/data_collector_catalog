@@ -90,7 +90,7 @@ class _CollectingStateScreenState extends State<CollectingStateScreen> {
     );
   }
 
-  Widget _createCollectStateView(Collector2 collector) {
+  Widget _createCollectStateView(Collector collector) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),

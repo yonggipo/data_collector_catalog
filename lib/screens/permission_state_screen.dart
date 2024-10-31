@@ -2,16 +2,16 @@
 import 'dart:developer' as dev;
 
 import 'package:app_usage/app_usage.dart';
-import 'package:data_collector_catalog/models/collector_premission_state.dart';
-import 'package:data_collector_catalog/screens/data_collection_screen.dart';
-import 'package:data_collector_catalog/views/animation_check.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:notification_listener_service/notification_listener_service.dart';
 
+import '../collectors/audio/audio_collector.dart';
 import '../common/constants.dart';
-import '../models/collection_item.dart';
+import '../models/item.dart';
+import '../models/permissions_getter.dart';
+import '../views/animation_check.dart';
 import 'collecting_state_screen.dart';
 
 class PermissionStateScreen extends StatefulWidget {
@@ -36,25 +36,33 @@ class _PermissionStateScreenState extends State<PermissionStateScreen> {
   }
 
   void _requestRequiredPermissions() async {
-    final items = CollectionItem.values;
-    for (var item in items) {
-      await item.requestRequired();
-    }
-
-    final hasPermission =
-        await NotificationListenerService.isPermissionGranted();
-    if (!hasPermission) {
-      final isGranted = await NotificationListenerService.requestPermission();
-      dev.log('NotificationListenerService isGranted: $isGranted', name: _log);
-    }
-
-    final hasAppUsagePermission = await AppUsage.hasPermission();
-    if (!hasAppUsagePermission) {
-      final isGranted = await AppUsage.requestPermission();
-      dev.log('AppUsage isGranted: $isGranted', name: _log);
-    }
-
+    final allGranted = await _requestAllPermission();
+    dev.log('allGranted: $allGranted', name: _log);
     setState(() {});
+  }
+
+  Future<bool> _requestAllPermission() async {
+    bool isNotiGranted;
+    isNotiGranted = await NotificationListenerService.isPermissionGranted();
+    if (!isNotiGranted) isNotiGranted = await NotificationListenerService.requestPermission();
+    dev.log('isNotiGranted: $isNotiGranted', name: _log);
+
+    bool isAppUsageGranted;
+    isAppUsageGranted = await AppUsage.hasPermission();
+    if (!isAppUsageGranted) isAppUsageGranted = await AppUsage.requestPermission();
+    dev.log('isAppUsageGranted: $isAppUsageGranted', name: _log);
+
+    bool isAudioGranted;
+    isAudioGranted = await AudioCollector.shared.hasPermission();
+    if (!isAudioGranted) isAudioGranted = await AudioCollector.shared.hasPermission();
+    dev.log('isAudioGranted: $isAudioGranted', name: _log);
+
+    final permissions = Item.values.expand((e) => e.permissions).toList();
+    bool areGranted =
+        (permissions.isEmpty) ? true : await permissions.requestRequired();
+    dev.log('areGranted: $areGranted', name: _log);
+
+    return (isNotiGranted && isAppUsageGranted && areGranted);
   }
 
   @override
@@ -78,20 +86,20 @@ class _PermissionStateScreenState extends State<PermissionStateScreen> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: ListView.builder(
-                itemCount: CollectionItem.values.length,
+                itemCount: Item.values.length,
                 itemBuilder: (context, index) {
-                  final item = CollectionItem.values[index];
+                  final item = Item.values[index];
                   return SizedBox(
                     height: 44,
                     child: Row(
                       children: [
                         Gap(20),
                         FutureBuilder(
-                          future: item.permissionStatus,
+                          future: item.hasPermission,
                           builder: (context, snapshot) =>
-                              (snapshot.data?.isValid ?? false)
+                              (snapshot.data ?? false)
                                   ? Text(
-                                      item.korean,
+                                      item.category,
                                       style: TextStyle(
                                         fontFamily: Constants.pretendard,
                                         fontSize: 16,
@@ -102,7 +110,7 @@ class _PermissionStateScreenState extends State<PermissionStateScreen> {
                                       ),
                                     )
                                   : Text(
-                                      item.korean,
+                                      item.category,
                                       style: TextStyle(
                                         fontFamily: Constants.pretendard,
                                         fontSize: 16,
@@ -112,9 +120,9 @@ class _PermissionStateScreenState extends State<PermissionStateScreen> {
                         ),
                         Spacer(),
                         FutureBuilder(
-                          future: item.permissionStatus,
+                          future: item.hasPermission,
                           builder: (context, snapshot) =>
-                              (snapshot.data?.isValid ?? false)
+                              (snapshot.data ?? false)
                                   ? SizedBox(
                                       width: 40,
                                       height: 40,
@@ -182,21 +190,3 @@ class _PermissionStateScreenState extends State<PermissionStateScreen> {
     );
   }
 }
-
-// FutureBuilder(
-//         future: _getPermissionRequiredItems(),
-//         builder: (context, snapshot) {
-//           if (snapshot.connectionState == ConnectionState.waiting) {
-//             return const CircularProgressIndicator();
-//           } else {
-//             final items = snapshot.data ?? [];
-//             return ListView.builder(
-//               itemCount: items.length,
-//               itemBuilder: (BuildContext context, int index) {
-//                 final item = items[index];
-//                 return Text(item.name);
-//               },
-//             );
-//           }
-//         },
-//       )

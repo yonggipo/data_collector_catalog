@@ -7,7 +7,7 @@ import '../../models/collector.dart';
 import '../../models/item.dart';
 import '../../models/sampling_interval.dart';
 
-class CallLogCollector extends Collector2 {
+class CallLogCollector extends Collector {
   CallLogCollector._() : super();
   static final shared = CallLogCollector._();
   factory CallLogCollector() => shared;

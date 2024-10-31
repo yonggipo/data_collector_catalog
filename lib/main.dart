@@ -3,12 +3,14 @@ import 'dart:developer' as dev;
 import 'dart:isolate';
 
 import 'package:data_collector_catalog/collectors/app_usage/app_usage_collector.dart';
+import 'package:data_collector_catalog/collectors/bluetooth/bluetooth_collector.dart';
+import 'package:data_collector_catalog/collectors/calendar/calendar_collector.dart';
 import 'package:data_collector_catalog/collectors/directory/directory_collector.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import 'background_service.dart';
+import 'common/background_service.dart';
 import 'collectors/battery/battery_collector.dart';
 import 'collectors/call_log/call_log_collector.dart';
 import 'collectors/enviroment/enviroment_collector.dart';
@@ -22,7 +24,7 @@ import 'collectors/volume/volume_collector.dart';
 import 'common/device.dart';
 import 'common/firebase_service.dart';
 import 'common/local_db_service.dart';
-import 'firebase_options.dart';
+import 'common/firebase_options.dart';
 import 'models/collector.dart';
 import 'screens/permission_state_screen.dart';
 import 'screens/user_inlet_screen.dart';
@@ -50,7 +52,7 @@ Future<void> main() async {
   runApp(MaterialApp(home: home));
 }
 
-final List<Collector2> collectors = [
+final List<Collector> collectors = [
   InertialCollector(),
   LocationCollector(),
   EnviromentCollector(),
@@ -63,6 +65,8 @@ final List<Collector2> collectors = [
   NotificationCollector(),
   DirectoryCollector(),
   AppUsageCollector(),
+  BluetoothCollector(),
+  CalendarCollector(),
 ];
 
 Future<void> onCollect() async {

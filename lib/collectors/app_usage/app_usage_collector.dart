@@ -7,7 +7,7 @@ import '../../models/collector.dart';
 import '../../models/item.dart';
 import '../../models/sampling_interval.dart';
 
-class AppUsageCollector extends Collector2 {
+class AppUsageCollector extends Collector {
   AppUsageCollector._() : super();
   static final shared = AppUsageCollector._();
   factory AppUsageCollector() => shared;

@@ -8,7 +8,7 @@ import '../../models/collector.dart';
 import '../../models/item.dart';
 import '../../models/sampling_interval.dart';
 
-class HealthCollector extends Collector2 {
+class HealthCollector extends Collector {
   HealthCollector._() : super();
   static final shared = HealthCollector._();
   factory HealthCollector() => shared;

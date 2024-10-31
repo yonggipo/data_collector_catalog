@@ -10,7 +10,7 @@ import '../../models/collector.dart';
 import '../../models/item.dart';
 import '../../models/sampling_interval.dart';
 
-class DirectoryCollector extends Collector2 {
+class DirectoryCollector extends Collector {
   DirectoryCollector._() : super();
   static final shared = DirectoryCollector._();
   factory DirectoryCollector() => shared;

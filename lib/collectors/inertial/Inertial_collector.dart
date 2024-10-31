@@ -4,7 +4,7 @@ import '../../models/collector.dart';
 import '../../models/item.dart';
 import '../../models/sampling_interval.dart';
 
-class InertialCollector extends Collector2 {
+class InertialCollector extends Collector {
   InertialCollector._() : super();
   static final shared = InertialCollector._();
   factory InertialCollector() => shared;

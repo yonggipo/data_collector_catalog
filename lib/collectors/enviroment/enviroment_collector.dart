@@ -7,7 +7,7 @@ import '../../models/collector.dart';
 import '../../models/item.dart';
 import '../../models/sampling_interval.dart';
 
-class EnviromentCollector extends Collector2 {
+class EnviromentCollector extends Collector {
   EnviromentCollector._() : super();
   static final shared = EnviromentCollector._();
   factory EnviromentCollector() => shared;

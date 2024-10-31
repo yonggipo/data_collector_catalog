@@ -6,7 +6,7 @@ import 'dart:isolate';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-import 'main.dart';
+import '../main.dart';
 
 const _notificationChannelId = 'catalog_channel_id';
 const _notificationChannelName = 'catalog_channel_name';

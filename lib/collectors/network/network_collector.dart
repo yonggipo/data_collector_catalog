@@ -7,7 +7,7 @@ import '../../models/collector.dart';
 import '../../models/item.dart';
 import '../../models/sampling_interval.dart';
 
-class NetworkCollector extends Collector2 {
+class NetworkCollector extends Collector {
   NetworkCollector._() : super();
   static final NetworkCollector shared = NetworkCollector._();
   factory NetworkCollector() => shared;

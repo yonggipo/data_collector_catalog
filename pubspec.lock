@@ -63,6 +63,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  calendar_watcher:
+    dependency: "direct main"
+    description:
+      path: "../calendar_watcher"
+      relative: true
+    source: path
+    version: "0.0.1"
   characters:
     dependency: transitive
     description:

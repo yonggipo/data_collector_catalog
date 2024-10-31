@@ -7,7 +7,7 @@ import '../../models/collector.dart';
 import '../../models/item.dart';
 import '../../models/sampling_interval.dart';
 
-final class VolumeCollector extends Collector2 {
+final class VolumeCollector extends Collector {
   static const _log = 'VolumeCollector';
 
   VolumeCollector._() : super();

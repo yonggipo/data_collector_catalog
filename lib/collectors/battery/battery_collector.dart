@@ -7,7 +7,7 @@ import '../../models/collector.dart';
 import '../../models/item.dart';
 import '../../models/sampling_interval.dart';
 
-class BatteryCollector extends Collector2 {
+class BatteryCollector extends Collector {
   BatteryCollector._() : super();
   static final shared = BatteryCollector._();
   factory BatteryCollector() => shared;

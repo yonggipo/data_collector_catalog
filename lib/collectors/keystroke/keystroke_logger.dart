@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import '../../models/collector.dart';
 import 'key_event_listener.dart';
 
-final class KeystrokeLogger extends Collector {
+final class KeystrokeLogger {
   KeystrokeLogger._() : super();
   static final KeystrokeLogger shared = KeystrokeLogger._();
   factory KeystrokeLogger() => shared;

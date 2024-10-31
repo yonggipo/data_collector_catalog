@@ -7,7 +7,7 @@ import 'package:geolocator/geolocator.dart' as geo;
 
 import '../../models/collector.dart';
 
-class LocationCollector extends Collector2 {
+class LocationCollector extends Collector {
   LocationCollector._() : super();
   static final shared = LocationCollector._();
   factory LocationCollector() => shared;

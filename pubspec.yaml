@@ -52,6 +52,8 @@ dependencies:
     path: ../app_usage
   blue_info:
     path: ../blue_info
+  calendar_watcher:
+    path: ../calendar_watcher
 
 dev_dependencies:
   flutter_test:

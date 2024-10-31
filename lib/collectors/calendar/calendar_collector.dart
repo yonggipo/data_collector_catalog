@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'dart:developer' as dev;
-import 'dart:ui';
 
+import 'package:calendar_watcher/calendar_watcher.dart';
 import 'package:device_calendar/device_calendar.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart';
 
 import '../../models/collector.dart';
-import 'calendar_adaptor.dart';
+import '../../models/item.dart';
+import '../../models/sampling_interval.dart';
 import 'calendar_evnet.dart';
 
 class CalendarCollector extends Collector {
@@ -20,34 +19,37 @@ class CalendarCollector extends Collector {
   StreamSubscription? _subscription;
 
   @override
-  void onCollectStart() async {
-    super.onCollectStart();
-    dev.log('onStart', name: _log);
-    _subscription = CalendarAdaptor.stream().listen(onData, onError: onError);
-  }
+  Item get item => Item.calendar;
 
   @override
-  void onData(data) {
-    super.onData(data);
-    dev.log('Calendar has been changed', name: _log);
-    // await _uploadEvents();
+  String get messagePortName => _log;
+
+  @override
+  SamplingInterval get samplingInterval => SamplingInterval.event;
+
+  @override
+  void collect() {
+    sendMessageToPort(true);
+    _subscription = CalendarWatcher.stream.listen(onData, onError: onError);
   }
 
-  Future<void> _uploadEvents() async {
-    final evnets = await _fetchAllCalendarEvents();
-    for (var event in evnets) {
-      // Upload item to firebase
-      await Firebase.initializeApp();
-      final ref = FirebaseDatabase.instance.ref();
-      await ref
-          .child("calendar")
-          .child('events')
-          .push()
-          .set(event.toMap())
-          .catchError((e) {
-        dev.log('error: $e', name: _log);
-      });
-    }
+  void onData(data) async {
+    dev.log('Calendar has been changed', name: _log);
+    final events = await _fetchAllCalendarEvents();
+    final maps = events.map((e) => e.toMap);
+    sendMessageToPort(<String, dynamic>{
+      'calendar': <String, dynamic>{'events': maps}
+    });
+    sendMessageToPort(true);
+  }
+
+  FutureOr<void> onError(Object error, StackTrace stackTrace) async {
+    dev.log('Error occurred: $error', name: _log);
+  }
+
+  void onCancel() {
+    _subscription?.cancel();
+    _subscription = null;
   }
 
   Future<List<CalendarEvent>> _fetchAllCalendarEvents() async {
@@ -69,7 +71,6 @@ class CalendarCollector extends Collector {
             .retrieveCalendars()
             .then((r) => r.data?.cast<Calendar>()) ??
         [];
-
     return calendars.where((c) {
       dev.log("calendar name: ${c.name}, id: ${c.id}", name: _log);
       final name = c.name;
@@ -89,11 +90,5 @@ class CalendarCollector extends Collector {
   bool _validateCalendarName(String name) {
     final emailRegex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$';
     return RegExp(emailRegex).hasMatch(name);
-  }
-
-  @override
-  void onCancel() {
-    _subscription?.cancel();
-    _subscription = null;
   }
 }

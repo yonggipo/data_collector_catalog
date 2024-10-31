@@ -5,10 +5,9 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:record/record.dart';
 
-import '../../common/constants.dart';
-import '../../common/firebase_service.dart';
-import '../../common/local_db_service.dart';
 import '../../models/collector.dart';
+import '../../models/item.dart';
+import '../../models/sampling_interval.dart';
 
 final class AudioCollector extends Collector {
   AudioCollector._() : super();
@@ -21,8 +20,34 @@ final class AudioCollector extends Collector {
   StreamSubscription? _subscription;
 
   @override
-  Future<bool> onRequest() async {
-    return await record.hasPermission();
+  Item get item => Item.microphone;
+
+  @override
+  String get messagePortName => _log;
+
+  @override
+  SamplingInterval get samplingInterval => SamplingInterval.min15;
+
+  @override
+  void collect() async {
+    sendMessageToPort(true);
+    final filePath = await getAudioFilePath();
+    const recordConfig = RecordConfig(encoder: AudioEncoder.aacLc);
+    await record.start(recordConfig, path: filePath);
+    await Future.delayed(Duration(minutes: 1));
+    final path = await record.stop() ?? 'error';
+    sendMessageToPort(<String, dynamic>{
+      'microphone': <String, dynamic>{'path': path}
+    });
+    sendMessageToPort(false);
+  }
+
+  Future<bool> hasPermission() {
+    return record.hasPermission();
+  }
+
+  Future<bool> requestPermission() {
+    return record.hasPermission();
   }
 
   static const _baseDir =
@@ -51,30 +76,7 @@ final class AudioCollector extends Collector {
     return p.join(audioDir.path, fileName);
   }
 
-  @override
-  void onCollectStart() async {
-    super.onCollectStart();
-    dev.log('onStart', name: _log);
-    final filePath = await getAudioFilePath();
-    const recordConfig = RecordConfig(encoder: AudioEncoder.aacLc);
-    await record.start(recordConfig, path: filePath);
-    await Future.delayed(Duration(minutes: 1));
-    final path = await record.stop() ?? 'error';
-    final Map<String, dynamic> map = {'path': path};
-    onData(map);
-  }
-
-  @override
-  void onData(data) {
-    super.onData(data);
-    if (data is! Map) return;
-    // LocalDbService._save(data, Constants.audio);
-  }
-
-  @override
-  void onCancel() async {
-    super.onCancel();
-
+  void onCancel() {
     _subscription?.cancel();
     _subscription = null;
 
