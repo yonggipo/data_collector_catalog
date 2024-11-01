@@ -25,8 +25,8 @@ class CallLogCollector extends Collector {
   SamplingInterval get samplingInterval => SamplingInterval.event;
 
   @override
-  void collect() {
-    sendMessageToPort(true);
+  void onCollect() async {
+    super.onCollect();
     _subscription = PhoneState.stream
         .where((e) => e.number != null)
         .listen(onData, onError: onError);
@@ -35,13 +35,13 @@ class CallLogCollector extends Collector {
   void onData(data) {
     if (data is PhoneState) {
       final log = data;
-      sendMessageToPort(<String, dynamic>{
+      sendMessageToMainPort(<String, dynamic>{
         'call_log': <String, dynamic>{
           'status': log.status.name,
           'phoneNumber': log.number
         }
       });
-      sendMessageToPort(true);
+      sendMessageToMainPort(true);
     }
   }
 

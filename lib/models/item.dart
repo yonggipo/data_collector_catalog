@@ -83,7 +83,8 @@ enum Item {
     }
   }
 
-  List<Permission> get permissions {
+  // 위치 네트워크 건강 전화기록 알림 경로 어플리케이션 블루투스 캘린더 오디오 
+  List<Permission> get permissions { 
     switch (this) {
       case Item.location: return [Permission.locationWhenInUse];
       case Item.network: return [Permission.locationWhenInUse];
@@ -109,8 +110,6 @@ enum Item {
       return AppUsage.hasPermission();
     } else if (this == Item.notification) {
       return NotificationListenerService.isPermissionGranted();
-    } else if (this == Item.microphone) {
-      return AudioRecorder().hasPermission();
     } else {
       return permissions.areGranted;
     }

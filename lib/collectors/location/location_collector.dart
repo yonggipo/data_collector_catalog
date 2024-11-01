@@ -4,8 +4,6 @@ import 'dart:developer' as dev;
 import 'package:data_collector_catalog/models/item.dart';
 import 'package:data_collector_catalog/models/sampling_interval.dart';
 import 'package:geolocator/geolocator.dart' as geo;
-import 'package:permission_handler/permission_handler.dart';
-
 import '../../models/collector.dart';
 
 class LocationCollector extends Collector {
@@ -26,17 +24,28 @@ class LocationCollector extends Collector {
   SamplingInterval get samplingInterval => SamplingInterval.min15;
 
   @override
-  void collect() async {
-    sendMessageToPort(true);
+  void onCollect() async {
+    final hasPermission = await item.hasPermission;
+    if (!hasPermission) {
+      sendMessageToMainPort(false);
+      sendMessageToMainPort('Permission is required');
+      return;
+    }
+
     final isServiceEnabled = await geo.Geolocator.isLocationServiceEnabled();
-    final hasPermission = await Permission.locationWhenInUse.isGranted;
-    if (!isServiceEnabled || !hasPermission) return;
+    if (!isServiceEnabled) {
+      sendMessageToMainPort(false);
+      sendMessageToMainPort('Location service is required');
+      return;
+    }
+
+    sendMessageToMainPort(true);
     final setting = geo.AndroidSettings(accuracy: geo.LocationAccuracy.medium);
     final position = await geo.Geolocator.getCurrentPosition(
       locationSettings: setting,
     );
 
-    sendMessageToPort(<String, dynamic>{
+    sendMessageToMainPort(<String, dynamic>{
       'location': <String, dynamic>{
         'latitude': position.latitude,
         'longitude': position.longitude,
@@ -45,6 +54,6 @@ class LocationCollector extends Collector {
         'speed': position.speed
       },
     });
-    sendMessageToPort(false);
+    sendMessageToMainPort(false);
   }
 }

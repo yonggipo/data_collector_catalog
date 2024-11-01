@@ -28,26 +28,28 @@ class CalendarCollector extends Collector {
   SamplingInterval get samplingInterval => SamplingInterval.event;
 
   @override
-  void collect() {
-    sendMessageToPort(true);
+  void onCollect() {
+    super.onCollect();
     _subscription = CalendarWatcher.stream.listen(onData, onError: onError);
   }
 
   void onData(data) async {
     dev.log('Calendar has been changed', name: _log);
     final events = await _fetchAllCalendarEvents();
-    final maps = events.map((e) => e.toMap);
-    sendMessageToPort(<String, dynamic>{
+    final maps = events.map((e) => e.toMap()).toList();
+    sendMessageToMainPort(<String, dynamic>{
       'calendar': <String, dynamic>{'events': maps}
     });
-    sendMessageToPort(true);
+    sendMessageToMainPort(true);
   }
 
   FutureOr<void> onError(Object error, StackTrace stackTrace) async {
     dev.log('Error occurred: $error', name: _log);
   }
 
+  @override
   void onCancel() {
+    super.onCancel();
     _subscription?.cancel();
     _subscription = null;
   }

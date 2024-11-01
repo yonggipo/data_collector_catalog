@@ -16,15 +16,34 @@ abstract class Collector {
   Item get item;
   String get messagePortName;
   SamplingInterval get samplingInterval;
-  void collect();
+  void onCancel() {}
 
+  void onCollect() async {
+    final hasPermission = await item.hasPermission;
+    if (!hasPermission) {
+      isOn = false;
+      sendMessageToMainPort(false);
+      sendMessageToMainPort('Permission is required');
+      onCancel();
+      return;
+    }
+
+    isOn = true;
+    sendMessageToMainPort(true);
+    sendMessageToMainPort('Waiting evnet..');
+  }
+
+  // Isolate variable
+  final _cron = Cron();
+  var isOn = false;
+
+  // Main Isolate variable
   final _messagePort = ReceivePort();
   // ignore: unused_field
   StreamSubscription? messageSubscription;
   final progressNotifier = ValueNotifier<double>(1.0);
-  final valueNotifier = ValueNotifier<dynamic>('Waiting permission..');
+  final messageNotifier = ValueNotifier<dynamic>('Loading..');
   final collectingNotifier = ValueNotifier<bool>(false);
-  final _cron = Cron();
   Timer? _timer;
   double _progressValue = 0;
 
@@ -34,24 +53,34 @@ abstract class Collector {
     messageSubscription = _messagePort.listen(_onMessage);
   }
 
-  void sendMessageToPort(dynamic message) {
+  void sendMessageToMainPort(dynamic message) {
     IsolateNameServer.lookupPortByName(messagePortName)?.send(message);
   }
 
   Future<void> _onMessage(dynamic message) async {
+    if (message is String) {
+      if (message == '_updateCountLabel') {
+        _updateCountLabel();
+      } else {
+        messageNotifier.value = message;
+      }
+    }
+
     if (message is bool) message ? _resetTracker() : _trackReminderTime();
-    // if (message is Map<String, dynamic>) valueNotifier.value = message;
 
     if (message is Map<String, dynamic>) {
       final map = message;
-      var entries = <String>[];
       for (var k in map.keys) {
         await LocalDbService.save(k, map[k]);
-        final count = await LocalDbService.count(k);
-        entries.add('${k.substring(0, 3)}: $count');
       }
-      valueNotifier.value = entries.join(', ');
+      _updateCountLabel();
     }
+  }
+
+  Future<void> _updateCountLabel() async {
+    final path = item.paths.first;
+    final count = await LocalDbService.count(path);
+    messageNotifier.value = 'count: $count';
   }
 
   void _resetTracker() {
@@ -63,7 +92,9 @@ abstract class Collector {
   void _trackReminderTime() {
     collectingNotifier.value = false;
     _progressValue = 0;
-    _tracking(samplingInterval.duration);
+    if (samplingInterval != SamplingInterval.event) {
+      _tracking(samplingInterval.duration);
+    }
   }
 
   void _tracking(Duration duration) {
@@ -77,12 +108,16 @@ abstract class Collector {
   }
 
   void start() {
-    collect();
+    onCollect();
     // 이후 주기적으로 시작
     if (samplingInterval != SamplingInterval.event) {
       final min = samplingInterval.duration.inMinutes;
       final schedule = Schedule.parse('*/$min * * * *');
-      _cron.schedule(schedule, () => collect());
+      _cron.schedule(schedule, () => onCollect());
     }
+  }
+
+  void updateUI() {
+    sendMessageToMainPort('_updateCountLabel');
   }
 }

@@ -26,16 +26,16 @@ class BluetoothCollector extends Collector {
   SamplingInterval get samplingInterval => SamplingInterval.event;
 
   @override
-  void collect() {
-    sendMessageToPort(true);
+  void onCollect() {
+    super.onCollect();
     _subscription = BlueInfo.stream.listen(onData, onError: onError);
   }
 
   void onData(dynamic data) {
     if (data is Map<String, dynamic>) {
       final blueInfo = data;
-      sendMessageToPort(<String, dynamic>{'bluetooth': blueInfo});
-      sendMessageToPort(true);
+      sendMessageToMainPort(<String, dynamic>{'bluetooth': blueInfo});
+      sendMessageToMainPort(true);
     }
   }
 
@@ -43,7 +43,9 @@ class BluetoothCollector extends Collector {
     dev.log('Error occurred: $error', name: _log);
   }
 
+  @override
   void onCancel() {
+    super.onCancel();
     _subscription?.cancel();
     _subscription = null;
   }

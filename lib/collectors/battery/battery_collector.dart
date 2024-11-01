@@ -25,13 +25,13 @@ class BatteryCollector extends Collector {
   SamplingInterval get samplingInterval => SamplingInterval.h4;
 
   @override
-  void collect() async {
-    sendMessageToPort(true);
+  void onCollect() async {
+    super.onCollect();
     final remaining = await _battery.batteryLevel;
     final state = await _battery.batteryState;
-    sendMessageToPort(<String, dynamic>{
+    sendMessageToMainPort(<String, dynamic>{
       'battery': <String, dynamic>{'remaining': remaining, 'state': state.name}
     });
-    sendMessageToPort(false);
+    sendMessageToMainPort(false);
   }
 }

@@ -19,8 +19,8 @@ class InertialCollector extends Collector {
   SamplingInterval get samplingInterval => SamplingInterval.min15;
 
   @override
-  Future<void> collect() async {
-    sendMessageToPort(true);
+  Future<void> onCollect() async {
+    super.onCollect();
 
     // 중력의 영향을 포함한 장치의 가속도 (m/s²)
     final userAcc = await userAccelerometerEventStream()
@@ -35,7 +35,7 @@ class InertialCollector extends Collector {
     final mag = await magnetometerEventStream()
         .firstWhere((e) => (e.x != 0) || (e.y != 0) || (e.z != 0));
 
-    sendMessageToPort(<String, dynamic>{
+    sendMessageToMainPort(<String, dynamic>{
       'user_accelerometer': <String, dynamic>{
         'x': userAcc.x,
         'z': userAcc.z,
@@ -45,6 +45,6 @@ class InertialCollector extends Collector {
       'gyroscope': <String, dynamic>{'x': gyr.x, 'z': gyr.z, 'y': gyr.y},
       'magnetometer': <String, dynamic>{'x': mag.x, 'z': mag.z, 'y': mag.y}
     });
-    sendMessageToPort(false);
+    sendMessageToMainPort(false);
   }
 }

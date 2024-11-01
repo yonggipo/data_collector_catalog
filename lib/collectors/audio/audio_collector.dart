@@ -29,25 +29,18 @@ final class AudioCollector extends Collector {
   SamplingInterval get samplingInterval => SamplingInterval.min15;
 
   @override
-  void collect() async {
-    sendMessageToPort(true);
+  void onCollect() async {
+    super.onCollect();
+
     final filePath = await getAudioFilePath();
     const recordConfig = RecordConfig(encoder: AudioEncoder.aacLc);
     await record.start(recordConfig, path: filePath);
     await Future.delayed(Duration(minutes: 1));
     final path = await record.stop() ?? 'error';
-    sendMessageToPort(<String, dynamic>{
+    sendMessageToMainPort(<String, dynamic>{
       'microphone': <String, dynamic>{'path': path}
     });
-    sendMessageToPort(false);
-  }
-
-  Future<bool> hasPermission() {
-    return record.hasPermission();
-  }
-
-  Future<bool> requestPermission() {
-    return record.hasPermission();
+    sendMessageToMainPort(false);
   }
 
   static const _baseDir =
@@ -76,7 +69,9 @@ final class AudioCollector extends Collector {
     return p.join(audioDir.path, fileName);
   }
 
+  @override
   void onCancel() {
+    super.onCancel();
     _subscription?.cancel();
     _subscription = null;
 

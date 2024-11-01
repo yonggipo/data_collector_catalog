@@ -28,8 +28,8 @@ class DirectoryCollector extends Collector {
   SamplingInterval get samplingInterval => SamplingInterval.event;
 
   @override
-  void collect() async {
-    sendMessageToPort(true);
+  void onCollect() async {
+    super.onCollect();
 
     // https://stackoverflow.com/questions/62974799/how-to-grant-permission-to-access-external-storage-in-flutter
 
@@ -62,7 +62,7 @@ class DirectoryCollector extends Collector {
   void onData(data) {
     if (data is WatchEvent) {
       final evnet = data;
-      sendMessageToPort(<String, dynamic>{
+      sendMessageToMainPort(<String, dynamic>{
         'directory(media)': <String, dynamic>{
           'path': evnet.path,
           'type': evnet.toString(),
@@ -70,14 +70,16 @@ class DirectoryCollector extends Collector {
         }
       });
     }
-    sendMessageToPort(true);
+    sendMessageToMainPort(true);
   }
 
   FutureOr<void> onError(Object error, StackTrace stackTrace) async {
     dev.log('Error occurred: $error', name: _log);
   }
 
+  @override
   void onCancel() {
+    super.onCancel();
     _subscriptions?.forEach((e) => e.cancel());
     _subscriptions = null;
   }

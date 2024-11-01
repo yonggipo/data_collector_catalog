@@ -27,8 +27,8 @@ class ScreenStateCollector extends Collector {
   SamplingInterval get samplingInterval => SamplingInterval.event;
 
   @override
-  void collect() {
-    sendMessageToPort(true);
+  void onCollect() {
+    super.onCollect();
     _subscription = _screen.screenStateStream.map((e) {
       switch (e.name) {
         case 'android.intent.action.USER_PRESENT':
@@ -44,18 +44,20 @@ class ScreenStateCollector extends Collector {
   void onData(data) {
     if (data is String?) {
       final screenState = data;
-      sendMessageToPort(<String, dynamic>{
+      sendMessageToMainPort(<String, dynamic>{
         'screen_state': <String, dynamic>{'state': screenState}
       });
+      sendMessageToMainPort(true);
     }
-    sendMessageToPort(true);
   }
 
   FutureOr<void> onError(Object error, StackTrace stackTrace) async {
     dev.log('Error occurred: $error', name: _log);
   }
 
+  @override
   void onCancel() {
+    super.onCancel();
     _subscription?.cancel();
     _subscription = null;
   }

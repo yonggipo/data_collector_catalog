@@ -3,10 +3,12 @@ import 'dart:developer' as dev;
 import 'dart:io';
 import 'dart:isolate';
 
+import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../main.dart';
+import 'device.dart';
 
 const _notificationChannelId = 'catalog_channel_id';
 const _notificationChannelName = 'catalog_channel_name';
@@ -74,7 +76,9 @@ Future<void> initializeBackgroundService() async {
 void _onBackgroundServiceStart(ServiceInstance service) async {
   dev.log('${Isolate.current.hashCode} Start background service',
       name: _backgroundServiceLog);
-  // DartPluginRegistrant.ensureInitialized();
+
+  await Device.shared.checkAndroidVersion();
+
   service.on('stopService').listen((event) => service.stopSelf());
 
   if (service is AndroidServiceInstance) {
@@ -84,6 +88,8 @@ void _onBackgroundServiceStart(ServiceInstance service) async {
     service
         .on('setAsBackground')
         .listen((event) => service.setAsBackgroundService());
+
+    service.on('onCollectRequired').listen((event) => onCollectRequired());
 
     final isForeground = await service.isForegroundService();
     if (isForeground) {

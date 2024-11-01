@@ -26,8 +26,8 @@ final class VolumeCollector extends Collector {
   SamplingInterval get samplingInterval => SamplingInterval.event;
 
   @override
-  void collect() {
-    sendMessageToPort(true);
+  void onCollect() {
+    super.onCollect();
     _subscriptions ??= [
       RealVolume.onRingerModeChanged.listen(onData, onError: onError),
       RealVolume.onVolumeChanged.listen(onData, onError: onError),
@@ -37,26 +37,29 @@ final class VolumeCollector extends Collector {
   void onData(dynamic data) {
     if (data is RingerMode) {
       final ringerMode = data;
-      sendMessageToPort(<String, dynamic>{
+      sendMessageToMainPort(<String, dynamic>{
         'ringer_mode': <String, dynamic>{'mode': ringerMode.name}
       });
+      sendMessageToMainPort(true);
     } else if (data is VolumeObj) {
       final volume = data;
-      sendMessageToPort(<String, dynamic>{
+      sendMessageToMainPort(<String, dynamic>{
         'volume': <String, dynamic>{
           'level': volume.volumeLevel,
           'type': volume.streamType?.name
         }
       });
+      sendMessageToMainPort(true);
     }
-    sendMessageToPort(true);
   }
 
   FutureOr<void> onError(Object error, StackTrace stackTrace) async {
     dev.log('Error occurred: $error', name: _log);
   }
 
+  @override
   void onCancel() {
+    super.onCancel();
     _subscriptions?.forEach((e) => e.cancel());
     _subscriptions = null;
   }

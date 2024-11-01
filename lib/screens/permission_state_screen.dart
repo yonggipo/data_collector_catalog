@@ -44,21 +44,13 @@ class _PermissionStateScreenState extends State<PermissionStateScreen> {
   Future<bool> _requestAllPermission() async {
     bool isNotiGranted;
     isNotiGranted = await NotificationListenerService.isPermissionGranted();
-    if (!isNotiGranted)
-      isNotiGranted = await NotificationListenerService.requestPermission();
+    if (!isNotiGranted) isNotiGranted = await NotificationListenerService.requestPermission();
     dev.log('isNotiGranted: $isNotiGranted', name: _log);
 
     bool isAppUsageGranted;
     isAppUsageGranted = await AppUsage.hasPermission();
-    if (!isAppUsageGranted)
-      isAppUsageGranted = await AppUsage.requestPermission();
+    if (!isAppUsageGranted) isAppUsageGranted = await AppUsage.requestPermission();
     dev.log('isAppUsageGranted: $isAppUsageGranted', name: _log);
-
-    bool isAudioGranted;
-    isAudioGranted = await AudioCollector.shared.hasPermission();
-    if (!isAudioGranted)
-      isAudioGranted = await AudioCollector.shared.hasPermission();
-    dev.log('isAudioGranted: $isAudioGranted', name: _log);
 
     final permissions = Item.values.expand((e) => e.permissions).toList();
     bool areGranted =

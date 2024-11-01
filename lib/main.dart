@@ -90,3 +90,19 @@ Future<void> onCollect() async {
     e.start();
   }
 }
+
+Future<void> onCollectRequired() async {
+  dev.log(
+      '${Isolate.current.hashCode} Start collecting required in background service',
+      name: _log);
+  final runningCollectors = collectors.where((e) => e.isOn);
+  for (var e in runningCollectors) {
+    e.updateUI();
+  }
+
+  final waitingCollectors = collectors.where((e) => !(e.isOn));
+  for (var e in waitingCollectors) {
+    dev.log('Start to collect ${e.item.name}', name: _log);
+    e.start();
+  }
+}

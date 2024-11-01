@@ -26,19 +26,16 @@ final class NotificationCollector extends Collector {
   SamplingInterval get samplingInterval => SamplingInterval.event;
 
   @override
-  void collect() async {
-    final isGranted = await NotificationListenerService.isPermissionGranted();
-    if (isGranted) {
-      sendMessageToPort(true);
-      _subscription = NotificationListenerService.notificationsStream
-          .listen(onData, onError: onError);
-    }
+  void onCollect() async {
+    super.onCollect();
+    _subscription = NotificationListenerService.notificationsStream
+        .listen(onData, onError: onError);
   }
 
   void onData(data) async {
     if (data is ServiceNotificationEvent) {
       final notification = data;
-      sendMessageToPort(<String, dynamic>{
+      sendMessageToMainPort(<String, dynamic>{
         'notification': <String, dynamic>{
           'id': notification.id,
           'hasRemoved': notification.hasRemoved,
@@ -47,7 +44,7 @@ final class NotificationCollector extends Collector {
           'content': notification.content,
         }
       });
-      sendMessageToPort(true);
+      sendMessageToMainPort(true);
     }
   }
 
@@ -55,7 +52,9 @@ final class NotificationCollector extends Collector {
     dev.log('Error occurred: $error', name: _log);
   }
 
+  @override
   void onCancel() {
+    super.onCancel();
     _subscription?.cancel();
     _subscription = null;
   }

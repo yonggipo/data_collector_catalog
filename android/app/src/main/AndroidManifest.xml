@@ -83,13 +83,11 @@
 
         <!-- BluetoothBroadcastReceiver -->
         <receiver        
-            android:name="com.kane.blue_Info.BlueInfoBroadcastReceiver"
+            android:name="com.kane.blue_info.BlueInfoBroadcastReceiver"
             android:exported="true">
             <intent-filter>
-                <!-- <action android:name="android.bluetooth.device.action.FOUND"/>  -->
                 <action android:name="android.bluetooth.device.action.ACL_CONNECTED"/>
                 <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED"/>
-                <!-- <action android:name="android.bluetooth.adapter.action.CONNECTION_STATE_CHANGED"/> -->
             </intent-filter>
         </receiver>
 

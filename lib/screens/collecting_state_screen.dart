@@ -45,6 +45,9 @@ class _CollectingStateScreenState extends State<CollectingStateScreen> {
         service.startService().then((isStart) {
           dev.log('Is service start: $isStart', name: _log);
         });
+      } else {
+        dev.log('Already service running: $isRunning', name: _log);
+        service.invoke('onCollectRequired');
       }
     });
   }
@@ -56,7 +59,7 @@ class _CollectingStateScreenState extends State<CollectingStateScreen> {
         await LocalDbService.upload(p);
       }
       setState(() {
-        e.valueNotifier.value = 'All data sent waiting collect..';
+        e.messageNotifier.value = 'All data sent waiting collect..';
       });
     }
   }
@@ -155,7 +158,7 @@ class _CollectingStateScreenState extends State<CollectingStateScreen> {
                       ],
                     ),
                     ValueListenableBuilder(
-                      valueListenable: collector.valueNotifier,
+                      valueListenable: collector.messageNotifier,
                       builder: (context, value, child) => Text(value ?? ''),
                     ),
                   ],

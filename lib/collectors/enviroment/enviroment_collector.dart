@@ -26,8 +26,8 @@ class EnviromentCollector extends Collector {
   SamplingInterval get samplingInterval => SamplingInterval.min15;
 
   @override
-  void collect() async {
-    sendMessageToPort(true);
+  void onCollect() async {
+    sendMessageToMainPort(true);
 
     final tempAvailable =
         await _sensors.getSensorAvailable(SensorType.AmbientTemperature);
@@ -43,7 +43,7 @@ class EnviromentCollector extends Collector {
     final pre = (pressureAvailable) ? await _sensors.pressure.first : null;
     final lux = (lightAvailable) ? await _sensors.light.first : null;
 
-    sendMessageToPort(<String, dynamic>{
+    sendMessageToMainPort(<String, dynamic>{
       'enviroment': <String, dynamic>{
         'temperature': tem,
         'humidity': hum,
@@ -51,6 +51,6 @@ class EnviromentCollector extends Collector {
         'light': lux,
       },
     });
-    sendMessageToPort(false);
+    sendMessageToMainPort(false);
   }
 }

@@ -25,22 +25,18 @@ class AppUsageCollector extends Collector {
   SamplingInterval get samplingInterval => SamplingInterval.event;
 
   @override
-  void collect() async {
-    final hasPermission = await onCheck();
-    dev.log('hasPermission: $hasPermission', name: _log);
-    if (hasPermission) {
-      sendMessageToPort(true);
-      _subscription =
-          AppUsage.stream.distinct().listen(onData, onError: onError);
-    }
+  void onCollect() async {
+    super.onCollect();
+
+    _subscription = AppUsage.stream.distinct().listen(onData, onError: onError);
   }
 
   void onData(data) {
     dev.log('data: $data', name: _log);
     if (data is Map<String, dynamic>) {
       final appUsage = data;
-      sendMessageToPort(<String, dynamic>{'app_usage': appUsage});
-      sendMessageToPort(true);
+      sendMessageToMainPort(<String, dynamic>{'app_usage': appUsage});
+      sendMessageToMainPort(true);
     }
   }
 
@@ -56,7 +52,9 @@ class AppUsageCollector extends Collector {
     return AppUsage.requestPermission();
   }
 
+  @override
   void onCancel() {
+    super.onCancel();
     _subscription?.cancel();
     _subscription = null;
   }

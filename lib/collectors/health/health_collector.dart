@@ -28,8 +28,9 @@ class HealthCollector extends Collector {
   SamplingInterval get samplingInterval => SamplingInterval.event;
 
   @override
-  void collect() {
-    sendMessageToPort(true);
+  void onCollect() async {
+    super.onCollect();
+
     _subscriptions ??= [
       _recognizer.activityStream.listen(onData, onError: onError),
       Pedometer.pedestrianStatusStream.listen(onData, onError: onError),
@@ -40,21 +41,21 @@ class HealthCollector extends Collector {
   void onData(dynamic data) {
     if (data is Activity) {
       final activity = data;
-      sendMessageToPort(
+      sendMessageToMainPort(
           <String, dynamic>{'physical_activity': activity.toJson()});
-      sendMessageToPort(true);
+      sendMessageToMainPort(true);
     } else if (data is StepCount) {
       final stepCount = data;
-      sendMessageToPort(<String, dynamic>{
+      sendMessageToMainPort(<String, dynamic>{
         'step_count': <String, dynamic>{'step': stepCount.steps}
       });
-      sendMessageToPort(true);
+      sendMessageToMainPort(true);
     } else if (data is PedestrianStatus) {
       final status = data;
-      sendMessageToPort(<String, dynamic>{
+      sendMessageToMainPort(<String, dynamic>{
         'pedestrian_status': <String, dynamic>{'status': status.status}
       });
-      sendMessageToPort(true);
+      sendMessageToMainPort(true);
     }
   }
 
@@ -62,7 +63,9 @@ class HealthCollector extends Collector {
     dev.log('Error occurred: $error', name: _log);
   }
 
+  @override
   void onCancel() {
+    super.onCancel();
     _subscriptions?.forEach((e) => e.cancel());
     _subscriptions = null;
   }

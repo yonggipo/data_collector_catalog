@@ -24,8 +24,8 @@ class NetworkCollector extends Collector {
   SamplingInterval get samplingInterval => SamplingInterval.min5;
 
   @override
-  Future<void> collect() async {
-    sendMessageToPort(true);
+  Future<void> onCollect() async {
+    super.onCollect();
 
     final String? ssid = await WiFiForIoTPlugin.getSSID();
     final String? bssid = await WiFiForIoTPlugin.getBSSID();
@@ -33,7 +33,7 @@ class NetworkCollector extends Collector {
         await WiFiForIoTPlugin.getCurrentSignalStrength();
     final int? frequency = await WiFiForIoTPlugin.getFrequency();
 
-    sendMessageToPort(<String, dynamic>{
+    sendMessageToMainPort(<String, dynamic>{
       'network': <String, dynamic>{
         'ssid': ssid,
         'bssid': bssid,
@@ -41,6 +41,6 @@ class NetworkCollector extends Collector {
         'frequency': frequency,
       },
     });
-    sendMessageToPort(false);
+    sendMessageToMainPort(false);
   }
 }
