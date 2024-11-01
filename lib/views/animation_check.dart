@@ -7,7 +7,7 @@ class AnimatedCheck extends StatefulWidget {
   const AnimatedCheck({
     this.size = 100,
     this.animate = true,
-    this.color = Colors.blue,
+    this.color = const Color(0x9f4376f8),
     super.key,
   });
 
@@ -44,8 +44,8 @@ class _AnimatedCheckState extends State<AnimatedCheck>
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      foregroundPainter:
-          AnimatedPathPainter(_animation, widget.color ?? Colors.blue),
+      foregroundPainter: AnimatedPathPainter(
+          _animation, widget.color ?? const Color(0x9f4376f8)),
       child: SizedBox(width: widget.size, height: widget.size),
     );
   }

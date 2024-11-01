@@ -1,11 +1,11 @@
-import 'package:data_collector_catalog/common/firebase_service.dart';
-import 'package:data_collector_catalog/screens/permission_state_screen.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 import 'dart:developer' as dev;
 
+import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+
+import "permission_state_screen.dart";
 import '../common/constants.dart';
+import '../common/firebase_service.dart';
 
 class UserInletScreen extends StatefulWidget {
   const UserInletScreen({super.key});
@@ -54,11 +54,22 @@ class _UserInletScreenState extends State<UserInletScreen> {
 
   Future<void> _moveToPermissionsScreen(
       BuildContext context, String username) async {
-    showCupertinoDialog(
+    showDialog(
       context: context,
-      builder: (context) {
-        return Center(
-          child: CupertinoActivityIndicator(radius: 20),
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text("Loading..."),
+              ],
+            ),
+          ),
         );
       },
     );
@@ -67,7 +78,7 @@ class _UserInletScreenState extends State<UserInletScreen> {
     await FirebaseService.shared.setRoot(username);
     Navigator.of(context).pop();
     Navigator.of(context).push(
-      CupertinoPageRoute(
+      MaterialPageRoute(
         builder: (context) => PermissionStateScreen(),
       ),
     );
@@ -75,12 +86,18 @@ class _UserInletScreenState extends State<UserInletScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        backgroundColor: Colors.white,
-        middle: const Text('User Inlet Screen'),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'User Registration',
+          style: TextStyle(
+            fontFamily: Constants.pretendard,
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
       ),
-      child: Center(
+      body: Center(
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -88,16 +105,19 @@ class _UserInletScreenState extends State<UserInletScreen> {
             children: [
               SizedBox(
                 height: 48,
-                child: CupertinoTextField(
+                child: TextField(
                   controller: _controller,
-                  placeholder: '이름을 입력해주세요',
-                  textAlign: TextAlign.center,
-                  placeholderStyle: TextStyle(
-                    fontFamily: Constants.pretendard,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: Color(0x993C3C43),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: '이름을 입력해주세요',
+                    hintStyle: TextStyle(
+                      fontFamily: Constants.pretendard,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0x993C3C43),
+                    ),
                   ),
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: Constants.pretendard,
                     fontSize: 16,
@@ -106,13 +126,16 @@ class _UserInletScreenState extends State<UserInletScreen> {
                 ),
               ),
               Gap(16),
-              CupertinoButton(
+              FilledButton.tonal(
+                style: FilledButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
                 onPressed:
                     _isButtonDisabled ? null : () => _createUser(context),
-                color: Color(0xFF4C71F5),
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8.0),
                 child: Text(
-                  '유저 생성',
+                  '유저 등록',
                   style: TextStyle(
                     fontFamily: Constants.pretendard,
                     fontSize: 16,

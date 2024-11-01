@@ -22,7 +22,7 @@ abstract class Collector {
   // ignore: unused_field
   StreamSubscription? messageSubscription;
   final progressNotifier = ValueNotifier<double>(1.0);
-  final valueNotifier = ValueNotifier<dynamic>('loading..');
+  final valueNotifier = ValueNotifier<dynamic>('Waiting permission..');
   final collectingNotifier = ValueNotifier<bool>(false);
   final _cron = Cron();
   Timer? _timer;

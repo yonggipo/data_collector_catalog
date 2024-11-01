@@ -4,6 +4,7 @@ import 'dart:developer' as dev;
 import 'package:data_collector_catalog/models/item.dart';
 import 'package:data_collector_catalog/models/sampling_interval.dart';
 import 'package:geolocator/geolocator.dart' as geo;
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../models/collector.dart';
 
@@ -27,7 +28,9 @@ class LocationCollector extends Collector {
   @override
   void collect() async {
     sendMessageToPort(true);
-
+    final isServiceEnabled = await geo.Geolocator.isLocationServiceEnabled();
+    final hasPermission = await Permission.locationWhenInUse.isGranted;
+    if (!isServiceEnabled || !hasPermission) return;
     final setting = geo.AndroidSettings(accuracy: geo.LocationAccuracy.medium);
     final position = await geo.Geolocator.getCurrentPosition(
       locationSettings: setting,

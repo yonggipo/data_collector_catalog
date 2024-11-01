@@ -44,17 +44,20 @@ class _PermissionStateScreenState extends State<PermissionStateScreen> {
   Future<bool> _requestAllPermission() async {
     bool isNotiGranted;
     isNotiGranted = await NotificationListenerService.isPermissionGranted();
-    if (!isNotiGranted) isNotiGranted = await NotificationListenerService.requestPermission();
+    if (!isNotiGranted)
+      isNotiGranted = await NotificationListenerService.requestPermission();
     dev.log('isNotiGranted: $isNotiGranted', name: _log);
 
     bool isAppUsageGranted;
     isAppUsageGranted = await AppUsage.hasPermission();
-    if (!isAppUsageGranted) isAppUsageGranted = await AppUsage.requestPermission();
+    if (!isAppUsageGranted)
+      isAppUsageGranted = await AppUsage.requestPermission();
     dev.log('isAppUsageGranted: $isAppUsageGranted', name: _log);
 
     bool isAudioGranted;
     isAudioGranted = await AudioCollector.shared.hasPermission();
-    if (!isAudioGranted) isAudioGranted = await AudioCollector.shared.hasPermission();
+    if (!isAudioGranted)
+      isAudioGranted = await AudioCollector.shared.hasPermission();
     dev.log('isAudioGranted: $isAudioGranted', name: _log);
 
     final permissions = Item.values.expand((e) => e.permissions).toList();
@@ -67,11 +70,10 @@ class _PermissionStateScreenState extends State<PermissionStateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        backgroundColor: Colors.white,
-        middle: const Text(
-          '권한 설정',
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Premission Setting',
           style: TextStyle(
             fontFamily: Constants.pretendard,
             fontSize: 16,
@@ -79,7 +81,7 @@ class _PermissionStateScreenState extends State<PermissionStateScreen> {
           ),
         ),
       ),
-      child: Column(
+      body: Column(
         children: [
           Gap(20),
           Expanded(
@@ -147,35 +149,41 @@ class _PermissionStateScreenState extends State<PermissionStateScreen> {
                 Expanded(
                   child: SizedBox(
                     height: 48,
-                    child: CupertinoButton(
+                    child: FilledButton.tonal(
+                      style: FilledButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                       onPressed: _requestRequiredPermissions,
-                      color: Color(0xFF4C71F5),
-                      padding: EdgeInsets.zero,
                       child: Text(
                         '권한 재요청',
                         style: TextStyle(
                           fontFamily: Constants.pretendard,
                           fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
                     ),
                   ),
                 ),
-                Gap(8.0),
+                Gap(16),
                 Expanded(
                   child: SizedBox(
                     height: 48,
-                    child: CupertinoButton(
+                    child: FilledButton.tonal(
+                      style: FilledButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                       onPressed: () => _moveToCollectStateScreen(context),
-                      color: Color(0xFF4C71F5),
-                      padding: EdgeInsets.zero,
                       child: Text(
                         '데이터 수집',
                         style: TextStyle(
                           fontFamily: Constants.pretendard,
                           fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
                     ),

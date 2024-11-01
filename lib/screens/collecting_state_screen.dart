@@ -64,6 +64,16 @@ class _CollectingStateScreenState extends State<CollectingStateScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Collecting State',
+          style: TextStyle(
+            fontFamily: Constants.pretendard,
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(

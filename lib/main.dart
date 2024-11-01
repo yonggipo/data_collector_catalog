@@ -49,7 +49,21 @@ Future<void> main() async {
 
   final isUserIn = await LocalDbService.isUserIn();
   final home = isUserIn ? PermissionStateScreen() : UserInletScreen();
-  runApp(MaterialApp(home: home));
+  runApp(
+    MaterialApp(
+      theme: ThemeData(
+        colorSchemeSeed: const Color(0x9f4376f8),
+      ),
+      // ThemeData(
+      //   colorScheme: ColorScheme.fromSeed(
+      //     seedColor: Colors.white,
+      //     brightness: Brightness.light,
+      //   ),
+      // ),
+      debugShowCheckedModeBanner: false,
+      home: home,
+    ),
+  );
 }
 
 final List<Collector> collectors = [
